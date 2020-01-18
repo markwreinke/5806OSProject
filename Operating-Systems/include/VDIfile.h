@@ -25,7 +25,7 @@ class VDIfile
 
         struct VDIFileX *vdiOpen(char *fn)
         {
-               ofstream OpenFile;
+                ofstream OpenFile;
                 OpenFile.open(fn);
                 if(OpenFile.is_open())
                 {
