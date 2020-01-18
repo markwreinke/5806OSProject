@@ -6,13 +6,14 @@
 #include <fstream>
 using namespace std;
 
-class VDIfile
-{
+class VDIfile {
     public:
         int ArraySize=1;
 
 
         VDIfile();
+
+
         VDIfile(int NewSize);
         virtual ~VDIfile();
 
