@@ -1,0 +1,12 @@
+# depslib dependency file v1.0
+1579238814 source:c:\users\chase hovel\documents\assignments\operating-systems\main.cpp
+	<iostream>
+	<iomanip>
+	<VDIfile.h>
+
+1579242089 c:\users\chase hovel\documents\assignments\operating-systems\include\vdifile.h
+	<stdint.h>
+	<sys/types.h>
+	<iostream>
+	<fstream>
+
