@@ -11,7 +11,7 @@ VDIfile::VDIfile(int NewSize)
     VDITransMapPointer = new int{ArraySize};
     Cursor = 0;
 }
-/*struct VDIfile::VDIFileX *vdiOpen(char *fn)
+struct VDIFileX VDIfile::*vdiOpen(char *fn)
 {
     ofstream OpenFile;
     OpenFile.open(fn);
@@ -24,7 +24,7 @@ VDIfile::VDIfile(int NewSize)
         return nullptr;
 
 
-};*/
+};
 void VDIfile::vdiClose(struct VDIfileX *f)
 {
 

@@ -1,10 +1,15 @@
 # depslib dependency file v1.0
-1579315567 source:c:\users\chase hovel\documents\assignments\operating-systems\main.cpp
+1579378009 source:c:\users\chase hovel\documents\assignments\operating-systems\main.cpp
 	<iostream>
 	<iomanip>
 	<VDIfile.h>
 	"step_0.h"
+	<errno.h>
+	<string.h>
 	<fcntl.h>
+	<unistd.h>
+	<stdio.h>
+	<stdlib.h>
 
 1579314045 c:\users\chase hovel\documents\assignments\operating-systems\include\vdifile.h
 	<stdint.h>
@@ -12,17 +17,18 @@
 	<iostream>
 	<fstream>
 
-1579315011 c:\users\chase hovel\documents\assignments\operating-systems\include\step_0.h
+1579374414 c:\users\chase hovel\documents\assignments\operating-systems\include\step_0.h
 	<stdint.h>
 	<sys/types.h>
 	<iostream>
 	<iomanip>
 	<fcntl.h>
 	<fstream>
+	<unistd.h>
 
-1579320381 source:c:\users\chase hovel\documents\assignments\operating-systems\src\step_0.cpp
+1579377198 source:c:\users\chase hovel\documents\assignments\operating-systems\src\step_0.cpp
 	"step_0.h"
 
-1579315752 source:c:\users\chase hovel\documents\assignments\operating-systems\src\vdifile.cpp
+1579372135 source:c:\users\chase hovel\documents\assignments\operating-systems\src\vdifile.cpp
 	"VDIfile.h"
 
