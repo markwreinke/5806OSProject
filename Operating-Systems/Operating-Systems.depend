@@ -1,9 +1,8 @@
 # depslib dependency file v1.0
-1579378009 source:c:\users\chase hovel\documents\assignments\operating-systems\main.cpp
+1579380409 source:c:\users\chase hovel\documents\assignments\operating-systems\main.cpp
 	<iostream>
 	<iomanip>
 	<VDIfile.h>
-	"step_0.h"
 	<errno.h>
 	<string.h>
 	<fcntl.h>
