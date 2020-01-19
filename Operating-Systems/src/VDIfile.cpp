@@ -1,4 +1,4 @@
-#include "..\include\VDIfile.h"
+#include "VDIfile.h"
 
 VDIfile::VDIfile()
 {
