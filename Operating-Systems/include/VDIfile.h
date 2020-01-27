@@ -47,7 +47,7 @@ class VDIfile {
     protected:
 
     private:
-        int Descriptor;
+        int Descriptor{};
         size_t Cursor;
         //int VDITransMapPointer;
 

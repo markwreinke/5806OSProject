@@ -1,9 +1,11 @@
-#include "include/VDIfile.h"
+#include "../include/VDIfile.h"
+
 
 VDIfile::VDIfile()
 {
     VDITransMapPointer = new int{ArraySize};
     Cursor = 0;
+
 }
 VDIfile::VDIfile(int NewSize)
 {

@@ -3,4 +3,4 @@ project(5806OSProject)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(5806OSProject main.cpp)
+add_executable(5806OSProject main.cpp src/StepZDebug.cpp include/StepZDebug.h)
