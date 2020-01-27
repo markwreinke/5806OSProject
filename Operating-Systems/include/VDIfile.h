@@ -4,23 +4,29 @@
 #include <sys/types.h>
 #include <iostream>
 #include <fstream>
+#include <string>
+
 using namespace std;
 
 class VDIfile {
     public:
-        int ArraySize=1;
-
-
+        int ArraySize = 1;
         VDIfile();
-
-
         VDIfile(int NewSize);
+
         virtual ~VDIfile();
 
-        struct VDIHeader
-        {
-            uint16_t preheader;
-            uint64_t Descriptor;
+
+        /* This struct holds all of the VDI file header information */
+        struct VDIHeaderInfo {
+            string imageName;
+            uint32_t  u32Signature;
+            float version; //todo Idk if float is what we want here or not? I'm not sure if this is the same as line 231 in the virtualbox.org/browser/vbox/trunk/src/VBox/Storage/VDICore.h
+            uint32_t cbHeaderSize; // header structure in bytes.
+            uint32_t imageType; // line 132 "u32Type"
+            uint32_t fFlags; // line 139
+
+
 
         };
 
@@ -36,6 +42,8 @@ class VDIfile {
                 else
                     return nullptr;
         };
+
+
         void vdiClose(struct VDIfileX *f);
         ssize_t vdiRead(struct VDIfileX *f, void *buf, size_t count);
         ssize_t vdiWrite(struct VDIFileX *f, void *buf, size_t count);
