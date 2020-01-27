@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include "utilityUUID.h"
 
 using namespace std;
 
@@ -26,11 +27,36 @@ class VDIfile {
             uint32_t imageType; // line 132 "u32Type"
             uint32_t fFlags; // line 139
 
+            /* todo not sure what this stuff is
+             * Virtual CHS
+             * Sector size
+             * Logical chs
+             * sector size
+             * map offset
+             * frame offset
+             * frame size
+             * extra frame size
+             * total frames
+             * frames allocated
+             *
+             */
+
+
+            uint64_t diskSize; //disk size in bytes - line 152
+            struct utilityUUID::UUID imageUUID;
+            struct utilityUUID::UUID lastSnapUUID;
+            struct utilityUUID::UUID linkUUID;
+            struct utilityUUID::UUID parentUUID;
+
+            /*
+             * Image comment
+             */
+
 
 
         };
 
-        struct VDIFileX *vdiOpen(char *fn)
+        struct VDIFile *vdiOpen(char *fn)
         {
                 ofstream OpenFile;
                 OpenFile.open(fn);
@@ -43,12 +69,12 @@ class VDIfile {
                     return nullptr;
         };
 
-
-        void vdiClose(struct VDIfileX *f);
-        ssize_t vdiRead(struct VDIfileX *f, void *buf, size_t count);
-        ssize_t vdiWrite(struct VDIFileX *f, void *buf, size_t count);
-        off_t vdiSeek(VDIFileX *F, off_t offset, int anchor);
-
+/* todo
+        void vdiClose(struct VDIfile *f);
+        ssize_t vdiRead(struct VDIfile *f, void *buf, size_t count);
+        ssize_t vdiWrite(struct VDIFile *f, void *buf, size_t count);
+        off_t vdiSeek(VDIFile *F, off_t offset, int anchor);
+*/
         int Capacity(){return ArraySize;}
         void SetCapacity(int NewSize){ArraySize = NewSize;}
 

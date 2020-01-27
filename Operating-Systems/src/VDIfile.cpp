@@ -35,34 +35,34 @@ VDIfile::VDIfile(int NewSize)
 
 };
 
-
+/*
 
 // todo
-void VDIfile::vdiClose(struct VDIfileX *f)
+void VDIfile::vdiClose(struct VDIfile *f)
 {
 
 }
 
 // todo
-ssize_t VDIfile::vdiRead(struct VDIfileX *f, void *buf, size_t count)
+ssize_t VDIfile::vdiRead(struct VDIfile *f, void *buf, size_t count)
 {
 
 }
 
 
 //todo
-ssize_t VDIfile::vdiWrite(struct VDIFileX *f, void *buf, size_t count)
+ssize_t VDIfile::vdiWrite(struct VDIFile *f, void *buf, size_t count)
 {
 
 }
 
 
 //todo
-off_t VDIfile::vdiSeek(VDIFileX *F, off_t offset, int anchor)
+off_t VDIfile::vdiSeek(VDIFile *F, off_t offset, int anchor)
 {
 
 }
-
+*/
 
 //todo
 VDIfile::~VDIfile()
