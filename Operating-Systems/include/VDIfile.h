@@ -11,9 +11,9 @@ using namespace std;
 
 class VDIfile {
     public:
-        int ArraySize = 1;
-        VDIfile();
-        VDIfile(int NewSize);
+
+
+        explicit VDIfile(int = 1);
 
         virtual ~VDIfile();
 
@@ -56,18 +56,7 @@ class VDIfile {
 
         };
 
-        struct VDIFile *vdiOpen(char *fn)
-        {
-                ofstream OpenFile;
-                OpenFile.open(fn);
-                if(OpenFile.is_open())
-                {
-                cout << "The file is open" << endl;
-
-                }
-                else
-                    return nullptr;
-        };
+        bool vdiOpen(char *fn);
 
 /* todo
         void vdiClose(struct VDIfile *f);
@@ -75,17 +64,20 @@ class VDIfile {
         ssize_t vdiWrite(struct VDIFile *f, void *buf, size_t count);
         off_t vdiSeek(VDIFile *F, off_t offset, int anchor);
 */
-        int Capacity(){return ArraySize;}
-        void SetCapacity(int NewSize){ArraySize = NewSize;}
+        int Capacity(){return transMapSize;}
+        void SetCapacity(int NewSize){transMapSize = NewSize;}
 
     protected:
 
     private:
+        /* This is to set the size of the VDI translation map array */
+        int transMapSize;
+
         int Descriptor{};
-        size_t Cursor;
+        size_t cursor;
         //int VDITransMapPointer;
 
-        int *VDITransMapPointer = new int[ArraySize];
+        int *VDITransMapPointer = new int[transMapSize];
 
 };
 

@@ -13,8 +13,7 @@ using namespace std;
 
 
 
-int main()
-{
+int main() {
    uint8_t *FileInformation;
    size_t BytesToCount = 500;
    int BytesRead;

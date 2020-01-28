@@ -1,37 +1,26 @@
 #include "../include/VDIfile.h"
 
-/* Declaration of constructor with no input */
-VDIfile::VDIfile()
-{
-    VDITransMapPointer = new int{ArraySize};
-    Cursor = 0;
 
-}
 
-/* Declaration of constructor with newsize input */
-VDIfile::VDIfile(int NewSize)
-{
-    ArraySize = NewSize;
-    VDITransMapPointer = new int{ArraySize};
-    Cursor = 0;
+/* Declaration of constructor with transMapSize input. Because it is explicit, it must be called VDIfile(int 3)*/
+VDIfile::VDIfile(int transSize) {
+    transMapSize = transSize;
+    VDITransMapPointer = new int{transMapSize};
+    cursor = 0;
 }
 
 
-
-
-
-
- VDIfile::VDIHeaderInfo VDIfile::*vdiOpen(char *fn) {
+/* This loads the header information and such from the given vdi file. Because VDIfile is a class, returns a boolean instead of a pointer. */
+bool VDIfile::vdiOpen(char *fn) {
     ofstream OpenFile;
     OpenFile.open(fn);
-    if(OpenFile.is_open())
-    {
-        cout << "The file is open" << endl;
+    if(OpenFile.is_open()) {
+        cout << "The file is open" << endl; // todo remove when done
 
     }
-    else
-        return nullptr;
-
+    else {
+        return false;
+    }
 
 };
 
@@ -69,3 +58,5 @@ VDIfile::~VDIfile()
 {
     delete[] VDITransMapPointer;
 }
+
+
