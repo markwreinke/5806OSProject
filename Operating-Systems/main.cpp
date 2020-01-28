@@ -19,7 +19,7 @@ int main()
    size_t BytesToCount = 500;
    int BytesRead;
 
-   char* filename = "../Testdoc.txt";
+   char* filename = "../experimentFiles/Testdoc.txt";
    cout << filename << endl;
    int FileDescriptor = open(filename, O_RDWR);
    cout << FileDescriptor << endl;
