@@ -12,6 +12,9 @@ VDIfile::VDIfile(int transSize) {
 
 /* This loads the header information and such from the given vdi file. Because VDIfile is a class, returns a boolean instead of a pointer. */
 bool VDIfile::vdiOpen(char *fn) {
+
+
+
     ofstream OpenFile;
     OpenFile.open(fn);
     if(OpenFile.is_open()) {

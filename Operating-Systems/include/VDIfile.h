@@ -52,12 +52,6 @@ class VDIfile {
             uint32_t LCHSCHeads;
             uint32_t LCHSCSectors;
             uint32_t LCHSCbSector;
-
-
-
-
-
-
         };
 
 
