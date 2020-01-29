@@ -21,11 +21,19 @@ class VDIfile {
         /* This struct holds all of the VDI file header information */
         struct VDIHeaderInfo {
             char imageName[64];
-            uint32_t  u32Signature;
-            uint32_t version;
-            uint32_t cbHeaderSize; // header structure in bytes.
+
+            /* This is the preheader information */
+            char szFileInfo[64];
+            uint32_t u32Signature;
+            uint32_t u32Version;
+
+            /* This is the rest of the file header info - for VDIHEADER1PLUS */
+            uint32_t cbHeader; // size of this header in bytes
             uint32_t imageType; // line 132 "u32Type"
             uint32_t fFlags; // line 139
+            char szComment[256]; //Image comment UTF-8
+
+
 
             /* todo not sure what this stuff is
              * Virtual CHS
