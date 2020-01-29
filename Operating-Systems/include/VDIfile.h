@@ -12,7 +12,7 @@ using namespace std;
 class VDIfile {
     public:
 
-
+        /* Declaration of constructor with transMapSize input. Because it is explicit, it must be called VDIfile(int 3)*/
         explicit VDIfile(int = 1);
 
         virtual ~VDIfile();
@@ -20,9 +20,9 @@ class VDIfile {
 
         /* This struct holds all of the VDI file header information */
         struct VDIHeaderInfo {
-            string imageName;
+            char imageName[64];
             uint32_t  u32Signature;
-            float version; //todo Idk if float is what we want here or not? I'm not sure if this is the same as line 231 in the virtualbox.org/browser/vbox/trunk/src/VBox/Storage/VDICore.h
+            uint32_t version;
             uint32_t cbHeaderSize; // header structure in bytes.
             uint32_t imageType; // line 132 "u32Type"
             uint32_t fFlags; // line 139
@@ -56,6 +56,8 @@ class VDIfile {
 
         };
 
+
+        /* This loads the header information and such from the given vdi file. Because VDIfile is a class, returns a boolean instead of a pointer. */
         bool vdiOpen(char *fn);
 
 /* todo
