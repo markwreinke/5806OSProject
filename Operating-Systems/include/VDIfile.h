@@ -6,7 +6,7 @@
 #include <fstream>
 #include <string>
 #include "utilityUUID.h"
-
+#include <unistd.h>
 using namespace std;
 
 class VDIfile {
@@ -54,18 +54,20 @@ class VDIfile {
 
 
 
-        };
+        }VDIHeaderInfo;
 
 
         /* This loads the header information and such from the given vdi file. Because VDIfile is a class, returns a boolean instead of a pointer. */
         bool vdiOpen(char *fn);
 
 /* todo
-        void vdiClose(struct VDIfile *f);
-        ssize_t vdiRead(struct VDIfile *f, void *buf, size_t count);
-        ssize_t vdiWrite(struct VDIFile *f, void *buf, size_t count);
-        off_t vdiSeek(VDIFile *F, off_t offset, int anchor);
-*/
+        void vdiClose();
+        ssize_t vdiRead(void *buf, size_t count);
+
+       */
+        ssize_t vdiWrite(void *buf, size_t count);
+        off_t vdiSeek(off_t offset, int anchor);
+
         int Capacity(){return transMapSize;}
         void SetCapacity(int NewSize){transMapSize = NewSize;}
 
