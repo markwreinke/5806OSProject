@@ -51,14 +51,14 @@ off_t VDIfile::vdiSeek(off_t offset, int anchor)
 {
     if(anchor == 0)
     {
-        if(offset < this->VDIHeaderInfo.diskSize && offset >= 0)
+        if(offset < this->VDIHeaderInfo.cbDisk && offset >= 0)
             this->cursor = offset;
         else
             return -1;
     }
     else if(anchor == 1)
     {
-        if(this->cursor + offset < this->VDIHeaderInfo.diskSize && this->cursor + offset >= 0)
+        if(this->cursor + offset < this->VDIHeaderInfo.cbDisk && this->cursor + offset >= 0)
             this->cursor = this->cursor + offset;
         else
             return -1;

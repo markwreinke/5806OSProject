@@ -20,39 +20,36 @@ class VDIfile {
 
         /* This struct holds all of the VDI file header information */
         struct VDIHeaderInfo {
-            char imageName[64];
-            uint32_t  u32Signature;
-            uint32_t version;
-            uint32_t cbHeaderSize; // header structure in bytes.
+            /* This is the preheader information */
+            char szFileInfo[64];
+            uint32_t u32Signature;
+            uint32_t u32Version;
+
+            /* This is the rest of the file header info - for VDIHEADER1PLUS */
+            uint32_t cbHeader; // size of this header in bytes
             uint32_t imageType; // line 132 "u32Type"
             uint32_t fFlags; // line 139
-
-            /* todo not sure what this stuff is
-             * Virtual CHS
-             * Sector size
-             * Logical chs
-             * sector size
-             * map offset
-             * frame offset
-             * frame size
-             * extra frame size
-             * total frames
-             * frames allocated
-             *
-             */
-
-
-            uint64_t diskSize; //disk size in bytes - line 152
-            struct utilityUUID::UUID imageUUID;
-            struct utilityUUID::UUID lastSnapUUID;
-            struct utilityUUID::UUID linkUUID;
-            struct utilityUUID::UUID parentUUID;
-
-            /*
-             * Image comment
-             */
-
-
+            char szComment[256]; //Image comment UTF-8
+            uint32_t offBlocks;
+            uint32_t offData;
+            uint32_t legacyCCylinders;
+            uint32_t legacyCHeads;
+            uint32_t legacyCSectors;
+            uint32_t legacyCbSector;
+            uint32_t u32Dummy;
+            uint64_t cbDisk; // Size of disk (in bytes)
+            uint32_t cbBlock;
+            uint32_t cbBlockExtra;
+            uint32_t cBlocks;
+            uint32_t cBlocksAllocated;
+            utilityUUID::UUID uuidCreate;
+            utilityUUID::UUID uuidModify;
+            utilityUUID::UUID uuidLinkage;
+            utilityUUID::UUID uuidParentModify;
+            uint32_t LCHSCCylinders;
+            uint32_t LCHSCHeads;
+            uint32_t LCHSCSectors;
+            uint32_t LCHSCbSector;
 
         }VDIHeaderInfo;
 
