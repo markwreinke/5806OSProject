@@ -13,11 +13,40 @@ VDIfile::VDIfile(int transSize) {
 //comment here to test git
 /* This loads the header information and such from the given vdi file. Because VDIfile is a class, returns a boolean instead of a pointer. */
 bool VDIfile::vdiOpen(char *fn) {
-    this->Descriptor = open(fn,O_RDWR);
-    if(this->Descriptor == -1)///the file failed to open, return false
-        {return false;}
+    this->fileDescriptor = open(fn, O_RDWR);
+
+    /* the file failed to open, return false */
+    if(this->fileDescriptor == -1) {
+        return false;
+    } else {
+        /* A temporary tempBuffer to use for reading commands */
+        char *tempBuffer  = new char[64];
+
+
+        /* This loop populates the file info/image type from the preheader */
+        for(int i = 0; i < 64; i++){
+            uint8_t temp = read(fileDescriptor, tempBuffer, 1);
+            VDIHeaderInfo.szFileInfo[i] = (char) temp;
+        }
+        VDIHeaderInfo.u32Signature = read(fileDescriptor, tempBuffer, 4);
+        VDIHeaderInfo.u32Version = read(fileDescriptor, tempBuffer, 4);
+
+
+
+
+        /*
+         * todo Continue filling values
+         */
+
+        delete[] tempBuffer; // Deallocate memory used by tempBuffer.
+
+
+
+
+
+    }
     /* todo
-        int errorcheck = read(Descriptor, VDIHeaderInfo, 400);
+        int errorcheck = read(fileDescriptor, VDIHeaderInfo, 400);
         vdiheaderinfo isnt an acceptable replacement for the void*
         unsure how the read would work
     */
@@ -42,8 +71,8 @@ ssize_t VDIfile::vdiRead(void *buf, size_t count)
 
 ssize_t VDIfile::vdiWrite(void *buf, size_t count)
 {
-   lseek(this->Descriptor, this->cursor, 0);//will move the cursor of the file with the given descriptor to the location of our cursor
-    write(this->Descriptor, buf, count);
+   lseek(this->fileDescriptor, this->cursor, 0);//will move the cursor of the file with the given descriptor to the location of our cursor
+    write(this->fileDescriptor, buf, count);
 }
 
 

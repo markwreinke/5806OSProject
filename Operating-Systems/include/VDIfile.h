@@ -74,8 +74,8 @@ class VDIfile {
         /* This is to set the size of the VDI translation map array */
         int transMapSize;
 
-        int Descriptor{};
-        size_t cursor;
+        int fileDescriptor{};
+        int cursor;
         //int VDITransMapPointer;
 
         int *VDITransMapPointer = new int[transMapSize];
