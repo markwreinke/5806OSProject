@@ -28,7 +28,8 @@ bool VDIfile::vdiOpen(char *fn) {
 // todo
 void VDIfile::vdiClose()
 {
-
+    close(this->descriptor);
+    delete[] vdipointertransmap;
 }
 
 // todo
