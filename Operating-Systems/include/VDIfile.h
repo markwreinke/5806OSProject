@@ -59,9 +59,8 @@ class VDIfile {
 
 /* todo
         void vdiClose();
-        ssize_t vdiRead(void *buf, size_t count);
-
        */
+        ssize_t vdiRead(void *buf, size_t count);
         ssize_t vdiWrite(void *buf, size_t count);
         off_t vdiSeek(off_t offset, int anchor);
 

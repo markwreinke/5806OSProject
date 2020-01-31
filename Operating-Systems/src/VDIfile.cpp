@@ -1,6 +1,8 @@
 #include <fcntl.h>
 #include "../include/VDIfile.h"
 #include <unistd.h>
+#include <sys/stat.h>
+#include <cstring>
 
 
 /* Declaration of constructor with transMapSize input. Because it is explicit, it must be called VDIfile(int 3)*/
@@ -97,14 +99,9 @@ bool VDIfile::vdiOpen(char *fn) {
 
 
         delete[] tempBuffer; // Deallocate memory used by tempBuffer.
-
+        this->cursor = VDIHeaderInfo.cbHeader + 1;
 
     }
-    /* todo
-        int errorcheck = read(fileDescriptor, VDIHeaderInfo, 400);
-        vdiheaderinfo isnt an acceptable replacement for the void*
-        unsure how the read would work
-    */
 };
 
 /*
@@ -115,19 +112,22 @@ void VDIfile::vdiClose()
     close(this->descriptor);
     delete[] vdipointertransmap;
 }
+*/
 
-// todo
 ssize_t VDIfile::vdiRead(void *buf, size_t count)
 {
-
+    lseek(this->fileDescriptor,cursor, 0);
+    read(this->fileDescriptor, buf, count);
+    cursor+= count;
 }
-*/
+
 
 
 ssize_t VDIfile::vdiWrite(void *buf, size_t count)
 {
    lseek(this->fileDescriptor, this->cursor, 0);//will move the cursor of the file with the given descriptor to the location of our cursor
-    write(this->fileDescriptor, buf, count);
+   write(this->fileDescriptor, buf, count);
+   cursor += count; // must move our cursor according to how many bytes we counted.
 }
 
 
@@ -150,16 +150,19 @@ off_t VDIfile::vdiSeek(off_t offset, int anchor)
     }
     else if (anchor == 2)
     {
-        /*todo
-            find location of end of file + offset and ensure its no larger than the disk
-            if conditions are met move cursor to the location, else return -1
-            Not sure how to find the end of file location
-        */
+        struct stat Temp; // temp structure that holds a variable for the size of the file
+        if(fstat(this->fileDescriptor, &Temp) == -1) // ensuring this worked
+        {
+            cout << strerror(errno) << endl;/// if it failed print the error
+            return -1;
+        }
+         cursor = Temp.st_size + offset;// set cursor to the size of the file and of the offset
     }
     else
     {
         return -1;
     }
+    return offset;
 }
 
 
