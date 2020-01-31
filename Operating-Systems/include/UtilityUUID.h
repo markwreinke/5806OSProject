@@ -11,9 +11,9 @@
 
 using namespace std;
 
-class utilityUUID {
+class UtilityUUID {
     //----------------------------------------------------------------------------
-    // utilityUUID
+    // UtilityUUID
     //
 
     public:
@@ -32,7 +32,7 @@ class utilityUUID {
 
         //-----------------------------------------------------------------------------
         // static char *uuid2ascii(uint8_t *uuid)
-        //  convert utilityUUID to ascii hex form
+        //  convert UtilityUUID to ascii hex form
         //
         // Parm
         //  uuid - 16-byte uuid

@@ -54,18 +54,49 @@ bool VDIfile::vdiOpen(char *fn) {
         VDIHeaderInfo.cBlocksAllocated = read(fileDescriptor, tempBuffer, 4);
 
 
+        /* Filling the UUID for uuidCreate */
+        VDIHeaderInfo.uuidCreate.timeLow = read(fileDescriptor, tempBuffer, 4);
+        VDIHeaderInfo.uuidCreate.timeMid = read(fileDescriptor, tempBuffer, 2);
+        VDIHeaderInfo.uuidCreate.timeHigh = read(fileDescriptor, tempBuffer, 2);
+        VDIHeaderInfo.uuidCreate.clock = read(fileDescriptor, tempBuffer, 2);
+        for(int i = 0; i < 6; i++){
+            VDIHeaderInfo.uuidCreate.node[i] = read(fileDescriptor, tempBuffer, 1);
+        }
 
+        /* Filling the UUID for uuidModify */
+        VDIHeaderInfo.uuidModify.timeLow = read(fileDescriptor, tempBuffer, 4);
+        VDIHeaderInfo.uuidModify.timeMid = read(fileDescriptor, tempBuffer, 2);
+        VDIHeaderInfo.uuidModify.timeHigh = read(fileDescriptor, tempBuffer, 2);
+        VDIHeaderInfo.uuidModify.clock = read(fileDescriptor, tempBuffer, 2);
+        for(int i = 0; i < 6; i++){
+            VDIHeaderInfo.uuidModify.node[i] = read(fileDescriptor, tempBuffer, 1);
+        }
 
+        /* Filling the UUID for uuidLinkage */
+        VDIHeaderInfo.uuidLinkage.timeLow = read(fileDescriptor, tempBuffer, 4);
+        VDIHeaderInfo.uuidLinkage.timeMid = read(fileDescriptor, tempBuffer, 2);
+        VDIHeaderInfo.uuidLinkage.timeHigh = read(fileDescriptor, tempBuffer, 2);
+        VDIHeaderInfo.uuidLinkage.clock = read(fileDescriptor, tempBuffer, 2);
+        for(int i = 0; i < 6; i++){
+            VDIHeaderInfo.uuidLinkage.node[i] = read(fileDescriptor, tempBuffer, 1);
+        }
 
+        /* Filling the UUID for uuidParentModify */
+        VDIHeaderInfo.uuidParentModify.timeLow = read(fileDescriptor, tempBuffer, 4);
+        VDIHeaderInfo.uuidParentModify.timeMid = read(fileDescriptor, tempBuffer, 2);
+        VDIHeaderInfo.uuidParentModify.timeHigh = read(fileDescriptor, tempBuffer, 2);
+        VDIHeaderInfo.uuidParentModify.clock = read(fileDescriptor, tempBuffer, 2);
+        for(int i = 0; i < 6; i++){
+            VDIHeaderInfo.uuidParentModify.node[i] = read(fileDescriptor, tempBuffer, 1);
+        }
 
-        /*
-         * todo Continue filling values
-         */
+        VDIHeaderInfo.LCHSCCylinders = read(fileDescriptor, tempBuffer, 4);
+        VDIHeaderInfo.LCHSCHeads = read(fileDescriptor, tempBuffer, 4);
+        VDIHeaderInfo.LCHSCSectors = read(fileDescriptor, tempBuffer, 4);
+        VDIHeaderInfo.LCHSCbSector = read(fileDescriptor, tempBuffer, 4);
+
 
         delete[] tempBuffer; // Deallocate memory used by tempBuffer.
-
-
-
 
 
     }

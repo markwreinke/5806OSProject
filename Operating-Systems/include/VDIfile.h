@@ -5,7 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "utilityUUID.h"
+#include "UtilityUUID.h"
 #include <unistd.h>
 using namespace std;
 
@@ -42,10 +42,10 @@ class VDIfile {
             uint32_t cbBlockExtra;
             uint32_t cBlocks;
             uint32_t cBlocksAllocated;
-            utilityUUID::UUID uuidCreate;
-            utilityUUID::UUID uuidModify;
-            utilityUUID::UUID uuidLinkage;
-            utilityUUID::UUID uuidParentModify;
+            UtilityUUID::UUID uuidCreate;
+            UtilityUUID::UUID uuidModify;
+            UtilityUUID::UUID uuidLinkage;
+            UtilityUUID::UUID uuidParentModify;
             uint32_t LCHSCCylinders;
             uint32_t LCHSCHeads;
             uint32_t LCHSCSectors;
