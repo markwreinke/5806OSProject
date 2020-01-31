@@ -30,6 +30,30 @@ bool VDIfile::vdiOpen(char *fn) {
         }
         VDIHeaderInfo.u32Signature = read(fileDescriptor, tempBuffer, 4);
         VDIHeaderInfo.u32Version = read(fileDescriptor, tempBuffer, 4);
+        VDIHeaderInfo.cbHeader = read(fileDescriptor, tempBuffer, 4);
+        VDIHeaderInfo.imageType = read(fileDescriptor, tempBuffer, 4);
+        VDIHeaderInfo.fFlags = read(fileDescriptor, tempBuffer,4);
+
+        /* This loop fills the image comment */
+        for(int i = 0; i < 256; i++){
+            uint8_t temp = read(fileDescriptor, tempBuffer, 1);
+            VDIHeaderInfo.szComment[i] = (char) temp;
+        }
+
+        VDIHeaderInfo.offBlocks = read(fileDescriptor, tempBuffer, 4);
+        VDIHeaderInfo.offData = read(fileDescriptor, tempBuffer, 4);
+        VDIHeaderInfo.legacyCCylinders = read(fileDescriptor, tempBuffer, 4);
+        VDIHeaderInfo.legacyCHeads = read(fileDescriptor, tempBuffer, 4);
+        VDIHeaderInfo.legacyCSectors = read(fileDescriptor, tempBuffer, 4);
+        VDIHeaderInfo.legacyCbSector = read(fileDescriptor, tempBuffer, 4);
+        VDIHeaderInfo.u32Dummy = read(fileDescriptor, tempBuffer, 4);
+        VDIHeaderInfo.cbDisk = read(fileDescriptor, tempBuffer, 8);
+        VDIHeaderInfo.cbBlock = read(fileDescriptor, tempBuffer, 4);
+        VDIHeaderInfo.cbBlockExtra = read(fileDescriptor, tempBuffer, 4);
+        VDIHeaderInfo.cBlocks = read(fileDescriptor, tempBuffer, 4);
+        VDIHeaderInfo.cBlocksAllocated = read(fileDescriptor, tempBuffer, 4);
+
+
 
 
 
