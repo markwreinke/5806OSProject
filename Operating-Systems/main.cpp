@@ -14,12 +14,12 @@ using namespace std;
 
 
 int main() {
-   uint8_t *FileInformation;
+  /* uint8_t *FileInformation;
    size_t BytesToCount = 500;
    int BytesRead;
-
-   char* filename = "../testFiles/Test-fixed-1k.vdi";
-
+*/
+   char* filename = "../testFiles/Test-fixed-4k.vdi";
+/*
    cout << filename << endl;
    int FileDescriptor = open(filename, O_RDWR);
    cout << FileDescriptor << endl;
@@ -30,7 +30,7 @@ int main() {
    cout << "number of bytes read: " << BytesRead << endl;
 
    StepZDebug::displayBuffer(FileInformation, 400, 0);
-/*
+*/
   uint8_t buffer[64];
 
   VDIfile f;
@@ -40,7 +40,7 @@ int main() {
   f.vdiRead(buffer, 64);
   StepZDebug::displayBufferPage(buffer, 64, 190, 256);
 
-*/
+
 
 
 

@@ -49,31 +49,43 @@ void VDIfile::vdiClose() {
 
 ssize_t VDIfile::vdiRead(void *buf, size_t count) {
     lseek(this->fileDescriptor, cursor, SEEK_SET);
-    size_t BytesRead = 0;
-    uint8_t *tempBuffer;
+    size_t bytesRead = 0;
+    uint8_t *tempBuffer = new uint8_t[256];
     uint8_t FullBuffer[count];
+
+    cout << "Count: " << count << endl;
     while(count != 0) {
         if(count > 256) {
-            read(this->fileDescriptor, buf, 256);
-            cursor += 256;
-            tempBuffer = static_cast<uint8_t *>(buf);
-            for (int x = BytesRead; x < (BytesRead + 256); x++) {
+            read(this->fileDescriptor, tempBuffer, 256);
+            vdiSeek(256, SEEK_CUR);
+
+            cout << "bytesRead: " << bytesRead << endl;
+            for (int x = bytesRead; x < (bytesRead + 256); x++) {
                 FullBuffer[x] = tempBuffer[x];
+
             }
-            BytesRead += 256;
+            bytesRead += 256;
             count -= 256;
         }
         else{
-            read(this->fileDescriptor,buf, count);
-            cursor+= count;
-            tempBuffer = static_cast<uint8_t *>(buf);
-            for (int x = BytesRead; x < (BytesRead + count); x++) {
+            int check  = read(this->fileDescriptor, tempBuffer, count);
+            vdiSeek(count, SEEK_CUR);
+            cout << "check: " << check << endl;
+            for (int x = bytesRead; x < (bytesRead + count); x++) {
                 FullBuffer[x] = tempBuffer[x];
+               /*
+                * DEBUG STUFF
+                * printf("%02x", FullBuffer[x]);
+                cout << " tempBuffer: ";
+                printf("%02x", tempBuffer[x]);
+                cout << endl; */
             }
-            BytesRead += count;
+            bytesRead += count;
             count -= count;
         }
-        return BytesRead;
+
+        buf = FullBuffer;
+        return bytesRead;
     }
 }
 ssize_t VDIfile::vdiWrite(void *buf, size_t count) {
