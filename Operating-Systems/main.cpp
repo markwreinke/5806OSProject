@@ -18,7 +18,8 @@ int main() {
    size_t BytesToCount = 500;
    int BytesRead;
 
-   char* filename = "../testFiles/Testdoc.txt";
+   char* filename = "../testFiles/Test-fixed-1k.vdi";
+
    cout << filename << endl;
    int FileDescriptor = open(filename, O_RDWR);
    cout << FileDescriptor << endl;
@@ -29,6 +30,18 @@ int main() {
    cout << "number of bytes read: " << BytesRead << endl;
 
    StepZDebug::displayBuffer(FileInformation, 400, 0);
+/*
+  uint8_t buffer[64];
+
+  VDIfile f;
+  bool i = f.vdiOpen(filename);
+  cout << i << endl;
+  f.vdiSeek(446, 0);
+  f.vdiRead(buffer, 64);
+  StepZDebug::displayBufferPage(buffer, 64, 190, 256);
+
+*/
+
 
 
 }

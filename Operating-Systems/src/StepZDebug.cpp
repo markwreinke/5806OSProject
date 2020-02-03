@@ -10,6 +10,7 @@ void StepZDebug::displayBufferPage(uint8_t *buf,uint32_t count, uint32_t start,u
     int loop = 16;
     int cursor = start;
     int cursor2 = start;
+    int countDracula = count;
 
     cout << "Offset: 0x" << offset << endl;
     cout << "   00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f     0...4...8...c..." <<endl;
@@ -33,13 +34,14 @@ void StepZDebug::displayBufferPage(uint8_t *buf,uint32_t count, uint32_t start,u
 
         while(loop > 0)
         {
-            if(start <= offset && offset < start + count && count > 0 && isprint(buf[cursor2])){
+            if(start <= offset && offset < start + countDracula && countDracula > 0 && isprint(buf[cursor2])){
                 cout << static_cast<uint8_t>(buf[cursor2]);
             } else{
                 cout << " ";
             }
             loop--;
             cursor2++;
+            countDracula--;
         }
         cout << "|" << endl;
         height++;

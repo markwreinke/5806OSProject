@@ -1,4 +1,4 @@
-ifndef VDIFILE_H
+#ifndef VDIFILE_H
 #define VDIFILE_H
 #include <stdint.h>
 #include <sys/types.h>
@@ -8,43 +8,46 @@ ifndef VDIFILE_H
 #include "UtilityUUID.h"
 #include <unistd.h>
 using namespace std;
+
+struct VDIHeaderInfo {
+    /* This is the preheader information */
+    char szFileInfo[64];
+    uint32_t u32Signature;
+    uint32_t u32Version;
+    /* This is the rest of the file header info - for VDIHEADER1PLUS */
+    uint32_t cbHeader; // size of this header in bytes
+    uint32_t imageType; // line 132 "u32Type"
+    uint32_t fFlags; // line 139
+    char szComment[256]; //Image comment UTF-8
+    uint32_t offBlocks;
+    uint32_t offData;
+    uint32_t legacyCCylinders;
+    uint32_t legacyCHeads;
+    uint32_t legacyCSectors;
+    uint32_t legacyCbSector;
+    uint32_t u32Dummy;
+    uint64_t cbDisk; // Size of disk (in bytes)
+    uint32_t cbBlock;
+    uint32_t cbBlockExtra;
+    uint32_t cBlocks;
+    uint32_t cBlocksAllocated;
+    UtilityUUID::UUID uuidCreate;
+    UtilityUUID::UUID uuidModify;
+    UtilityUUID::UUID uuidLinkage;
+    UtilityUUID::UUID uuidParentModify;
+    uint32_t LCHSCCylinders;
+    uint32_t LCHSCHeads;
+    uint32_t LCHSCSectors;
+    uint32_t LCHSCbSector;
+};
+
+
 class VDIfile {
 public:
     /* Declaration of constructor with transMapSize input. Because it is explicit, it must be called VDIfile(int 3)*/
     explicit VDIfile(int = 1);
-    virtual ~VDIfile();
     /* This struct holds all of the VDI file header information */
-    struct VDIHeaderInfo {
-        /* This is the preheader information */
-        char szFileInfo[64];
-        uint32_t u32Signature;
-        uint32_t u32Version;
-        /* This is the rest of the file header info - for VDIHEADER1PLUS */
-        uint32_t cbHeader; // size of this header in bytes
-        uint32_t imageType; // line 132 "u32Type"
-        uint32_t fFlags; // line 139
-        char szComment[256]; //Image comment UTF-8
-        uint32_t offBlocks;
-        uint32_t offData;
-        uint32_t legacyCCylinders;
-        uint32_t legacyCHeads;
-        uint32_t legacyCSectors;
-        uint32_t legacyCbSector;
-        uint32_t u32Dummy;
-        uint64_t cbDisk; // Size of disk (in bytes)
-        uint32_t cbBlock;
-        uint32_t cbBlockExtra;
-        uint32_t cBlocks;
-        uint32_t cBlocksAllocated;
-        UtilityUUID::UUID uuidCreate;
-        UtilityUUID::UUID uuidModify;
-        UtilityUUID::UUID uuidLinkage;
-        UtilityUUID::UUID uuidParentModify;
-        uint32_t LCHSCCylinders;
-        uint32_t LCHSCHeads;
-        uint32_t LCHSCSectors;
-        uint32_t LCHSCbSector;
-    }VDIHeaderInfo;
+    struct VDIHeaderInfo headerInfo;
     /* This loads the header information and such from the given vdi file. Because VDIfile is a class, returns a boolean instead of a pointer. */
     bool vdiOpen(char *fn);
     void vdiClose();
@@ -53,11 +56,12 @@ public:
     off_t vdiSeek(off_t offset, int anchor);
     int Capacity(){return transMapSize;}
     void SetCapacity(int NewSize){transMapSize = NewSize;}
+
+    int fileDescriptor;
 protected:
 private:
     /* This is to set the size of the VDI translation map array */
     int transMapSize;
-    int fileDescriptor;
     size_t cursor;
     //int VDITransMapPointer;
     int *VDITransMapPointer;

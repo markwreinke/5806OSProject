@@ -12,65 +12,32 @@ VDIfile::VDIfile(int transSize) {
 //comment here to test git
 /* This loads the header information and such from the given vdi file. Because VDIfile is a class, returns a boolean instead of a pointer. */
 bool VDIfile::vdiOpen(char *fn) {
-    this->fileDescriptor = open(fn, O_RDWR);
+
+    cout << "I'm doing someting" << endl;
+
+
+    fileDescriptor = open(fn, 2);
+
+    cout << "I'm still doing someting" << endl;
+
+
     /* the file failed to open, return false */
     if(this->fileDescriptor == -1) {
         return false;
     } else {
         /* A temporary tempBuffer to use for reading commands */
-        char *tempBuffer  = new char[64];
-        *VDIHeaderInfo.szFileInfo = read(fileDescriptor, tempBuffer, 64);
-        VDIHeaderInfo.u32Signature = read(fileDescriptor, tempBuffer, 4);
-        VDIHeaderInfo.u32Version = read(fileDescriptor, tempBuffer, 4);
-        VDIHeaderInfo.cbHeader = read(fileDescriptor, tempBuffer, 4);
-        VDIHeaderInfo.imageType = read(fileDescriptor, tempBuffer, 4);
-        VDIHeaderInfo.fFlags = read(fileDescriptor, tempBuffer,4);
-        *VDIHeaderInfo.szComment = read(fileDescriptor, tempBuffer, 256);
-        VDIHeaderInfo.offBlocks = read(fileDescriptor, tempBuffer, 4);
-        VDIHeaderInfo.offData = read(fileDescriptor, tempBuffer, 4);
-        VDIHeaderInfo.legacyCCylinders = read(fileDescriptor, tempBuffer, 4);
-        VDIHeaderInfo.legacyCHeads = read(fileDescriptor, tempBuffer, 4);
-        VDIHeaderInfo.legacyCSectors = read(fileDescriptor, tempBuffer, 4);
-        VDIHeaderInfo.legacyCbSector = read(fileDescriptor, tempBuffer, 4);
-        VDIHeaderInfo.u32Dummy = read(fileDescriptor, tempBuffer, 4);
-        VDIHeaderInfo.cbDisk = read(fileDescriptor, tempBuffer, 8);
-        VDIHeaderInfo.cbBlock = read(fileDescriptor, tempBuffer, 4);
-        VDIHeaderInfo.cbBlockExtra = read(fileDescriptor, tempBuffer, 4);
-        VDIHeaderInfo.cBlocks = read(fileDescriptor, tempBuffer, 4);
-        VDIHeaderInfo.cBlocksAllocated = read(fileDescriptor, tempBuffer, 4);
-        /* Filling the UUID for uuidCreate */
-        VDIHeaderInfo.uuidCreate.timeLow = read(fileDescriptor, tempBuffer, 4);
-        VDIHeaderInfo.uuidCreate.timeMid = read(fileDescriptor, tempBuffer, 2);
-        VDIHeaderInfo.uuidCreate.timeHigh = read(fileDescriptor, tempBuffer, 2);
-        VDIHeaderInfo.uuidCreate.clock = read(fileDescriptor, tempBuffer, 2);
-        *VDIHeaderInfo.uuidCreate.node = read(fileDescriptor, tempBuffer, 6);
-        /* Filling the UUID for uuidModify */
-        VDIHeaderInfo.uuidModify.timeLow = read(fileDescriptor, tempBuffer, 4);
-        VDIHeaderInfo.uuidModify.timeMid = read(fileDescriptor, tempBuffer, 2);
-        VDIHeaderInfo.uuidModify.timeHigh = read(fileDescriptor, tempBuffer, 2);
-        VDIHeaderInfo.uuidModify.clock = read(fileDescriptor, tempBuffer, 2);
-        *VDIHeaderInfo.uuidModify.node = read(fileDescriptor, tempBuffer, 6);
-        /* Filling the UUID for uuidLinkage */
-        VDIHeaderInfo.uuidLinkage.timeLow = read(fileDescriptor, tempBuffer, 4);
-        VDIHeaderInfo.uuidLinkage.timeMid = read(fileDescriptor, tempBuffer, 2);
-        VDIHeaderInfo.uuidLinkage.timeHigh = read(fileDescriptor, tempBuffer, 2);
-        VDIHeaderInfo.uuidLinkage.clock = read(fileDescriptor, tempBuffer, 2);
-        *VDIHeaderInfo.uuidLinkage.node = read(fileDescriptor, tempBuffer, 6);
-        /* Filling the UUID for uuidParentModify */
-        VDIHeaderInfo.uuidParentModify.timeLow = read(fileDescriptor, tempBuffer, 4);
-        VDIHeaderInfo.uuidParentModify.timeMid = read(fileDescriptor, tempBuffer, 2);
-        VDIHeaderInfo.uuidParentModify.timeHigh = read(fileDescriptor, tempBuffer, 2);
-        VDIHeaderInfo.uuidParentModify.clock = read(fileDescriptor, tempBuffer, 2);
-        *VDIHeaderInfo.uuidParentModify.node = read(fileDescriptor, tempBuffer, 6);
-        VDIHeaderInfo.LCHSCCylinders = read(fileDescriptor, tempBuffer, 4);
-        VDIHeaderInfo.LCHSCHeads = read(fileDescriptor, tempBuffer, 4);
-        VDIHeaderInfo.LCHSCSectors = read(fileDescriptor, tempBuffer, 4);
-        VDIHeaderInfo.LCHSCbSector = read(fileDescriptor, tempBuffer, 4);
+
+        read(fileDescriptor, &headerInfo, sizeof(headerInfo));
+
         /* Initialize the translation map */
-        this-> transMapSize = VDIHeaderInfo.cBlocks; // The number of blocks in the image
+        this-> transMapSize = headerInfo.cBlocks; // The number of blocks in the image
+        cout << transMapSize << endl;
         this-> VDITransMapPointer = new int[transMapSize];
-        delete[] tempBuffer; // Deallocate memory used by tempBuffer.
-        this->cursor = VDIHeaderInfo.cbHeader + 72; /// This sets the start of the curser to just after the header, accounting for the header + preheader size.
+        lseek(fileDescriptor, headerInfo.offBlocks, SEEK_SET);
+        read(fileDescriptor, VDITransMapPointer, transMapSize* sizeof(int));
+        this->cursor = 0; /// This sets the start of the curser to just after the header, accounting for the header + preheader size.
+        cout << "signature: 0x" << hex << headerInfo.u32Signature << endl;
+        cout << "offblocks: " << hex << headerInfo.offBlocks << endl;
     }
 };
 /* Closes the vdi file while destroying dynamically created stuff */
@@ -78,8 +45,10 @@ void VDIfile::vdiClose() {
     close(this->fileDescriptor);
     delete[] VDITransMapPointer;
 }
+
+
 ssize_t VDIfile::vdiRead(void *buf, size_t count) {
-    lseek(this->fileDescriptor, cursor, 0);
+    lseek(this->fileDescriptor, cursor, SEEK_SET);
     size_t BytesRead = 0;
     uint8_t *tempBuffer;
     uint8_t FullBuffer[count];
@@ -115,20 +84,20 @@ ssize_t VDIfile::vdiWrite(void *buf, size_t count) {
 /* I feel like this is a better situation for a switch, but that is kinda arbitrary */
 off_t VDIfile::vdiSeek(off_t offset, int anchor) {
     if(anchor == 0) {
-        if(offset < this->VDIHeaderInfo.cbDisk && offset >= 0)
+        if(offset < this->headerInfo.cbDisk && offset >= 0)
             this->cursor = offset;
         else
             return -1;
     }
     else if(anchor == 1) {
-        if((this->cursor + offset) < this->VDIHeaderInfo.cbDisk && (this->cursor + offset) >= 0)
+        if((this->cursor + offset) < this->headerInfo.cbDisk && (this->cursor + offset) >= 0)
             this->cursor = this->cursor + offset;
         else
             return -1;
     }
     else if (anchor == 2) {
         if(offset < 0){
-            this->cursor = this->VDIHeaderInfo.cbDisk + offset;
+            this->cursor = this->headerInfo.cbDisk + offset;
         } else{
             return -1;
         }
@@ -138,7 +107,4 @@ off_t VDIfile::vdiSeek(off_t offset, int anchor) {
     }
     return cursor;
 }
-//todo
-VDIfile::~VDIfile() {
-    delete[] VDITransMapPointer;
-}
+
