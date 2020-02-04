@@ -12,7 +12,7 @@ void StepZDebug::displayBufferPage(uint8_t *buf,uint32_t count, uint32_t start,u
     int cursor2 = start;
     int countDracula = count;
 
-    cout << "Offset: 0x" << offset << endl;
+    cout << hex << "Offset: 0x" << offset << endl;
     cout << "   00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f     0...4...8...c..." <<endl;
     cout << "  +------------------------------------------------+  +----------------+" <<endl;
 
@@ -69,6 +69,15 @@ void StepZDebug::displayBuffer(uint8_t *buf, uint32_t count, uint64_t offset) {
             count = 0;
         }
     }
+}
+
+void StepZDebug::dumpVDIHeader(struct VDIHeaderInfo* headerInfo) {
+    cout << "Image Name: " << headerInfo->szFileInfo << endl;
+    cout << "Signature: 0x" << hex << headerInfo->u32Signature << endl;
+    cout << "Version: " << hex << headerInfo->u32Version << endl;
+    cout << "Header Size: 0x" << hex << setw(8) <<  setfill('0') << headerInfo->cbHeader << "   " << dec << headerInfo->cbHeader << endl;
+    cout << "offblocks: " << hex << headerInfo->offBlocks << endl;
+    ///displayBufferPage(headerInfo->szComment, 256, 0, 0);
 }
 
 

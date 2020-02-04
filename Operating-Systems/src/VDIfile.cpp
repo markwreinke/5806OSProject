@@ -12,21 +12,13 @@ VDIfile::VDIfile(int transSize) {
 //comment here to test git
 /* This loads the header information and such from the given vdi file. Because VDIfile is a class, returns a boolean instead of a pointer. */
 bool VDIfile::vdiOpen(char *fn) {
-
-    cout << "I'm doing someting" << endl;
-
-
     fileDescriptor = open(fn, 2);
-
-    cout << "I'm still doing someting" << endl;
-
 
     /* the file failed to open, return false */
     if(this->fileDescriptor == -1) {
         return false;
     } else {
-        /* A temporary tempBuffer to use for reading commands */
-
+        /* Sets the header into structure */
         read(fileDescriptor, &headerInfo, sizeof(headerInfo));
 
         /* Initialize the translation map */
@@ -35,9 +27,9 @@ bool VDIfile::vdiOpen(char *fn) {
         this-> VDITransMapPointer = new int[transMapSize];
         lseek(fileDescriptor, headerInfo.offBlocks, SEEK_SET);
         read(fileDescriptor, VDITransMapPointer, transMapSize* sizeof(int));
-        this->cursor = 0; /// This sets the start of the curser to just after the header, accounting for the header + preheader size.
-        cout << "signature: 0x" << hex << headerInfo.u32Signature << endl;
-        cout << "offblocks: " << hex << headerInfo.offBlocks << endl;
+
+        this->cursor = 0;
+
     }
 };
 /* Closes the vdi file while destroying dynamically created stuff */
@@ -49,6 +41,7 @@ void VDIfile::vdiClose() {
 
 ssize_t VDIfile::vdiRead(void *buf, size_t count) {
     lseek(this->fileDescriptor, cursor, SEEK_SET);
+    cout << dec << "Curser: " << cursor << endl;
     size_t bytesRead = 0;
     uint8_t *tempBuffer = new uint8_t[256];
     uint8_t FullBuffer[count];
@@ -58,6 +51,7 @@ ssize_t VDIfile::vdiRead(void *buf, size_t count) {
         if(count > 256) {
             read(this->fileDescriptor, tempBuffer, 256);
             vdiSeek(256, SEEK_CUR);
+            cout << dec << "Curser: " << cursor << endl;
 
             cout << "bytesRead: " << bytesRead << endl;
             for (int x = bytesRead; x < (bytesRead + 256); x++) {
@@ -68,25 +62,26 @@ ssize_t VDIfile::vdiRead(void *buf, size_t count) {
             count -= 256;
         }
         else{
-            int check  = read(this->fileDescriptor, tempBuffer, count);
+            read(this->fileDescriptor, tempBuffer, count);
             vdiSeek(count, SEEK_CUR);
-            cout << "check: " << check << endl;
+            ssize_t position = lseek(fileDescriptor, 0,  SEEK_CUR);
+            cout << dec << "Curser2: " <<  position << endl;
             for (int x = bytesRead; x < (bytesRead + count); x++) {
                 FullBuffer[x] = tempBuffer[x];
                /*
-                * DEBUG STUFF
-                * printf("%02x", FullBuffer[x]);
+                * DEBUG STUFF*/
+                printf("%02x", FullBuffer[x]);
                 cout << " tempBuffer: ";
                 printf("%02x", tempBuffer[x]);
-                cout << endl; */
+                cout << endl;
             }
             bytesRead += count;
             count -= count;
         }
 
-        buf = FullBuffer;
-        return bytesRead;
     }
+    buf = FullBuffer;
+    return bytesRead;
 }
 ssize_t VDIfile::vdiWrite(void *buf, size_t count) {
     lseek(this->fileDescriptor, this->cursor, 0);//will move the cursor of the file with the given descriptor to the location of our cursor
@@ -95,19 +90,19 @@ ssize_t VDIfile::vdiWrite(void *buf, size_t count) {
 }
 /* I feel like this is a better situation for a switch, but that is kinda arbitrary */
 off_t VDIfile::vdiSeek(off_t offset, int anchor) {
-    if(anchor == 0) {
+    if(anchor == SEEK_SET) {
         if(offset < this->headerInfo.cbDisk && offset >= 0)
             this->cursor = offset;
         else
             return -1;
     }
-    else if(anchor == 1) {
+    else if(anchor == SEEK_CUR) {
         if((this->cursor + offset) < this->headerInfo.cbDisk && (this->cursor + offset) >= 0)
             this->cursor = this->cursor + offset;
         else
             return -1;
     }
-    else if (anchor == 2) {
+    else if (anchor == SEEK_END) {
         if(offset < 0){
             this->cursor = this->headerInfo.cbDisk + offset;
         } else{

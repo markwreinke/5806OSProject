@@ -7,6 +7,7 @@
 #include <string>
 #include "UtilityUUID.h"
 #include <unistd.h>
+
 using namespace std;
 
 struct VDIHeaderInfo {

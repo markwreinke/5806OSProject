@@ -14,11 +14,11 @@ using namespace std;
 
 
 int main() {
-  /* uint8_t *FileInformation;
-   size_t BytesToCount = 500;
-   int BytesRead;
-*/
-   char* filename = "../testFiles/Test-fixed-4k.vdi";
+    /* uint8_t *FileInformation;
+     size_t BytesToCount = 500;
+     int BytesRead;
+  */
+    char *filename = "../testFiles/Test-fixed-1k.vdi";
 /*
    cout << filename << endl;
    int FileDescriptor = open(filename, O_RDWR);
@@ -31,13 +31,20 @@ int main() {
 
    StepZDebug::displayBuffer(FileInformation, 400, 0);
 */
-  uint8_t buffer[64];
+    uint8_t buffer[64];
 
-  VDIfile f;
-  bool i = f.vdiOpen(filename);
-  cout << i << endl;
-  f.vdiSeek(446, 0);
-  f.vdiRead(buffer, 64);
+    VDIfile f;
+    bool i = f.vdiOpen(filename);
+
+    StepZDebug::dumpVDIHeader(&f.headerInfo);
+    cout << i << endl;
+    f.vdiSeek(446, SEEK_SET);
+    f.vdiRead(buffer, 64);
+
+    for (int x = 0; x < 64; x++) {
+        printf("%02x", buffer[x]);
+        cout << endl;
+    }
   StepZDebug::displayBufferPage(buffer, 64, 190, 256);
 
 
