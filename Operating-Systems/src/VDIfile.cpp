@@ -76,7 +76,10 @@ ssize_t VDIfile::vdiRead(void *buf, size_t count) {
         }
 
     }
-    buf = FullBuffer;
+    for(int x = 0; x < sizeof(FullBuffer); x++)
+    {
+        ((uint8_t *) buf)[x] = FullBuffer[x];
+    }
     return bytesRead;
 }
 ssize_t VDIfile::vdiWrite(void *buf, size_t count) {
