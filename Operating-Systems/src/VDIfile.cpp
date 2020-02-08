@@ -41,38 +41,34 @@ void VDIfile::vdiClose() {
 
 ssize_t VDIfile::vdiRead(void *buf, size_t count) {
     lseek(this->fileDescriptor, cursor, SEEK_SET);
-    cout << dec << "Curser: " << cursor << endl;
+    //cout << dec << "Curser: " << cursor << endl;
     size_t bytesRead = 0;
-    uint8_t *tempBuffer = new uint8_t[256];
     uint8_t FullBuffer[count];
 
-    cout << "Count: " << count << endl;
+    //cout << "Count: " << count << endl;
     while(count != 0) {
         if(count > 256) {
-            read(this->fileDescriptor, tempBuffer, 256);
+            read(this->fileDescriptor, buf, 256);
             vdiSeek(256, SEEK_CUR);
-            cout << dec << "Curser: " << cursor << endl;
+            //cout << dec << "Curser: " << cursor << endl;
 
             cout << "bytesRead: " << bytesRead << endl;
             for (int x = bytesRead; x < (bytesRead + 256); x++) {
-                FullBuffer[x] = tempBuffer[x];
-
+                FullBuffer[x] = ((uint8_t*)buf)[x];
             }
             bytesRead += 256;
             count -= 256;
         }
         else{
-            read(this->fileDescriptor, tempBuffer, count);
+            read(this->fileDescriptor, buf, count);
             vdiSeek(count, SEEK_CUR);
             ssize_t position = lseek(fileDescriptor, 0,  SEEK_CUR);
-            cout << dec << "Curser2: " <<  position << endl;
+            //cout << dec << "Cursor2: " <<  position << endl;
             for (int x = bytesRead; x < (bytesRead + count); x++) {
-                FullBuffer[x] = tempBuffer[x];
+                FullBuffer[x] = ((uint8_t*)buf)[x];
                /*
                 * DEBUG STUFF*/
                 printf("%02x", FullBuffer[x]);
-                cout << " tempBuffer: ";
-                printf("%02x", tempBuffer[x]);
                 cout << endl;
             }
             bytesRead += count;
@@ -85,8 +81,32 @@ ssize_t VDIfile::vdiRead(void *buf, size_t count) {
 }
 ssize_t VDIfile::vdiWrite(void *buf, size_t count) {
     lseek(this->fileDescriptor, this->cursor, 0);//will move the cursor of the file with the given descriptor to the location of our cursor
-    write(this->fileDescriptor, buf, count);
-    cursor += count; // must move our cursor according to how many bytes we counted.
+    size_t bytesWritten = 0;
+    uint8_t buffer[count];
+    while(count != 0)
+    {
+        if (count >= 256) {
+            for(int x = bytesWritten; x < (bytesWritten + 256); x++)
+            {
+                buffer[x] = ((uint8_t *)buf)[x];
+            }
+            write(fileDescriptor, buffer, 256);
+            bytesWritten += 256;
+            cursor += 256;
+            count -= 256;
+        } else {
+            for(int x = bytesWritten; x < (bytesWritten + count); x++)
+            {
+                buffer[x] = ((uint8_t *)buf)[x];
+            }
+            write(fileDescriptor, buffer, count);
+            cursor += count;
+            count -= count;
+            bytesWritten += count;
+        }
+        return bytesWritten;
+    }
+
 }
 /* I feel like this is a better situation for a switch, but that is kinda arbitrary */
 off_t VDIfile::vdiSeek(off_t offset, int anchor) {
