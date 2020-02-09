@@ -22,10 +22,12 @@ struct VDIHeaderInfo {
     char szComment[256]; //Image comment UTF-8
     uint32_t offBlocks; // Offset before trans map?
     uint32_t offData;
-    uint32_t legacyCCylinders;
-    uint32_t legacyCHeads;
-    uint32_t legacyCSectors;
-    uint32_t legacyCbSector;
+    uint32_t legacyGeometry[4];
+    /* Replaced by above array :
+     * uint32_t legacyCCylinders;
+     * uint32_t legacyCHeads;
+     * uint32_t legacyCSectors;
+     * uint32_t legacyCbSector; */
     uint32_t u32Dummy;
     uint64_t cbDisk; // Size of disk (in bytes)
     uint32_t cbBlock; //Block size
@@ -36,10 +38,14 @@ struct VDIHeaderInfo {
     UtilityUUID::UUID uuidModify;
     UtilityUUID::UUID uuidLinkage;
     UtilityUUID::UUID uuidParentModify;
-    uint32_t LCHSCCylinders;
-    uint32_t LCHSCHeads;
-    uint32_t LCHSCSectors;
-    uint32_t LCHSCbSector;
+
+    uint32_t LCHSGeometry[4];
+    /* Replaced by above array :
+     * uint32_t LCHSCCylinders;
+     * uint32_t LCHSCHeads;
+     * uint32_t LCHSCSectors;
+     * uint32_t LCHSCbSector;
+     * */
 };
 
 

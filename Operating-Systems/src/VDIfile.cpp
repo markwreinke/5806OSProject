@@ -38,9 +38,70 @@ void VDIfile::vdiClose() {
     delete[] VDITransMapPointer;
 }
 
-
+// #todo might need to update buf
 ssize_t VDIfile::vdiRead(void *buf, size_t count) {
-    lseek(this->fileDescriptor, cursor, SEEK_SET);
+  size_t bytesRemaining = count;
+  size_t bytesRead = 0;
+
+
+  while(bytesRemaining > 0){
+      size_t virtualPage = cursor/this->headerInfo.cbBlock;
+      size_t offset = cursor%this->headerInfo.cbBlock;
+      size_t physicalPage = this->VDITransMapPointer[virtualPage];
+
+      size_t realLocation = physicalPage*this->headerInfo.cbBlock + offset;
+
+      size_t bytesJustRead;
+      if(realLocation >= 0) {
+          lseek(fileDescriptor, realLocation + this->headerInfo.offData, SEEK_SET);
+          bytesJustRead = read(fileDescriptor, buf, this->headerInfo.cbBlock);
+      } else{
+          stringstream addedZeros;
+          addedZeros  << setfill('0') << setw(this->headerInfo.cbBlock);
+          // #todo add addedZeros to buf,
+          bytesJustRead = this->headerInfo.cbBlock;
+
+      }
+
+      bytesRead += bytesJustRead;
+      bytesRemaining -= bytesJustRead;
+      vdiSeek(bytesJustRead, SEEK_CUR);
+
+
+
+
+
+
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   /*{ lseek(this->fileDescriptor, cursor, SEEK_SET);
     //cout << dec << "Curser: " << cursor << endl;
     size_t bytesRead = 0;
     uint8_t FullBuffer[count];
@@ -67,7 +128,7 @@ ssize_t VDIfile::vdiRead(void *buf, size_t count) {
             for (int x = bytesRead; x < (bytesRead + count); x++) {
                 FullBuffer[x] = ((uint8_t*)buf)[x];
                /*
-                * DEBUG STUFF*/
+                * DEBUG STUFF*
                 printf("%02x", FullBuffer[x]);
                 cout << endl;
             }
@@ -80,7 +141,7 @@ ssize_t VDIfile::vdiRead(void *buf, size_t count) {
     {
         ((uint8_t *) buf)[x] = FullBuffer[x];
     }
-    return bytesRead;
+    return bytesRead }*/
 }
 ssize_t VDIfile::vdiWrite(void *buf, size_t count) {
     lseek(this->fileDescriptor, this->cursor, 0);//will move the cursor of the file with the given descriptor to the location of our cursor
@@ -115,7 +176,7 @@ ssize_t VDIfile::vdiWrite(void *buf, size_t count) {
 off_t VDIfile::vdiSeek(off_t offset, int anchor) {
     if(anchor == SEEK_SET) {
         if(offset < this->headerInfo.cbDisk && offset >= 0)
-            this->cursor = offset;
+            this->cursor = headerInfo.offData;
         else
             return -1;
     }
