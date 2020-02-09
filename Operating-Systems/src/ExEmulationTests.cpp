@@ -5,6 +5,8 @@
 #include "../include/ExEmulationTests.h"
 
 void ExEmulationTests::step0Ex1() {
+    cout << "Displaying Step 0, Example 1" << endl;
+
     uint8_t *FileInformation;
     size_t BytesToCount = 500;
     int BytesRead;
@@ -25,13 +27,16 @@ void ExEmulationTests::step0Ex1() {
 }
 
 void ExEmulationTests::step0Ex2() {
+    cout << "Displaying Step 0, Example 2" << endl;
     uint8_t *FileInformation;
-    size_t BytesToCount = 472;
+
 
     char *filename = "../testFiles/Test-fixed-1k.vdi";
     int FileDescriptor = open(filename, O_RDWR);
     VDIfile testVDIfile;
     testVDIfile.vdiOpen(filename);
+
+    size_t BytesToCount = sizeof(testVDIfile.headerInfo.offData);
 
     FileInformation = (uint8_t*) malloc(100 * sizeof(uint8_t));
     read(FileDescriptor, FileInformation, BytesToCount);

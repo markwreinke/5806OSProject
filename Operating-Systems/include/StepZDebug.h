@@ -16,6 +16,7 @@ public:
     static void displayBufferPage(uint8_t *buf,uint32_t count, uint32_t start,uint64_t offset);
     static void displayBuffer(uint8_t *buf, uint32_t count, uint64_t offset);
     static void dumpVDIHeader(struct VDIHeaderInfo* headerInfo);
+
 };
 
 
