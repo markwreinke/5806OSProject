@@ -12,13 +12,18 @@ void StepZDebug::displayBufferPage(uint8_t *buf,uint32_t count, uint32_t start,u
     int cursor2 = start;
     int countDracula = count;
 
+    /* This is the header of the display table */
     cout << hex << "Offset: 0x" << offset << endl;
     cout << "   00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f     0...4...8...c..." <<endl;
     cout << "  +------------------------------------------------+  +----------------+" <<endl;
 
+    /* Loop iterates once for each row */
     while(height < 16) {
 
+        /* Fills out the row label */
         cout << hex << setfill('0')<< setw(2) << height << "|";
+
+        /* This handles the left side of the table with the hex numbers */
         while (width > 0) {
             if (start <= offset && offset < start + count && count > 0) {
                 printf("%02x", buf[cursor]);
@@ -30,8 +35,11 @@ void StepZDebug::displayBufferPage(uint8_t *buf,uint32_t count, uint32_t start,u
             width--;
             count--;
         }
+
+        /* Divisor between left/right hex/char sides of the table */
         cout<< hex << "|" << setfill('0') << setw(2) << height << "|";
 
+        /* This handles the right side of the table with the characters */
         while(loop > 0)
         {
             if(start <= offset && offset < start + countDracula && countDracula > 0 && isprint(buf[cursor2])){
@@ -43,11 +51,17 @@ void StepZDebug::displayBufferPage(uint8_t *buf,uint32_t count, uint32_t start,u
             cursor2++;
             countDracula--;
         }
+
+        /* The right border of the table */
         cout << "|" << endl;
+
+        /* Incrementing values for the next row */
         height++;
         width = 16;
         loop = 16;
     }
+
+    /* The bottom of the table */
     cout << "  +------------------------------------------------+  +----------------+" <<endl;
 }
 

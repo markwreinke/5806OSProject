@@ -20,7 +20,7 @@ struct VDIHeaderInfo {
     uint32_t imageType; // line 132 "u32Type"
     uint32_t fFlags; // line 139
     char szComment[256]; //Image comment UTF-8
-    uint32_t offBlocks;
+    uint32_t offBlocks; // Offset before trans map?
     uint32_t offData;
     uint32_t legacyCCylinders;
     uint32_t legacyCHeads;
@@ -28,9 +28,9 @@ struct VDIHeaderInfo {
     uint32_t legacyCbSector;
     uint32_t u32Dummy;
     uint64_t cbDisk; // Size of disk (in bytes)
-    uint32_t cbBlock;
+    uint32_t cbBlock; //Block size
     uint32_t cbBlockExtra;
-    uint32_t cBlocks;
+    uint32_t cBlocks; // Number of blocks
     uint32_t cBlocksAllocated;
     UtilityUUID::UUID uuidCreate;
     UtilityUUID::UUID uuidModify;
