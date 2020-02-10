@@ -3,6 +3,8 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <cstring>
+#include <string>
+
 /* Declaration of constructor with transMapSize input. Because it is explicit, it must be called VDIfile(int 3)*/
 VDIfile::VDIfile(int transSize) {
     transMapSize = transSize;
@@ -51,97 +53,23 @@ ssize_t VDIfile::vdiRead(void *buf, size_t count) {
 
       size_t realLocation = physicalPage*this->headerInfo.cbBlock + offset;
 
-      size_t bytesJustRead;
-      if(realLocation >= 0) {
-          lseek(fileDescriptor, realLocation + this->headerInfo.offData, SEEK_SET);
-          bytesJustRead = read(fileDescriptor, buf, this->headerInfo.cbBlock);
-      } else{
-          stringstream addedZeros;
-          addedZeros  << setfill('0') << setw(this->headerInfo.cbBlock);
-          // #todo add addedZeros to buf,
-          bytesJustRead = this->headerInfo.cbBlock;
+      lseek(fileDescriptor, realLocation, SEEK_SET);
 
+      size_t bytesJustRead = 0;
+      if(realLocation >= 0) {
+          bytesJustRead = read(fileDescriptor, static_cast<uint8_t *>(buf) + bytesRead, this->headerInfo.cbBlock);
+      } else{
+          int SizeOfBlock = this->headerInfo.cbBlock;
+          for(int x = 0; x > SizeOfBlock; x++){
+              *(static_cast<uint8_t *>(buf) + (bytesRead + bytesJustRead)) = '0';
+              bytesJustRead++;
+          }
       }
 
       bytesRead += bytesJustRead;
       bytesRemaining -= bytesJustRead;
       vdiSeek(bytesJustRead, SEEK_CUR);
-
-
-
-
-
-
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   /*{ lseek(this->fileDescriptor, cursor, SEEK_SET);
-    //cout << dec << "Curser: " << cursor << endl;
-    size_t bytesRead = 0;
-    uint8_t FullBuffer[count];
-
-    //cout << "Count: " << count << endl;
-    while(count != 0) {
-        if(count > 256) {
-            read(this->fileDescriptor, buf, 256);
-            vdiSeek(256, SEEK_CUR);
-            //cout << dec << "Curser: " << cursor << endl;
-
-            cout << "bytesRead: " << bytesRead << endl;
-            for (int x = bytesRead; x < (bytesRead + 256); x++) {
-                FullBuffer[x] = ((uint8_t*)buf)[x];
-            }
-            bytesRead += 256;
-            count -= 256;
-        }
-        else{
-            read(this->fileDescriptor, buf, count);
-            vdiSeek(count, SEEK_CUR);
-            ssize_t position = lseek(fileDescriptor, 0,  SEEK_CUR);
-            //cout << dec << "Cursor2: " <<  position << endl;
-            for (int x = bytesRead; x < (bytesRead + count); x++) {
-                FullBuffer[x] = ((uint8_t*)buf)[x];
-               /*
-                * DEBUG STUFF*
-                printf("%02x", FullBuffer[x]);
-                cout << endl;
-            }
-            bytesRead += count;
-            count -= count;
-        }
-
-    }
-    for(int x = 0; x < sizeof(FullBuffer); x++)
-    {
-        ((uint8_t *) buf)[x] = FullBuffer[x];
-    }
-    return bytesRead }*/
 }
 ssize_t VDIfile::vdiWrite(void *buf, size_t count) {
     lseek(this->fileDescriptor, this->cursor, 0);//will move the cursor of the file with the given descriptor to the location of our cursor
@@ -176,7 +104,7 @@ ssize_t VDIfile::vdiWrite(void *buf, size_t count) {
 off_t VDIfile::vdiSeek(off_t offset, int anchor) {
     if(anchor == SEEK_SET) {
         if(offset < this->headerInfo.cbDisk && offset >= 0)
-            this->cursor = headerInfo.offData;
+            this->cursor = headerInfo.offData + offset;
         else
             return -1;
     }
