@@ -32,7 +32,7 @@ void StepZDebug::displayBufferPage(uint8_t *buf,uint32_t count, uint32_t start,u
         while (hexWidth > 0) {
 
             /* if the offset is as least as great as the start and the offset is less than the start and count and count is greater than 0 */
-            if (start <= offset && offset < start + hexCount && hexCount > 0) {
+            if (start <= offset + hexCount && hexCount > 0) {
                 printf("%02x", buf[hexCursor]);
                 cout << " ";
                 hexCursor++;
@@ -51,7 +51,7 @@ void StepZDebug::displayBufferPage(uint8_t *buf,uint32_t count, uint32_t start,u
         /* This handles the right side of the table with the characters */
         while(charWidth > 0)
         {
-            if(start <= offset && offset < start + charCount && charCount > 0 && isprint(buf[charCursor])){
+            if(start <= offset + charCount && charCount > 0 && isprint(buf[charCursor])){
                 cout << static_cast<uint8_t>(buf[charCursor]);
             } else{
                 cout << " ";
