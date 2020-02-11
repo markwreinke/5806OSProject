@@ -15,9 +15,9 @@ using namespace std;
 
 
 int main() {
-    //ExEmulationTests::step0Ex1();
+    ExEmulationTests::step0Ex1();
     //ExEmulationTests::step0Ex2();
-    ExEmulationTests::step0Ex3();
+    //ExEmulationTests::step0Ex3();
     /* uint8_t buffer[64];
  dedZeros.str() << end;
 

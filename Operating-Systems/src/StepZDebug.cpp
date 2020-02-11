@@ -11,8 +11,8 @@ void StepZDebug::displayBufferPage(uint8_t *buf,uint32_t count, uint32_t start,u
     int hexWidth = 16;
     int charWidth = 16;
 
-    int hexCursor = start;
-    int charCursor = start;
+    int hexCursor = 0;
+    int charCursor = 0;
 
     int hexCount = count;
     int charCount = count;
@@ -21,6 +21,8 @@ void StepZDebug::displayBufferPage(uint8_t *buf,uint32_t count, uint32_t start,u
     int charCurrentSpot = 0;
     if(start >= 256)
     {
+        hexCursor = start;
+        charCursor = start;
         start = 0;
     }
     /* This is the header of the display table */
