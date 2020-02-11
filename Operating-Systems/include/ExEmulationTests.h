@@ -21,6 +21,7 @@ class ExEmulationTests {
 public:
     static void step0Ex1();
     static void step0Ex2();
+    static void step0Ex3();
 };
 
 

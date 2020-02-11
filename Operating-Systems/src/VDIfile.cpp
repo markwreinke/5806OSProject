@@ -25,7 +25,6 @@ bool VDIfile::vdiOpen(char *fn) {
 
         /* Initialize the translation map */
         this-> transMapSize = headerInfo.cBlocks; // The number of blocks in the image
-        cout << transMapSize << endl;
         this-> VDITransMapPointer = new int[transMapSize];
         lseek(fileDescriptor, headerInfo.offBlocks, SEEK_SET);
         read(fileDescriptor, VDITransMapPointer, transMapSize* sizeof(int));
@@ -56,13 +55,25 @@ ssize_t VDIfile::vdiRead(void *buf, size_t count) {
       lseek(fileDescriptor, realLocation, SEEK_SET);
 
       size_t bytesJustRead = 0;
+
+
       if(realLocation >= 0) {
-          bytesJustRead = read(fileDescriptor, static_cast<uint8_t *>(buf) + bytesRead, this->headerInfo.cbBlock);
+
+
+          size_t bytesToRead = 0;
+          if(count < this-> headerInfo.cbBlock){
+              bytesToRead = count;
+          }else{
+              bytesToRead = this->headerInfo.cbBlock;
+          }
+          bytesJustRead = read(fileDescriptor, static_cast<uint8_t *>(buf) + bytesRead, bytesToRead);
       } else{
           int SizeOfBlock = this->headerInfo.cbBlock;
+          cout << SizeOfBlock << endl;
           for(int x = 0; x > SizeOfBlock; x++){
               *(static_cast<uint8_t *>(buf) + (bytesRead + bytesJustRead)) = '0';
               bytesJustRead++;
+              cout << SizeOfBlock << endl;
           }
       }
 

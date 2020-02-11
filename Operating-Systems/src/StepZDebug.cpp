@@ -17,6 +17,12 @@ void StepZDebug::displayBufferPage(uint8_t *buf,uint32_t count, uint32_t start,u
     int hexCount = count;
     int charCount = count;
 
+    int hexCurrentSpot = 0;
+    int charCurrentSpot = 0;
+    if(start >= 256)
+    {
+        start = 0;
+    }
     /* This is the header of the display table */
     cout << hex << "Offset: 0x" << offset << endl;
     cout << "   00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f     0...4...8...c..." <<endl;
@@ -30,35 +36,56 @@ void StepZDebug::displayBufferPage(uint8_t *buf,uint32_t count, uint32_t start,u
 
         /* This handles the left side of the table with the hex numbers */
         while (hexWidth > 0) {
-
+           /*cout << dec << "start: " << start << " <= " << offset << endl;
+           cout << dec << "hexCount: " << hexCount << "> 0" << endl;
+           cout << dec << hexCurrentSpot << " >= " << start << endl;*/
             /* if the offset is as least as great as the start and the offset is less than the start and count and count is greater than 0 */
-            if (start <= offset + hexCount && hexCount > 0) {
+            if (start <= offset && hexCount > 0 && hexCurrentSpot >= start) {
                 printf("%02x", buf[hexCursor]);
                 cout << " ";
                 hexCursor++;
-
+                hexCount--;
             } else {
                 cout << "   ";
             }
             hexWidth--;
-
-            hexCount--;
+            hexCurrentSpot++;
         }
 
         /* Divisor between left/right hex/char sides of the table */
         cout<< hex << "|" << setfill('0') << setw(2) << height << "|";
 
         /* This handles the right side of the table with the characters */
-        while(charWidth > 0)
-        {
-            if(start <= offset + charCount && charCount > 0 && isprint(buf[charCursor])){
-                cout << static_cast<uint8_t>(buf[charCursor]);
-            } else{
+        while(charWidth > 0) {
+            //cout << dec << "start: " << start << " <= " << offset << endl;
+           // cout << dec << "charCount: " << charCount << "> 0" << endl;
+            //cout << dec << charCurrentSpot << " >= " << start << endl;
+
+            if(isprint(buf[charCursor])){
+                //cout << "Entered isPrint: " << buf[charCursor] << endl;
+            }
+
+
+
+
+            /* if the offset is as least as great as the start and the offset is less than the start and count and count is greater than 0 */
+            if(start <= offset && charCount > 0 && charCurrentSpot >= start){
+
+                /* If the character is printable */
+                if(isprint(buf[charCursor])){
+                    cout << static_cast<uint8_t>(buf[charCursor]);
+                } else {
+                    cout << " ";
+                }
+
+                charCursor++;
+                charCount--;
+            } else {
                 cout << " ";
+                //charCursor++;
             }
             charWidth--;
-            charCursor++;
-            charCount--;
+            charCurrentSpot++;
         }
 
         /* The right border of the table */
@@ -81,7 +108,7 @@ void StepZDebug::displayBuffer(uint8_t *buf, uint32_t count, uint64_t offset) {
     while(count > 0) {
         if(count > 256){
             displayBufferPage(buf,256,start,offset);
-            start += 256;
+            start+=256;
             count -= 256;
             offset += 256;
         } else{
