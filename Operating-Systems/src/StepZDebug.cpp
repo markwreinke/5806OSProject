@@ -131,8 +131,15 @@ void StepZDebug::dumpVDIHeader(struct VDIHeaderInfo* headerInfo) {
     cout << "Sector size: 0x" << hex << setw(8) <<  setfill('0') << headerInfo->legacyGeometry[3] << "   " << dec << headerInfo->legacyGeometry[3] << endl;
     cout << "Logical CHS: " << dec << headerInfo->LCHSGeometry[0] << "-" << headerInfo->LCHSGeometry[1] << "-" << headerInfo->LCHSGeometry[2] << endl;
     cout << "Sector size: 0x" << hex << setw(8) <<  setfill('0') << headerInfo->LCHSGeometry[3] << "   " << dec << headerInfo->LCHSGeometry[3] << endl;
-    cout << "offblocks: " << hex << setw(8) <<  setfill('0') << headerInfo->offBlocks << endl;
-    displayBufferPage(reinterpret_cast<uint8_t *>(headerInfo->szComment), 256, 0, 0);
+    cout << "Map Offset (""Offblocks""): 0x" << hex << setw(8) << setfill('0') << headerInfo->offBlocks << "   " << dec << headerInfo->offBlocks << endl;
+    cout << "Frame offset (""OffData""): 0x" << hex << setw(8) << setfill('0') << headerInfo->offData << "   " << dec << headerInfo->offData << endl;
+    cout << "Frame size (""cbBlock""): 0x" << hex << setw(8) << setfill('0') << headerInfo->cbBlock << "   " << dec << headerInfo->cbBlock << endl;
+    cout << "Extra Frame Size: 0x" << hex << setw(8) << setfill('0') << headerInfo->cbBlockExtra << "   " << dec << headerInfo->cbBlockExtra << endl;
+    cout << "Total frames (""cBlocks""): 0x" << hex << setw(8) << setfill('0') << headerInfo->cBlocks << "   " << dec << headerInfo->cBlocks << endl;
+    cout << "Frames allocated: 0x" << hex << setw(8) << setfill('0') << headerInfo->cBlocksAllocated << "   " << dec << headerInfo->cBlocksAllocated << endl;
+    cout << "Disk size (""cbDisk""): 0x" << hex << setw(16) << setfill('0') << headerInfo->cbDisk << "   " << dec << headerInfo->cbDisk << endl;
+    cout << "Image Comment: " << endl;
+    displayBufferPage(reinterpret_cast<uint8_t *>(headerInfo->szComment), 256, 0, 84);
 }
 
 

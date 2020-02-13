@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <sys/types.h>
 #include <iostream>
+#include <iomanip>
 
 using namespace std;
 
@@ -29,6 +30,8 @@ class UtilityUUID {
         };
 
         static char uuidStr[40];
+
+
 
         //-----------------------------------------------------------------------------
         // static char *uuid2ascii(uint8_t *uuid)

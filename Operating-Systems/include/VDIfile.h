@@ -34,10 +34,10 @@ struct VDIHeaderInfo {
     uint32_t cbBlockExtra;
     uint32_t cBlocks; // Number of blocks
     uint32_t cBlocksAllocated;
-    UtilityUUID::UUID uuidCreate;
-    UtilityUUID::UUID uuidModify;
-    UtilityUUID::UUID uuidLinkage;
-    UtilityUUID::UUID uuidParentModify;
+    char uuidCreate[16];
+    char uuidModify[16];
+    char uuidLinkage[16];
+    char uuidParentModify[16];
 
     uint32_t LCHSGeometry[4];
     /* Replaced by above array :

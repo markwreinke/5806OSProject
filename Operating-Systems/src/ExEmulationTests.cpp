@@ -18,10 +18,11 @@ void ExEmulationTests::runEmTest(int step, int example){
                     break;
                 }
 
-        case 1:if(example ==1){
-                    step1Ex1();
-                    break;
+        case 1:if(example ==1) {
+                step1Ex1();
+                break;
                 }
+
         default:
             cout << "These are not the  step " << step << " example " << example << " emulation tests you are looking for." << endl;
     }
