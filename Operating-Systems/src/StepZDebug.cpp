@@ -125,8 +125,14 @@ void StepZDebug::dumpVDIHeader(struct VDIHeaderInfo* headerInfo) {
     cout << "Signature: 0x" << hex << headerInfo->u32Signature << endl;
     cout << "Version: " << hex << headerInfo->u32Version << endl;
     cout << "Header Size: 0x" << hex << setw(8) <<  setfill('0') << headerInfo->cbHeader << "   " << dec << headerInfo->cbHeader << endl;
-    cout << "offblocks: " << hex << headerInfo->offBlocks << endl;
-    ///displayBufferPage(headerInfo->szComment, 256, 0, 0);
+    cout << "Image Type: 0x" << hex << setw(8) <<  setfill('0') << headerInfo->imageType << endl;
+    cout << "Flags: 0x" << hex << setw(8) <<  setfill('0') << headerInfo->fFlags << endl;
+    cout << "Virtual CHS: " << headerInfo->legacyGeometry[0] << "-" << headerInfo->legacyGeometry[1] << "-" << headerInfo->legacyGeometry[2] << endl;
+    cout << "Sector size: 0x" << hex << setw(8) <<  setfill('0') << headerInfo->legacyGeometry[3] << "   " << dec << headerInfo->legacyGeometry[3] << endl;
+    cout << "Logical CHS: " << dec << headerInfo->LCHSGeometry[0] << "-" << headerInfo->LCHSGeometry[1] << "-" << headerInfo->LCHSGeometry[2] << endl;
+    cout << "Sector size: 0x" << hex << setw(8) <<  setfill('0') << headerInfo->LCHSGeometry[3] << "   " << dec << headerInfo->LCHSGeometry[3] << endl;
+    cout << "offblocks: " << hex << setw(8) <<  setfill('0') << headerInfo->offBlocks << endl;
+    displayBufferPage(reinterpret_cast<uint8_t *>(headerInfo->szComment), 256, 0, 0);
 }
 
 

@@ -4,6 +4,33 @@
 
 #include "../include/ExEmulationTests.h"
 
+
+void ExEmulationTests::runEmTest(int step, int example){
+    switch(step){
+        case 0: if(example == 1){
+                    step0Ex1();
+                    break;
+                } else if(example == 2){
+                    step0Ex2();
+                    break;
+                } else if(example ==3){
+                    step0Ex3();
+                    break;
+                }
+
+        case 1:if(example ==1){
+                    step1Ex1();
+                    break;
+                }
+        default:
+            cout << "These are not the  step " << step << " example " << example << " emulation tests you are looking for." << endl;
+    }
+}
+
+
+
+
+
 void ExEmulationTests::step0Ex1() {
     cout << "Displaying Step 0, Example 1" << endl;
 
@@ -51,7 +78,6 @@ void ExEmulationTests::step0Ex2() {
 void ExEmulationTests::step0Ex3() {
     cout << "Displaying Step 0, Example 3" << endl;
 
-
     /// Cursed Fuckery
     /*uint8_t *buffer = new uint8_t[64];
     char *filename = "../testFiles/Test-fixed-1k.vdi";
@@ -83,12 +109,19 @@ void ExEmulationTests::step0Ex3() {
     StepZDebug::displayBufferPage(buffer, 64, 190, 256);
     f.vdiClose();
     delete[] buffer;
+}
 
+void ExEmulationTests::step1Ex1() {
+    cout << "Displaying Step 1, Example 1" << endl;
 
+    char *filename = "../testFiles/Test-fixed-1k.vdi";
 
-
-
-
-
-
+    uint8_t *buffer = new uint8_t[64];
+    VDIfile f;
+    f.vdiOpen(filename);
+    f.vdiSeek(446, SEEK_SET);
+    f.vdiRead(buffer, 64);
+    StepZDebug::dumpVDIHeader(&f.headerInfo);
+    f.vdiClose();
+    delete[] buffer;
 }

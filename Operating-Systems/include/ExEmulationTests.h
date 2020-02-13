@@ -19,9 +19,11 @@ using namespace std;
 
 class ExEmulationTests {
 public:
+    static void runEmTest(int step, int example);
     static void step0Ex1();
     static void step0Ex2();
     static void step0Ex3();
+    static void step1Ex1();
 };
 
 
