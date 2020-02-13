@@ -25,6 +25,7 @@ public:
     static void step0Ex3();
     static void step1Ex1();
     static void step1Ex2();
+    static void step1Ex3();
 };
 
 
