@@ -13,16 +13,18 @@ void ExEmulationTests::runEmTest(int step, int example){
                 } else if(example == 2){
                     step0Ex2();
                     break;
-                } else if(example ==3){
+                } else if(example == 3){
                     step0Ex3();
                     break;
                 }
 
-        case 1:if(example ==1) {
+        case 1:if(example == 1) {
                 step1Ex1();
                 break;
+                } else if(example == 2){
+                step1Ex2();
+                break;
                 }
-
         default:
             cout << "These are not the  step " << step << " example " << example << " emulation tests you are looking for." << endl;
     }
@@ -123,6 +125,21 @@ void ExEmulationTests::step1Ex1() {
     f.vdiSeek(446, SEEK_SET);
     f.vdiRead(buffer, 64);
     StepZDebug::dumpVDIHeader(&f.headerInfo);
+    f.vdiClose();
+    delete[] buffer;
+}
+
+void ExEmulationTests::step1Ex2() {
+    cout << "Displaying Step 1, Example 2" << endl;
+
+    char *filename = "../testFiles/Test-fixed-1k.vdi";
+
+    uint8_t *buffer = new uint8_t[64];
+    VDIfile f;
+    f.vdiOpen(filename);
+    f.vdiSeek(446, SEEK_SET);
+    f.vdiRead(buffer, 64);
+    StepZDebug::displayBuffer(reinterpret_cast<uint8_t *>(&f.headerInfo), 400, 0);
     f.vdiClose();
     delete[] buffer;
 }
