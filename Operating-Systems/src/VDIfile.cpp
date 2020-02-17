@@ -39,27 +39,26 @@ void VDIfile::vdiClose() {
     delete[] VDITransMapPointer;
 }
 
-// #todo might need to update buf
+
 ssize_t VDIfile::vdiRead(void *buf, size_t count) {
   size_t bytesRemaining = count;
   size_t bytesRead = 0;
 
 
   while(bytesRemaining > 0){
+
+      /* Translate the cursor to the real location according to the translation map */
       size_t virtualPage = cursor/this->headerInfo.cbBlock;
       size_t offset = cursor%this->headerInfo.cbBlock;
       size_t physicalPage = this->VDITransMapPointer[virtualPage];
-
       size_t realLocation = physicalPage*this->headerInfo.cbBlock + offset;
-
       lseek(fileDescriptor, realLocation, SEEK_SET);
+
 
       size_t bytesJustRead = 0;
 
-
+      /* If the location has been initialized */
       if(realLocation >= 0) {
-
-
           size_t bytesToRead = 0;
           if(count < this-> headerInfo.cbBlock){
               bytesToRead = count;
@@ -67,13 +66,11 @@ ssize_t VDIfile::vdiRead(void *buf, size_t count) {
               bytesToRead = this->headerInfo.cbBlock;
           }
           bytesJustRead = read(fileDescriptor, static_cast<uint8_t *>(buf) + bytesRead, bytesToRead);
-      } else{
+      } else{ /* if the block wasn't initialized, it reads out a block of Os */
           int SizeOfBlock = this->headerInfo.cbBlock;
-          cout << SizeOfBlock << endl;
           for(int x = 0; x > SizeOfBlock; x++){
               *(static_cast<uint8_t *>(buf) + (bytesRead + bytesJustRead)) = '0';
               bytesJustRead++;
-              cout << SizeOfBlock << endl;
           }
       }
 
@@ -82,7 +79,46 @@ ssize_t VDIfile::vdiRead(void *buf, size_t count) {
       vdiSeek(bytesJustRead, SEEK_CUR);
   }
 }
+
+
 ssize_t VDIfile::vdiWrite(void *buf, size_t count) {
+    size_t bytesRemaining = count;
+    size_t bytesWritten = 0;
+
+
+    while(bytesRemaining > 0) {
+        size_t virtualPage = cursor / this->headerInfo.cbBlock;
+        size_t offset = cursor % this->headerInfo.cbBlock;
+        size_t physicalPage = this->VDITransMapPointer[virtualPage];
+
+        size_t realLocation = physicalPage * this->headerInfo.cbBlock + offset;
+
+        lseek(fileDescriptor, realLocation, SEEK_SET);
+
+        size_t bytesJustWritten = 0;
+
+        /* If the block wasn't initialized */
+        if (realLocation < 0) {
+            size_t newLocation =
+                    this->headerInfo.offData + this->headerInfo.cBlocksAllocated * this->headerInfo.cbBlock;
+            lseek(fileDescriptor, newLocation, SEEK_SET);
+            this->VDITransMapPointer[virtualPage] = newLocation;
+        }
+
+        size_t bytesToWrite = 0;
+
+        if (count < this->headerInfo.cbBlock) {
+            bytesToWrite = count;
+        } else {
+            bytesToWrite = this->headerInfo.cbBlock;
+        }
+        bytesJustWritten = write(fileDescriptor, static_cast<uint8_t *>(buf) + bytesWritten, bytesToWrite);
+
+        bytesWritten += bytesJustWritten;
+        bytesRemaining -= bytesJustWritten;
+        vdiSeek(bytesJustWritten, SEEK_CUR);
+    }
+    /*
     lseek(this->fileDescriptor, this->cursor, 0);//will move the cursor of the file with the given descriptor to the location of our cursor
     size_t bytesWritten = 0;
     uint8_t buffer[count];
@@ -109,8 +145,10 @@ ssize_t VDIfile::vdiWrite(void *buf, size_t count) {
         }
         return bytesWritten;
     }
-
+    */
 }
+
+
 /* I feel like this is a better situation for a switch, but that is kinda arbitrary */
 off_t VDIfile::vdiSeek(off_t offset, int anchor) {
     if(anchor == SEEK_SET) {
