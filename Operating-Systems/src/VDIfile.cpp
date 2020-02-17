@@ -107,6 +107,7 @@ ssize_t VDIfile::vdiWrite(void *buf, size_t count) {
 
         size_t bytesToWrite = 0;
 
+        /* This is so the method writes one block at a time */
         if (count < this->headerInfo.cbBlock) {
             bytesToWrite = count;
         } else {
