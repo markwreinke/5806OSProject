@@ -15,6 +15,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "Partition.h"
 using namespace std;
 
 class ExEmulationTests {
@@ -27,6 +28,7 @@ public:
     static void step1Ex2();
     static void step1Ex3();
     static void step1Ex4();
+    static void step2Ex1();
 };
 
 

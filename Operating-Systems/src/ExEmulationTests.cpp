@@ -30,6 +30,12 @@ void ExEmulationTests::runEmTest(int step, int example){
                 } else if(example == 4){
                 step1Ex4();
                 break;
+                } else if(example == 5){
+
+                }
+        case 2:if(example == 1){
+                step2Ex1();
+                break;
                 }
         default:
             cout << "These are not the  step " << step << " example " << example << " emulation tests you are looking for." << endl;
@@ -177,4 +183,19 @@ void ExEmulationTests::step1Ex4(){
     StepZDebug::dumpVDIHeader(&f.headerInfo);
     f.vdiClose();
     delete[] buffer;
+}
+void ExEmulationTests::step2Ex1(){
+    cout << "Displaying Step 2, Example 1" << endl;
+
+    struct PartitionEntry* PE;
+    PE.partitionEntry[0]+1 = hex(20);
+    PE->partitionEntry[0]+2 = hex(21);
+    PE->partitionEntry[0]+4 = hex(83);
+    PE->partitionEntry[0]+5 = hex(51);
+    PE->partitionEntry[0]+6 = hex(01);
+    PE->partitionEntry[0]+7 = hex(10);
+    PE->partitionEntry[0]+9 = hex(8);
+    PE->partitionEntry[0]+13 = hex(8);
+    PE->partitionEntry[0]+14 = hex(03);
+    StepZDebug::dumpPartitionTable(PE);
 }

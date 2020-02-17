@@ -87,12 +87,11 @@ ssize_t VDIfile::vdiWrite(void *buf, size_t count) {
 
 
     while(bytesRemaining > 0) {
+        /* Translate the cursor to the real location according to the translation map */
         size_t virtualPage = cursor / this->headerInfo.cbBlock;
         size_t offset = cursor % this->headerInfo.cbBlock;
         size_t physicalPage = this->VDITransMapPointer[virtualPage];
-
         size_t realLocation = physicalPage * this->headerInfo.cbBlock + offset;
-
         lseek(fileDescriptor, realLocation, SEEK_SET);
 
         size_t bytesJustWritten = 0;
@@ -113,6 +112,7 @@ ssize_t VDIfile::vdiWrite(void *buf, size_t count) {
         } else {
             bytesToWrite = this->headerInfo.cbBlock;
         }
+
         bytesJustWritten = write(fileDescriptor, static_cast<uint8_t *>(buf) + bytesWritten, bytesToWrite);
 
         bytesWritten += bytesJustWritten;
