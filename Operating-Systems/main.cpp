@@ -3,7 +3,7 @@
 #include "src/VDIfile.cpp"
 #include "include/VDIfile.h"
 #include "include/StepZDebug.h"
-#include "include/ExEmulationTests.h"""
+#include "include/ExEmulationTests.h"
 #include <errno.h>
 #include <string.h>
 #include <fcntl.h>

@@ -19,16 +19,18 @@ struct PartitionEntry{
 
 class Partition {
 public:
-    struct PartitionFile *partitionOpen(VDIfile *f);
+    bool partitionOpen(VDIfile *f);
     void partitionClose();
     ssize_t partitionRead(void *buf, size_t count);
     ssize_t partitionWrite(void *buf, size_t count);
-    off_t paritionSeek(off_t offset, int anchor);
-    struct PartitionEntry PartEntry;
+    off_t partitionSeek(off_t offset, int anchor);
+    struct PartitionEntry partEntry;
 private:
     VDIfile *VDIFile;
     size_t partitionStart;
     size_t partitionSize;
+    size_t cursor;
+
 };
 
 

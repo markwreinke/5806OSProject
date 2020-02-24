@@ -19,22 +19,34 @@ struct PartitionFile *partitionOpen(VDIfile *f, struct PartitionEntry PartEntry)
     //set start location
     //set size of partition
 }
-off_t partitionSeek(off_t offset, int anchor){
+
+bool Partition::partitionOpen(VDIfile *f) {
+    f->vdiSeek(446, SEEK_SET);
+    f->vdiRead(&partEntry.partitionEntry, 64);
+    cursor = 0;
+    partitionStart = *(partEntry.partitionEntry + 8*sizeof(uint8_t)) * 512;
+    partitionSize = *(partEntry.partitionEntry + 12*sizeof(uint8_t)) * 512;
+}
+
+
+
+
+off_t Partition::partitionSeek(off_t offset, int anchor){
     if(anchor == SEEK_SET) {
-        if(offset < this->headerInfo.cbDisk && offset >= 0)
-            this->cursor = headerInfo.offData + offset;
+        if(offset < this->partitionSize && offset >= 0)
+            this->cursor = 446 + offset;
         else
             return -1;
     }
     else if(anchor == SEEK_CUR) {
-        if((this->cursor + offset) < this->headerInfo.cbDisk && (this->cursor + offset) >= 0)
+        if((this->cursor + offset) < this->partitionSize && (this->cursor + offset) >= 0)
             this->cursor = this->cursor + offset;
         else
             return -1;
     }
     else if (anchor == SEEK_END) {
         if(offset < 0){
-            this->cursor = this->headerInfo.cbDisk + offset;
+            this->cursor = this->partitionSize + offset;
         } else{
             return -1;
         }

@@ -144,16 +144,26 @@ void StepZDebug::dumpVDIHeader(struct VDIHeaderInfo* headerInfo) {
 void StepZDebug::dumpPartitionTable(struct PartitionEntry *P){
     for(int PartitionNumber = 0; PartitionNumber < 4; PartitionNumber++){
         //p[array#,Byte#]
-        cout << "Partition: " << PartitionNumber << endl;
+        cout << "Partition: " << PartitionNumber + 1 << endl;
         cout << "Status: ";
         if(P->partitionEntry[PartitionNumber] == 00)
-            cout << "inactive" << endl;
-        else if(P->partitionEntry[PartitionNumber] >= hex(01) && P->partitionEntry[PartitionNumber] <= hex(7f))
-            cout << "invalid" << endl;
+            cout << "Inactive" << endl;
+        else if(P->partitionEntry[PartitionNumber] >= 1 && P->partitionEntry[PartitionNumber] <= 127)
+            cout << "Invalid" << endl;
         else
             cout << P->partitionEntry[PartitionNumber] << endl;
+        cout << dec << "First sector CHS: " << *(&P->partitionEntry[PartitionNumber] + 1* sizeof(uint8_t)) << "-" << *(&P->partitionEntry[PartitionNumber] + 2*sizeof(uint8_t)) << "-" << P->partitionEntry[PartitionNumber] + 3 << endl;
+        cout << "Partition Type: " << *(&P->partitionEntry[PartitionNumber] + 4* sizeof(uint8_t)) << endl;
 
-        cout << dec << "First sector CHS: " << &P->partitionEntry[PartitionNumber] + 1 << "-" << P->partitionEntry[PartitionNumber] + 2 << "-" << P->partitionEntry[PartitionNumber] + 3 << endl;
+        cout << endl;
+
+
+        /*
+         *
+         *
+         *
+
+
         cout << dec << "Last sector CHS: " << P->partitionEntry[PartitionNumber] + 5 << "-" << P->partitionEntry[PartitionNumber] + 6 << "-" << P->partitionEntry[PartitionNumber] + 7 << endl;
 
         cout << "Partition Type: " << P->partitionEntry[PartitionNumber] + 4;
@@ -166,6 +176,9 @@ void StepZDebug::dumpPartitionTable(struct PartitionEntry *P){
         cout << "First LBA sector: " << dec << (P->partitionEntry[PartitionNumber] + 8)+(P->partitionEntry[PartitionNumber] + 9)+(P->partitionEntry[PartitionNumber] + 10)+(P->partitionEntry[PartitionNumber] + 11) << endl;
         cout << "LBA Sector Count: " << dec << (P->partitionEntry[PartitionNumber] + 12)+(P->partitionEntry[PartitionNumber] + 13)+(P->partitionEntry[PartitionNumber] + 14)+(P->partitionEntry[PartitionNumber] + 15) << endl;
         cout << endl;
+
+
+         */
     }
 }
 

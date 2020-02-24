@@ -187,8 +187,22 @@ void ExEmulationTests::step1Ex4(){
 void ExEmulationTests::step2Ex1(){
     cout << "Displaying Step 2, Example 1" << endl;
 
-    struct PartitionEntry* PE;
-    PE.partitionEntry[0]+1 = hex(20);
+    char *filename = "../testFiles/Test-dynamic-1k.vdi";
+
+    VDIfile f;
+    f.vdiOpen(filename);
+
+    Partition p;
+    p.partitionOpen(&f);
+    StepZDebug::dumpPartitionTable(&p.partEntry);
+    f.vdiClose();
+
+
+
+    /*
+
+    PartitionEntry* PE = new PartitionEntry;
+    *PE->partitionEntry[0]+1 = 20;
     PE->partitionEntry[0]+2 = hex(21);
     PE->partitionEntry[0]+4 = hex(83);
     PE->partitionEntry[0]+5 = hex(51);
@@ -198,4 +212,6 @@ void ExEmulationTests::step2Ex1(){
     PE->partitionEntry[0]+13 = hex(8);
     PE->partitionEntry[0]+14 = hex(03);
     StepZDebug::dumpPartitionTable(PE);
+
+    delete[] PE; */
 }
