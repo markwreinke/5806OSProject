@@ -22,10 +22,10 @@ struct PartitionFile *partitionOpen(VDIfile *f, struct PartitionEntry PartEntry)
 
 bool Partition::partitionOpen(VDIfile *f) {
     f->vdiSeek(446, SEEK_SET);
-    f->vdiRead(&partEntry.partitionEntry, 64);
+    f->vdiRead(this->partEntry.partitionEntry, 64);
     cursor = 0;
-    partitionStart = *(partEntry.partitionEntry + 8*sizeof(uint8_t)) * 512;
-    partitionSize = *(partEntry.partitionEntry + 12*sizeof(uint8_t)) * 512;
+    this->partitionStart = *(partEntry.partitionEntry + 8*sizeof(uint8_t) * 512);
+    this->partitionSize = *(partEntry.partitionEntry + 12*sizeof(uint8_t) * 512);
 }
 
 
