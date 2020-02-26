@@ -193,7 +193,7 @@ void ExEmulationTests::step2Ex1(){
     f.vdiOpen(filename);
 
     Partition p;
-    p.partitionOpen(&f);
+    p.fillPartitionEntry(&f);
     StepZDebug::dumpPartitionTable(&p.partEntry);
     f.vdiClose();
 

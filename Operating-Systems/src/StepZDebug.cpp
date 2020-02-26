@@ -143,42 +143,49 @@ void StepZDebug::dumpVDIHeader(struct VDIHeaderInfo* headerInfo) {
 }
 void StepZDebug::dumpPartitionTable(struct PartitionEntry *P){
     for(int PartitionNumber = 0; PartitionNumber < 4; PartitionNumber++){
-        //p[array#,Byte#]
+        //p[array#][Byte#]
+
         cout << "Partition: " << PartitionNumber + 1 << endl;
+
         cout << "Status: ";
-        if(P->partitionEntry[PartitionNumber] == 00)
+        if(P->partitionEntries[PartitionNumber][0] == 00)
             cout << "Inactive" << endl;
-        else if(P->partitionEntry[PartitionNumber] >= 1 && P->partitionEntry[PartitionNumber] <= 127)
+        else if(P->partitionEntries[PartitionNumber][0] >= 1 && P->partitionEntries[PartitionNumber][0] <= 127)
             cout << "Invalid" << endl;
         else
-            cout << P->partitionEntry[PartitionNumber] << endl;
-        cout << dec << "First sector CHS: " << *(&P->partitionEntry[PartitionNumber] + 1* sizeof(uint8_t)) << "-" << *(&P->partitionEntry[PartitionNumber] + 2*sizeof(uint8_t)) << "-" << P->partitionEntry[PartitionNumber] + 3 << endl;
-        cout << "Partition Type: " << *(&P->partitionEntry[PartitionNumber] + 4* sizeof(uint8_t)) << endl;
+            cout << P->partitionEntries[PartitionNumber][0] << endl;
 
+        cout << hex << "First sector CHS: ";
+        printf("%u", P->partitionEntries[PartitionNumber][1]);
+        cout << "-";
+        printf("%u", P->partitionEntries[PartitionNumber][2]);
+        cout << "-";
+        printf("%u", P->partitionEntries[PartitionNumber][3]);
         cout << endl;
 
-
-        /*
-         *
-         *
-         *
-
-
-        cout << dec << "Last sector CHS: " << P->partitionEntry[PartitionNumber] + 5 << "-" << P->partitionEntry[PartitionNumber] + 6 << "-" << P->partitionEntry[PartitionNumber] + 7 << endl;
-
-        cout << "Partition Type: " << P->partitionEntry[PartitionNumber] + 4;
-        if(P->partitionEntry[PartitionNumber] + 4 == hex(83)
-        cout << " linux native" << endl;
-        else if(P->partitionEntry[PartitionNumber] + 4 == 00)
-        cout << " empty" << endl;
+        cout << "Partition Type: " ;
+        printf("%u", P->partitionEntries[PartitionNumber][4]);
+        cout << " ";
+        if(P->partitionEntries[PartitionNumber][4] == 83)
+            cout << " linux native" << endl;
+        else if(P->partitionEntries[PartitionNumber][4] == 00)
+            cout << " empty" << endl;
         else
-            cout << "You done fucked up now ricky bobby   " << (P->partitionEntry[PartitionNumber] + 4 << endl;
-        cout << "First LBA sector: " << dec << (P->partitionEntry[PartitionNumber] + 8)+(P->partitionEntry[PartitionNumber] + 9)+(P->partitionEntry[PartitionNumber] + 10)+(P->partitionEntry[PartitionNumber] + 11) << endl;
-        cout << "LBA Sector Count: " << dec << (P->partitionEntry[PartitionNumber] + 12)+(P->partitionEntry[PartitionNumber] + 13)+(P->partitionEntry[PartitionNumber] + 14)+(P->partitionEntry[PartitionNumber] + 15) << endl;
+            cout << "You done fucked up now ricky bobby   " << P->partitionEntries[PartitionNumber][4] << endl;
+
+        cout << "Last Sector CHS: ";
+        printf("%u", P->partitionEntries[PartitionNumber][5]);
+        cout << "-";
+        printf("%u", P->partitionEntries[PartitionNumber][6]);
+        cout << "-";
+        printf("%u", P->partitionEntries[PartitionNumber][7]);
         cout << endl;
 
+        cout << "First LBA sector: " << dec << P->partitionEntries[PartitionNumber][8]+P->partitionEntries[PartitionNumber][9]+P->partitionEntries[PartitionNumber][10]+P->partitionEntries[PartitionNumber][11] << endl;
 
-         */
+        cout << "LBA Sector Count: " << dec << P->partitionEntries[PartitionNumber][12]+P->partitionEntries[PartitionNumber][13]+P->partitionEntries[PartitionNumber][14]+P->partitionEntries[PartitionNumber][15] << endl;
+
+        cout << endl;
     }
 }
 

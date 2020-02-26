@@ -1,4 +1,4 @@
-//
+ //
 // Created by csis on 2/17/20.
 //
 
@@ -14,7 +14,8 @@
 #include "VDIfile.h"
 struct PartitionEntry{
     static const int NUM_PARTITION_ENTRIES = 4;
-    uint64_t partitionEntry[NUM_PARTITION_ENTRIES];
+    static const int NUM_BYTES = 16;
+    uint8_t partitionEntries[NUM_PARTITION_ENTRIES][NUM_BYTES];
 };
 
 class Partition {
@@ -24,6 +25,7 @@ public:
     ssize_t partitionRead(void *buf, size_t count);
     ssize_t partitionWrite(void *buf, size_t count);
     off_t partitionSeek(off_t offset, int anchor);
+    void fillPartitionEntry(VDIfile *f);
     struct PartitionEntry partEntry;
 private:
     VDIfile *VDIFile;
