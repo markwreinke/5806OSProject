@@ -35,7 +35,7 @@ bool VDIfile::vdiOpen(char *fn) {
 };
 /* Closes the vdi file while destroying dynamically created stuff */
 void VDIfile::vdiClose() {
-    close(this->fileDescriptor);
+    close(fileDescriptor);
     delete[] VDITransMapPointer;
 }
 
@@ -52,8 +52,7 @@ ssize_t VDIfile::vdiRead(void *buf, size_t count) {
       size_t offset = cursor%this->headerInfo.cbBlock;
       size_t physicalPage = this->VDITransMapPointer[virtualPage];
       size_t realLocation = physicalPage*this->headerInfo.cbBlock + offset;
-      lseek(fileDescriptor, realLocation, SEEK_SET);
-
+      lseek(fileDescriptor, realLocation + this->headerInfo.offData, SEEK_SET);
 
       size_t bytesJustRead = 0;
 
@@ -92,16 +91,27 @@ ssize_t VDIfile::vdiWrite(void *buf, size_t count) {
         size_t offset = cursor % this->headerInfo.cbBlock;
         size_t physicalPage = this->VDITransMapPointer[virtualPage];
         size_t realLocation = physicalPage * this->headerInfo.cbBlock + offset;
-        lseek(fileDescriptor, realLocation, SEEK_SET);
+        lseek(fileDescriptor, realLocation + this->headerInfo.offData, SEEK_SET);
 
         size_t bytesJustWritten = 0;
 
         /* If the block wasn't initialized */
-        if (realLocation < 0) {
-            size_t newLocation =
-                    this->headerInfo.offData + this->headerInfo.cBlocksAllocated * this->headerInfo.cbBlock;
-            lseek(fileDescriptor, newLocation, SEEK_SET);
-            this->VDITransMapPointer[virtualPage] = newLocation;
+        if(realLocation < 0) {
+            lseek(fileDescriptor, 0, SEEK_END);
+            uint8_t *pageBuffer = new uint8_t[this->headerInfo.cbBlock];
+            write(fileDescriptor, pageBuffer, this->headerInfo.cbBlock);
+            delete[] pageBuffer;
+
+            physicalPage = this->headerInfo.cBlocksAllocated;
+            this->headerInfo.cBlocksAllocated++;
+
+            this->VDITransMapPointer[virtualPage] = physicalPage;
+
+            lseek(fileDescriptor, 0, SEEK_SET);
+            write(fileDescriptor, &this->headerInfo, sizeof(this->headerInfo));
+
+            lseek(fileDescriptor, this->headerInfo.offBlocks, SEEK_SET);
+            write(fileDescriptor, this->VDITransMapPointer, sizeof(uint32_t) * this->headerInfo.cBlocks);
         }
 
         size_t bytesToWrite = 0;
@@ -154,7 +164,7 @@ ssize_t VDIfile::vdiWrite(void *buf, size_t count) {
 off_t VDIfile::vdiSeek(off_t offset, int anchor) {
     if(anchor == SEEK_SET) {
         if(offset < this->headerInfo.cbDisk && offset >= 0)
-            this->cursor = headerInfo.offData + offset;
+            this->cursor = offset;
         else
             return -1;
     }

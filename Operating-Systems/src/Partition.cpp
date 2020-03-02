@@ -22,7 +22,6 @@ off_t paritionSeek(off_t offset, int anchor);
 bool Partition::partitionOpen(VDIfile *f) {
     f->vdiSeek(446, SEEK_SET);
     f->vdiRead(this->partEntry.partitionEntries, 64);
-    cursor = 0;
     int partitionNum;
     // checks which of the partitionEntries we would like to use
     if(this->partEntry.partitionEntries[0][4] == 0x83){
@@ -39,6 +38,7 @@ bool Partition::partitionOpen(VDIfile *f) {
     this->partitionStart =  this->partEntry.partitionEntries[partitionNum][8] | this->partEntry.partitionEntries[partitionNum][9] << 8 |
             this->partEntry.partitionEntries[partitionNum][10] << 16 |this->partEntry.partitionEntries[partitionNum][11] << 24;
     this->partitionStart = this->partitionStart*512;
+
     //sets the value of size
     this->partitionSize = this->partEntry.partitionEntries[partitionNum][12] | this->partEntry.partitionEntries[partitionNum][13] << 8 |
                           this->partEntry.partitionEntries[partitionNum][14] << 16 |this->partEntry.partitionEntries[partitionNum][14] << 24;
@@ -69,21 +69,20 @@ ssize_t Partition::partitionWrite(void *buf, size_t count) {
 off_t Partition::partitionSeek(off_t offset, int anchor){
     if(anchor == SEEK_SET) {
         if(offset < (this->partitionSize + partitionStart) && offset >= 0)
-            this->cursor = partitionStart + offset;
+            return this->VDIFile->vdiSeek(partitionStart +  offset, SEEK_SET);
         else
             return -1;
     }
     else if(anchor == SEEK_CUR) {
-        if((this->cursor + offset) < (this->partitionSize + partitionStart) && (this->cursor + offset) >= 0)
-            this->cursor = this->cursor + offset;
+        if((this->VDIFile->vdiSeek(0,SEEK_CUR) + offset) < (this->partitionSize + partitionStart) && (this->VDIFile->vdiSeek(0,SEEK_CUR) + offset) >= 0)
+            return this->VDIFile->vdiSeek(offset, SEEK_CUR);
         else
             return -1;
     }
     else if (anchor == SEEK_END) {
         if(offset < 0){
-            this->cursor = this->partitionSize + partitionStart + offset;
+            return this->VDIFile->vdiSeek(this->partitionSize + partitionStart + offset, SEEK_SET);
         } else{return -1;}
     }
     else {return -1;}
-    return cursor;
 }

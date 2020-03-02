@@ -30,7 +30,6 @@ private:
     VDIfile *VDIFile;
     size_t partitionStart;
     size_t partitionSize;
-    size_t cursor;
 
 };
 

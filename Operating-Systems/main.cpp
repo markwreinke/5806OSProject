@@ -15,7 +15,7 @@ using namespace std;
 
 
 int main() {
-    ExEmulationTests::runEmTest(2,3);
+    ExEmulationTests::runEmTest(2,1);
     /* uint8_t buffer[64];
  dedZeros.str() << end;
 
