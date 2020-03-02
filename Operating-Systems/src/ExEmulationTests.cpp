@@ -36,6 +36,12 @@ void ExEmulationTests::runEmTest(int step, int example){
         case 2:if(example == 1){
                 step2Ex1();
                 break;
+                } else if(example == 2) {
+                step2Ex2();
+                break;
+                } else if(example == 3) {
+                step2Ex3();
+                break;
                 }
         default:
             cout << "These are not the  step " << step << " example " << example << " emulation tests you are looking for." << endl;
@@ -185,33 +191,52 @@ void ExEmulationTests::step1Ex4(){
     delete[] buffer;
 }
 void ExEmulationTests::step2Ex1(){
-    cout << "Displaying Step 2, Example 1" << endl;
+    cout << "Displaying Step 2, Example 1 (It's Borked)" << endl;
 
     char *filename = "../testFiles/Test-dynamic-1k.vdi";
-
+    uint8_t *buffer = new uint8_t[1024];
     VDIfile f;
     f.vdiOpen(filename);
 
     Partition p;
-    p.fillPartitionEntry(&f);
-    StepZDebug::dumpPartitionTable(&p.partEntry);
-    f.vdiClose();
+    p.partitionOpen(&f);
+    StepZDebug::dumpPartitionTable(&f,&p.partEntry);
+    p.partitionSeek(1024,SEEK_SET);
+    p.partitionRead(buffer,1024);
+    StepZDebug::displayBuffer(buffer,1024,1024);
+    p.partitionClose();
+}
 
+void ExEmulationTests::step2Ex2(){
+    cout << "Displaying Step 2, Example 2" << endl;
 
+    char *filename = "../testFiles/Test-fixed-1k.vdi";
+    uint8_t *buffer = new uint8_t[1024];
+    VDIfile f;
+    f.vdiOpen(filename);
 
-    /*
+    Partition p;
+    p.partitionOpen(&f);
+    StepZDebug::dumpPartitionTable(&f,&p.partEntry);
+    p.partitionSeek(1024,SEEK_SET);
+    p.partitionRead(buffer,1024);
+    StepZDebug::displayBuffer(buffer,1024,1024);
+    p.partitionClose();
+}
 
-    PartitionEntry* PE = new PartitionEntry;
-    *PE->partitionEntry[0]+1 = 20;
-    PE->partitionEntry[0]+2 = hex(21);
-    PE->partitionEntry[0]+4 = hex(83);
-    PE->partitionEntry[0]+5 = hex(51);
-    PE->partitionEntry[0]+6 = hex(01);
-    PE->partitionEntry[0]+7 = hex(10);
-    PE->partitionEntry[0]+9 = hex(8);
-    PE->partitionEntry[0]+13 = hex(8);
-    PE->partitionEntry[0]+14 = hex(03);
-    StepZDebug::dumpPartitionTable(PE);
+void ExEmulationTests::step2Ex3(){
+    cout << "Displaying Step 2, Example 3" << endl;
 
-    delete[] PE; */
+    char *filename = "../testFiles/Test-fixed-4k.vdi";
+    uint8_t *buffer = new uint8_t[1024];
+    VDIfile f;
+    f.vdiOpen(filename);
+
+    Partition p;
+    p.partitionOpen(&f);
+    StepZDebug::dumpPartitionTable(&f,&p.partEntry);
+    p.partitionSeek(1024,SEEK_SET);
+    p.partitionRead(buffer,1024);
+    StepZDebug::displayBuffer(buffer,1024,1024);
+    p.partitionClose();
 }

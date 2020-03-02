@@ -11,7 +11,7 @@ VDIfile::VDIfile(int transSize) {
     VDITransMapPointer = new int{transMapSize};
     cursor = 0;
 }
-//comment here to test git
+
 /* This loads the header information and such from the given vdi file. Because VDIfile is a class, returns a boolean instead of a pointer. */
 bool VDIfile::vdiOpen(char *fn) {
     fileDescriptor = open(fn, 2);

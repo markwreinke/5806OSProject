@@ -25,7 +25,6 @@ public:
     ssize_t partitionRead(void *buf, size_t count);
     ssize_t partitionWrite(void *buf, size_t count);
     off_t partitionSeek(off_t offset, int anchor);
-    void fillPartitionEntry(VDIfile *f);
     struct PartitionEntry partEntry;
 private:
     VDIfile *VDIFile;
