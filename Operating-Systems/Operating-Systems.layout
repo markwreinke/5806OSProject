@@ -7,12 +7,12 @@
 			<Cursor1 position="1364" topLine="65" />
 		</cursor>
 	</File>
-	<File name="src\VDIfile.cpp" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src\VDIFile.cpp" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<cursor>
 			<Cursor1 position="264" topLine="0" />
 		</cursor>
 	</File>
-	<File name="include\VDIfile.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="include\VDIFile.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<cursor>
 			<Cursor1 position="482" topLine="12" />
 		</cursor>

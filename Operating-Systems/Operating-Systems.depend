@@ -2,7 +2,7 @@
 1579380409 source:c:\users\chase hovel\documents\assignments\operating-systems\main.cpp
 	<iostream>
 	<iomanip>
-	<VDIfile.h>
+	<VDIFile.h>
 	<errno.h>
 	<string.h>
 	<fcntl.h>
@@ -29,5 +29,5 @@
 	"step_0.h"
 
 1579372135 source:c:\users\chase hovel\documents\assignments\operating-systems\src\vdifile.cpp
-	"VDIfile.h"
+	"VDIFile.h"
 

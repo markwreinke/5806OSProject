@@ -11,7 +11,7 @@
 #include <string>
 #include "UtilityUUID.h"
 #include <unistd.h>
-#include "VDIfile.h"
+#include "VDIFile.h"
 struct PartitionEntry{
     static const int NUM_PARTITION_ENTRIES = 4;
     static const int NUM_BYTES = 16;
@@ -20,14 +20,14 @@ struct PartitionEntry{
 
 class Partition {
 public:
-    bool partitionOpen(VDIfile *f);
+    bool partitionOpen(VDIFile *f);
     void partitionClose();
     ssize_t partitionRead(void *buf, size_t count);
     ssize_t partitionWrite(void *buf, size_t count);
     off_t partitionSeek(off_t offset, int anchor);
     struct PartitionEntry partEntry;
 private:
-    VDIfile *VDIFile;
+    VDIFile *vdiFile;
     size_t partitionStart;
     size_t partitionSize;
 

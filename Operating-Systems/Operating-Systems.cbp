@@ -34,9 +34,9 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
-		<Unit filename="include/VDIfile.h" />
+		<Unit filename="include/VDIFile.h" />
 		<Unit filename="main.cpp" />
-		<Unit filename="src/VDIfile.cpp" />
+		<Unit filename="src/VDIFile.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

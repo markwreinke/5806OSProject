@@ -1,7 +1,7 @@
 #include <iostream>
 #include <iomanip>
-#include "src/VDIfile.cpp"
-#include "include/VDIfile.h"
+#include "src/VDIFile.cpp"
+#include "include/VDIFile.h"
 #include "include/StepZDebug.h"
 #include "include/ExEmulationTests.h"
 #include <errno.h>

@@ -1,19 +1,19 @@
 #include <fcntl.h>
-#include "../include/VDIfile.h"
+#include "../include/VDIFile.h"
 #include <unistd.h>
 #include <sys/stat.h>
 #include <cstring>
 #include <string>
 
-/* Declaration of constructor with transMapSize input. Because it is explicit, it must be called VDIfile(int 3)*/
-VDIfile::VDIfile(int transSize) {
+/* Declaration of constructor with transMapSize input. Because it is explicit, it must be called VDIFile(int 3)*/
+VDIFile::VDIFile(int transSize) {
     transMapSize = transSize;
     VDITransMapPointer = new int{transMapSize};
     cursor = 0;
 }
 
-/* This loads the header information and such from the given vdi file. Because VDIfile is a class, returns a boolean instead of a pointer. */
-bool VDIfile::vdiOpen(char *fn) {
+/* This loads the header information and such from the given vdi file. Because VDIFile is a class, returns a boolean instead of a pointer. */
+bool VDIFile::vdiOpen(char *fn) {
     fileDescriptor = open(fn, 2);
 
     /* the file failed to open, return false */
@@ -34,13 +34,13 @@ bool VDIfile::vdiOpen(char *fn) {
     }
 };
 /* Closes the vdi file while destroying dynamically created stuff */
-void VDIfile::vdiClose() {
+void VDIFile::vdiClose() {
     close(fileDescriptor);
     delete[] VDITransMapPointer;
 }
 
 
-ssize_t VDIfile::vdiRead(void *buf, size_t count) {
+ssize_t VDIFile::vdiRead(void *buf, size_t count) {
   size_t bytesRemaining = count;
   size_t bytesRead = 0;
 
@@ -80,7 +80,7 @@ ssize_t VDIfile::vdiRead(void *buf, size_t count) {
 }
 
 
-ssize_t VDIfile::vdiWrite(void *buf, size_t count) {
+ssize_t VDIFile::vdiWrite(void *buf, size_t count) {
     size_t bytesRemaining = count;
     size_t bytesWritten = 0;
 
@@ -161,7 +161,7 @@ ssize_t VDIfile::vdiWrite(void *buf, size_t count) {
 
 
 /* I feel like this is a better situation for a switch, but that is kinda arbitrary */
-off_t VDIfile::vdiSeek(off_t offset, int anchor) {
+off_t VDIFile::vdiSeek(off_t offset, int anchor) {
     if(anchor == SEEK_SET) {
         if(offset < this->headerInfo.cbDisk && offset >= 0)
             this->cursor = offset;

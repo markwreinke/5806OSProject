@@ -7,6 +7,8 @@
 
 #include <cstdint>
 #include <time.h>
+#include "VDIFile.h"
+#include "Partition.h"
 
 struct SuperBlock{
     uint32_t s_inodes_count;
@@ -54,9 +56,19 @@ struct SuperBlock{
     uint8_t s_def_hash_version;
     uint32_t s_default_mount_options;
     uint32_t s_first_meta_bg;
+
 };
 class Ext2File {
-
+public:
+    bool ext2Open(char *fn); /// LEFT PNUM OUT BECAUSE OF HOW OUR PARTITION OPEN WORKS ********************************KASHDLGJKA;SLDKGH;ASKLDGHKL;GAHKL;SDGAWDGASDGAHKL
+    void ext2Close();
+    uint32_t fetchBlock(uint32_t blockNum, void* buf);
+    int32_t fetchSuperBlock(uint32_t blockNum, struct Superblock *sb);
+private:
+    VDIFile *vdiFile;
+    Partition *Partition;
+    uint32_t blockSize;
+    uint32_t numBlockGroups;
 };
 
 

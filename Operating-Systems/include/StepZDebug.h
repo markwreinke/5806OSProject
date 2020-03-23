@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <iomanip>
-#include "../include/VDIfile.h"
+#include "VDIFile.h"
 #include "Partition.h"
 using namespace std;
 
@@ -16,7 +16,7 @@ public:
     static void displayBufferPage(uint8_t *buf,uint32_t count, uint32_t start,uint64_t offset);
     static void displayBuffer(uint8_t *buf, uint32_t count, uint64_t offset);
     static void dumpVDIHeader(struct VDIHeaderInfo* headerInfo);
-    static void dumpPartitionTable(VDIfile *f, PartitionEntry *P);
+    static void dumpPartitionTable(VDIFile *f, PartitionEntry *P);
 };
 
 

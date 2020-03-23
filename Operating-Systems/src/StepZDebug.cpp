@@ -141,7 +141,7 @@ void StepZDebug::dumpVDIHeader(struct VDIHeaderInfo* headerInfo) {
     cout << "Image Comment: " << endl;
     displayBufferPage(reinterpret_cast<uint8_t *>(headerInfo->szComment), 256, 0, 84);
 }
-void StepZDebug::dumpPartitionTable(VDIfile *f,struct PartitionEntry *P){
+void StepZDebug::dumpPartitionTable(VDIFile *f, struct PartitionEntry *P){
     for(int PartitionNumber = 0; PartitionNumber < 4; PartitionNumber++) {
         //p[array#][Byte#]
 

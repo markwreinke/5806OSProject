@@ -49,21 +49,19 @@ struct VDIHeaderInfo {
 };
 
 
-class VDIfile {
+class VDIFile {
 public:
-    /* Declaration of constructor with transMapSize input. Because it is explicit, it must be called VDIfile(int 3)*/
-    explicit VDIfile(int = 1);
+    /* Declaration of constructor with transMapSize input. Because it is explicit, it must be called VDIFile(int 3)*/
+    explicit VDIFile(int = 1);
     /* This struct holds all of the VDI file header information */
     struct VDIHeaderInfo headerInfo;
-    /* This loads the header information and such from the given vdi file. Because VDIfile is a class, returns a boolean instead of a pointer. */
+    /* This loads the header information and such from the given vdi file. Because VDIFile is a class, returns a boolean instead of a pointer. */
     bool vdiOpen(char *fn);
     void vdiClose();
     ssize_t vdiRead(void *buf, size_t count);
     ssize_t vdiWrite(void *buf, size_t count);
     off_t vdiSeek(off_t offset, int anchor);
-
     int fileDescriptor;
-protected:
 private:
     /* This is to set the size of the VDI translation map array */
     int transMapSize;

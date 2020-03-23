@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <iomanip>
-#include "VDIfile.h"
+#include "VDIFile.h"
 #include "StepZDebug.h"
 #include <errno.h>
 #include <string.h>

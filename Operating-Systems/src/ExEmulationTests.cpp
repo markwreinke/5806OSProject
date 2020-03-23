@@ -82,7 +82,7 @@ void ExEmulationTests::step0Ex2() {
 
     char *filename = "../testFiles/Test-fixed-1k.vdi";
     int FileDescriptor = open(filename, O_RDWR);
-    VDIfile testVDIfile;
+    VDIFile testVDIfile;
     testVDIfile.vdiOpen(filename);
 
     size_t BytesToCount = 256; // #todo figure out how tp dynamically?
@@ -104,7 +104,7 @@ void ExEmulationTests::step0Ex3() {
     char *filename = "../testFiles/Test-fixed-1k.vdi";
 
     int FileDescripter = open(filename, O_RDWR);
-    VDIfile testVDIfile;
+    VDIFile testVDIfile;
     testVDIfile.vdiOpen(filename);
 
     uint8_t *FileInformation;
@@ -123,7 +123,7 @@ void ExEmulationTests::step0Ex3() {
     char *filename = "../testFiles/Test-fixed-1k.vdi";
 
     uint8_t *buffer = new uint8_t[64];
-    VDIfile f;
+    VDIFile f;
     f.vdiOpen(filename);
     f.vdiSeek(446, SEEK_SET);
     f.vdiRead(buffer, 64);
@@ -138,7 +138,7 @@ void ExEmulationTests::step1Ex1() {
     char *filename = "../testFiles/Test-fixed-1k.vdi";
 
     uint8_t *buffer = new uint8_t[64];
-    VDIfile f;
+    VDIFile f;
     f.vdiOpen(filename);
     f.vdiSeek(446, SEEK_SET);
     f.vdiRead(buffer, 64);
@@ -153,7 +153,7 @@ void ExEmulationTests::step1Ex2() {
     char *filename = "../testFiles/Test-fixed-1k.vdi";
 
     uint8_t *buffer = new uint8_t[64];
-    VDIfile f;
+    VDIFile f;
     f.vdiOpen(filename);
     f.vdiSeek(446, SEEK_SET);
     f.vdiRead(buffer, 64);
@@ -167,7 +167,7 @@ void ExEmulationTests::step1Ex3(){
     char *filename = "../testFiles/Test-fixed-1k.vdi";
 
     uint8_t *buffer = new uint8_t[64];
-    VDIfile f;
+    VDIFile f;
     f.vdiOpen(filename);
     f.vdiSeek(446, SEEK_SET);
     f.vdiRead(buffer, 64);
@@ -182,7 +182,7 @@ void ExEmulationTests::step1Ex4(){
     char *filename = "../testFiles/Test-dynamic-1k.vdi";
 
     uint8_t *buffer = new uint8_t[64];
-    VDIfile f;
+    VDIFile f;
     f.vdiOpen(filename);
     f.vdiSeek(446, SEEK_SET);
     f.vdiRead(buffer, 64);
@@ -195,7 +195,7 @@ void ExEmulationTests::step2Ex1(){
 
     char *filename = "../testFiles/Test-dynamic-1k.vdi";
     uint8_t *buffer = new uint8_t[1024];
-    VDIfile f;
+    VDIFile f;
     f.vdiOpen(filename);
 
     Partition p;
@@ -212,7 +212,7 @@ void ExEmulationTests::step2Ex2(){
 
     char *filename = "../testFiles/Test-fixed-1k.vdi";
     uint8_t *buffer = new uint8_t[1024];
-    VDIfile f;
+    VDIFile f;
     f.vdiOpen(filename);
 
     Partition p;
@@ -229,7 +229,7 @@ void ExEmulationTests::step2Ex3(){
 
     char *filename = "../testFiles/Test-fixed-4k.vdi";
     uint8_t *buffer = new uint8_t[1024];
-    VDIfile f;
+    VDIFile f;
     f.vdiOpen(filename);
 
     Partition p;
