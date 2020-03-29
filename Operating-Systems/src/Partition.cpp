@@ -4,6 +4,10 @@
 
 #include "../include/Partition.h"
 
+Partition::Partition(){
+
+};
+
 /* Opens the filled partition by finding its number (whichever is type 0x83) */
 bool Partition::partitionOpen(VDIFile *f) {
     f->vdiSeek(446, SEEK_SET);
@@ -37,7 +41,6 @@ bool Partition::partitionOpen(VDIFile *f) {
     return true;
 }
 void Partition::partitionClose() {
-    vdiFile->vdiClose();
 }
 
 
@@ -45,8 +48,8 @@ ssize_t Partition::partitionRead(void *buf, size_t count) {
     if(count > partitionStart + partitionSize) {
         return -1;
     }
-    ssize_t Temp = this->vdiFile->vdiRead(buf, count);
-    return Temp;
+    ssize_t temp = this->vdiFile->vdiRead(buf, count);
+    return temp;
 }
 
 ssize_t Partition::partitionWrite(void *buf, size_t count) {

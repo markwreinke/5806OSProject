@@ -20,6 +20,7 @@ struct PartitionEntry{
 
 class Partition {
 public:
+    Partition();
     bool partitionOpen(VDIFile *f);
     void partitionClose();
     ssize_t partitionRead(void *buf, size_t count);

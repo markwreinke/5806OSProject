@@ -14,7 +14,7 @@ VDIFile::VDIFile(int transSize) {
 
 /* This loads the header information and such from the given vdi file. Because VDIFile is a class, returns a boolean instead of a pointer. */
 bool VDIFile::vdiOpen(char *fn) {
-    fileDescriptor = open(fn, 2);
+    this->fileDescriptor = open(fn, 2);
 
     /* the file failed to open, return false */
     if(this->fileDescriptor == -1) {

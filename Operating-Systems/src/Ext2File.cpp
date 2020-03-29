@@ -7,12 +7,11 @@
 #include "../include/Partition.h"
 
 Ext2File::Ext2File() {
+    vdiFile = new VDIFile();
+    partition = new Partition();
 }
 
 bool Ext2File::ext2Open(char *fn) {
-    /// It might be the Java dev in me that noticed that we never instantiated vdiFile or partition...is this necessary in C++, or would the space for it be created when Ext2File is created ?
-   vdiFile = new VDIFile();
-   partition = new Partition();
     ///make sure filename is correct;
     vdiFile->vdiOpen(fn);
     bool PartitionOpenSuccess = partition->partitionOpen(vdiFile);

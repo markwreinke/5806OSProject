@@ -254,10 +254,11 @@ void ExEmulationTests::step3Ex1() {
 
     char *filename = "../testFiles/Test-fixed-1k.vdi";
     uint8_t *buffer = new uint8_t[1024];
-    Ext2File ext2File;
-    bool success = ext2File.ext2Open(filename);
+    Ext2File *ext2File = new Ext2File();
+    bool success = ext2File->ext2Open(filename);
     cout << success << endl;
-    ext2File.ext2Close();
+    ext2File->ext2Close();
+    delete[] ext2File;
     delete[] buffer;
 
 }
