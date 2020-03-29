@@ -7,7 +7,10 @@
 /* Opens the filled partition by finding its number (whichever is type 0x83) */
 bool Partition::partitionOpen(VDIFile *f) {
     f->vdiSeek(446, SEEK_SET);
-    f->vdiRead(this->partEntry.partitionEntries, 64);
+    ssize_t successfulRead = f->vdiRead(this->partEntry.partitionEntries, 64);
+    if(successfulRead < 0) {
+        return false;
+    }
     int partitionNum;
     // checks which of the partitionEntries we would like to use
     if(this->partEntry.partitionEntries[0][4] == 0x83){
@@ -31,6 +34,7 @@ bool Partition::partitionOpen(VDIFile *f) {
     this->partitionSize = this->partitionSize*512;
 
     this->vdiFile = f;
+    return true;
 }
 void Partition::partitionClose() {
     vdiFile->vdiClose();

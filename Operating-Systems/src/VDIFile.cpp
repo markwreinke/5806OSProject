@@ -54,7 +54,7 @@ ssize_t VDIFile::vdiRead(void *buf, size_t count) {
       size_t realLocation = physicalPage*this->headerInfo.cbBlock + offset;
       lseek(fileDescriptor, realLocation + this->headerInfo.offData, SEEK_SET);
 
-      size_t bytesJustRead = 0;
+      ssize_t bytesJustRead = 0;
 
       /* If the location has been initialized */
       if(realLocation >= 0) {
@@ -72,7 +72,9 @@ ssize_t VDIFile::vdiRead(void *buf, size_t count) {
               bytesJustRead++;
           }
       }
-
+      if(bytesJustRead < 0) {
+          return -1;
+      }
       bytesRead += bytesJustRead;
       bytesRemaining -= bytesJustRead;
       vdiSeek(bytesJustRead, SEEK_CUR);

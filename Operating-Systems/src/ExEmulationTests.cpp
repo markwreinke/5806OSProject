@@ -5,6 +5,7 @@
 #include "../include/ExEmulationTests.h"
 
 
+
 void ExEmulationTests::runEmTest(int step, int example){
     switch(step){
         case 0: if(example == 1){
@@ -41,6 +42,10 @@ void ExEmulationTests::runEmTest(int step, int example){
                 break;
                 } else if(example == 3) {
                 step2Ex3();
+                break;
+                }
+        case 3: if(example == 1) {
+                step3Ex1();
                 break;
                 }
         default:
@@ -162,7 +167,7 @@ void ExEmulationTests::step1Ex2() {
     delete[] buffer;
 }
 
-void ExEmulationTests::step1Ex3(){
+void ExEmulationTests::step1Ex3() {
     cout << "Displaying Step 1, Example 3" << endl;
     char *filename = "../testFiles/Test-fixed-1k.vdi";
 
@@ -176,7 +181,7 @@ void ExEmulationTests::step1Ex3(){
     delete[] buffer;
 }
 
-void ExEmulationTests::step1Ex4(){
+void ExEmulationTests::step1Ex4() {
     cout << "Displaying Step 1, Example 4" << endl;
 
     char *filename = "../testFiles/Test-dynamic-1k.vdi";
@@ -190,7 +195,7 @@ void ExEmulationTests::step1Ex4(){
     f.vdiClose();
     delete[] buffer;
 }
-void ExEmulationTests::step2Ex1(){
+void ExEmulationTests::step2Ex1() {
     cout << "Displaying Step 2, Example 1 (It's Borked)" << endl;
 
     char *filename = "../testFiles/Test-dynamic-1k.vdi";
@@ -205,9 +210,10 @@ void ExEmulationTests::step2Ex1(){
     p.partitionRead(buffer,1024);
     StepZDebug::displayBuffer(buffer,1024,1024);
     p.partitionClose();
+    delete[] buffer;
 }
 
-void ExEmulationTests::step2Ex2(){
+void ExEmulationTests::step2Ex2() {
     cout << "Displaying Step 2, Example 2" << endl;
 
     char *filename = "../testFiles/Test-fixed-1k.vdi";
@@ -222,9 +228,10 @@ void ExEmulationTests::step2Ex2(){
     p.partitionRead(buffer,1024);
     StepZDebug::displayBuffer(buffer,1024,1024);
     p.partitionClose();
+    delete[] buffer;
 }
 
-void ExEmulationTests::step2Ex3(){
+void ExEmulationTests::step2Ex3() {
     cout << "Displaying Step 2, Example 3" << endl;
 
     char *filename = "../testFiles/Test-fixed-4k.vdi";
@@ -239,4 +246,18 @@ void ExEmulationTests::step2Ex3(){
     p.partitionRead(buffer,1024);
     StepZDebug::displayBuffer(buffer,1024,1024);
     p.partitionClose();
+    delete[] buffer;
+}
+
+void ExEmulationTests::step3Ex1() {
+    cout << "Displaying Step 3, Example 1" << endl;
+
+    char *filename = "../testFiles/Test-fixed-1k.vdi";
+    uint8_t *buffer = new uint8_t[1024];
+    Ext2File ext2File;
+    bool success = ext2File.ext2Open(filename);
+    cout << success << endl;
+    ext2File.ext2Close();
+    delete[] buffer;
+
 }
