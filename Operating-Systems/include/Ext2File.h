@@ -60,13 +60,17 @@ struct SuperBlock{
 };
 class Ext2File {
 public:
+    Ext2File();
     bool ext2Open(char *fn); /// LEFT PNUM OUT BECAUSE OF HOW OUR PARTITION OPEN WORKS ********************************KASHDLGJKA;SLDKGH;ASKLDGHKL;GAHKL;SDGAWDGASDGAHKL
     void ext2Close();
-    uint32_t fetchBlock(uint32_t blockNum, void* buf);
-    int32_t fetchSuperBlock(uint32_t blockNum, struct Superblock *sb);
+    uint32_t fetchBlock(uint32_t blockNum, void *buf);
+    uint32_t writeBlock(uint32_t blockNum, void *buf);
+    int32_t fetchSuperBlock(uint32_t blockNum, struct SuperBlock *sb);
+    struct SuperBlock superBlock;
+
 private:
     VDIFile *vdiFile;
-    Partition *Partition;
+    Partition *partition;
     uint32_t blockSize;
     uint32_t numBlockGroups;
 };

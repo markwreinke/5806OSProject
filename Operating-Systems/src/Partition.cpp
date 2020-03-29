@@ -3,22 +3,8 @@
 //
 
 #include "../include/Partition.h"
-/*todo
-struct PartitionFile *partitionOpen(struct VDIFILE *);
-void partitionClose();
-ssize_t partitionRead(void *buf, size_t count);
-ssize_t partitionWrite(void *buf, size_t count;
-off_t paritionSeek(off_t offset, int anchor);
- */
-//struct PartitionFile *partitionOpen(VDIFile *f, struct PartitionEntry PartEntry){
-   // f->vdiSeek(446, SEEK_SET);
-   // f->vdiRead(PartEntry.partitionEntry, 64);
-    //read from vdifile into partition entry array for 64 bytes at location of the partition
-    //check each arrays index of 4 for parition type 183
-    //ie array[0] spot 4 thru array[3] spot 4
-    //set start location
-    //set size of partition
 
+/* Opens the filled partition by finding its number (whichever is type 0x83) */
 bool Partition::partitionOpen(VDIFile *f) {
     f->vdiSeek(446, SEEK_SET);
     f->vdiRead(this->partEntry.partitionEntries, 64);
@@ -49,17 +35,18 @@ bool Partition::partitionOpen(VDIFile *f) {
 void Partition::partitionClose() {
     vdiFile->vdiClose();
 }
+
+
 ssize_t Partition::partitionRead(void *buf, size_t count) {
-    if(count > partitionStart + partitionSize)
-    {
+    if(count > partitionStart + partitionSize) {
         return -1;
     }
     ssize_t Temp = this->vdiFile->vdiRead(buf, count);
     return Temp;
 }
+
 ssize_t Partition::partitionWrite(void *buf, size_t count) {
-    if(count > partitionStart + partitionSize)
-    {
+    if(count > partitionStart + partitionSize) {
         return -1;
     }
     ssize_t Temp = this->vdiFile->vdiRead(buf, count);

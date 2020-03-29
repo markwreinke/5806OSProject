@@ -119,7 +119,6 @@ void StepZDebug::displayBuffer(uint8_t *buf, uint32_t count, uint64_t offset) {
         }
     }
 }
-
 void StepZDebug::dumpVDIHeader(struct VDIHeaderInfo* headerInfo) {
     cout << "Image Name: " << headerInfo->szFileInfo << endl;
     cout << "Signature: 0x" << hex << headerInfo->u32Signature << endl;
@@ -145,7 +144,7 @@ void StepZDebug::dumpPartitionTable(VDIFile *f, struct PartitionEntry *P){
     for(int PartitionNumber = 0; PartitionNumber < 4; PartitionNumber++) {
         //p[array#][Byte#]
 
-        cout << "Partition: " << PartitionNumber + 1 << endl;
+        cout << "partition: " << PartitionNumber + 1 << endl;
 
         cout << "Status: ";
         if (P->partitionEntries[PartitionNumber][0] == 00)
@@ -171,7 +170,7 @@ void StepZDebug::dumpPartitionTable(VDIFile *f, struct PartitionEntry *P){
         printf("%u", P->partitionEntries[PartitionNumber][6]);
         cout << endl;
 
-        cout << "Partition Type: ";
+        cout << "partition Type: ";
         printf("%x", P->partitionEntries[PartitionNumber][4]);
         cout << " ";
         if (P->partitionEntries[PartitionNumber][4] == 0x83)

@@ -26,11 +26,11 @@ public:
     ssize_t partitionWrite(void *buf, size_t count);
     off_t partitionSeek(off_t offset, int anchor);
     struct PartitionEntry partEntry;
+
 private:
     VDIFile *vdiFile;
     size_t partitionStart;
     size_t partitionSize;
-
 };
 
 

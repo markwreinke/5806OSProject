@@ -129,38 +129,8 @@ ssize_t VDIFile::vdiWrite(void *buf, size_t count) {
         bytesRemaining -= bytesJustWritten;
         vdiSeek(bytesJustWritten, SEEK_CUR);
     }
-    /*
-    lseek(this->fileDescriptor, this->cursor, 0);//will move the cursor of the file with the given descriptor to the location of our cursor
-    size_t bytesWritten = 0;
-    uint8_t buffer[count];
-    while(count != 0)
-    {
-        if (count >= 256) {
-            for(int x = bytesWritten; x < (bytesWritten + 256); x++)
-            {
-                buffer[x] = ((uint8_t *)buf)[x];
-            }
-            write(fileDescriptor, buffer, 256);
-            bytesWritten += 256;
-            cursor += 256;
-            count -= 256;
-        } else {
-            for(int x = bytesWritten; x < (bytesWritten + count); x++)
-            {
-                buffer[x] = ((uint8_t *)buf)[x];
-            }
-            write(fileDescriptor, buffer, count);
-            cursor += count;
-            count -= count;
-            bytesWritten += count;
-        }
-        return bytesWritten;
-    }
-    */
 }
 
-
-/* I feel like this is a better situation for a switch, but that is kinda arbitrary */
 off_t VDIFile::vdiSeek(off_t offset, int anchor) {
     if(anchor == SEEK_SET) {
         if(offset < this->headerInfo.cbDisk && offset >= 0)
