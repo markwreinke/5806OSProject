@@ -198,7 +198,9 @@ void StepZDebug::dumpPartitionTable(VDIFile *f, struct PartitionEntry *P){
 }
 void dumpSuperBlock(Ext2File *ext2 ){
     cout << "Superblock contents:" << endl;
-    cout << "Number of Inodes: "; printf("%u",ext2->superBlock.s_inodes_count); cout << endl;
+    cout << "Number of Inodes: ";
+        printf("%u",ext2->superBlock.s_inodes_count);
+        cout << endl;
     cout << "Number of Blocks: ";
     cout << "Number of reserved blocks: ";
     cout << "Number of free blocks: ";
