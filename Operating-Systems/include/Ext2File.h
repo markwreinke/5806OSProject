@@ -58,6 +58,17 @@ struct SuperBlock{
     uint32_t s_first_meta_bg;
 
 };
+struct BlockGroupDescriptorTable{
+    uint32_t bg_block_bitmap;
+    uint32_t bg_inode_bitmap;
+    uint32_t bg_inode_table;
+    uint16_t bg_free_blocks_count;
+    uint16_t bg_free_inodes_count;
+    uint16_t bg_used_dirs_count;
+    uint16_t bg_pad;
+    uint8_t bg_reserved[12];
+
+};
 class Ext2File {
 public:
     Ext2File();

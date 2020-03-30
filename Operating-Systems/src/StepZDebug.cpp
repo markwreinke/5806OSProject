@@ -3,6 +3,7 @@
 //
 
 #include "../include/StepZDebug.h"
+#include "../include/Ext2File.h"
 
 void StepZDebug::displayBufferPage(uint8_t *buf,uint32_t count, uint32_t start,uint64_t offset) {
 
@@ -194,13 +195,51 @@ void StepZDebug::dumpPartitionTable(VDIFile *f, struct PartitionEntry *P){
         printf("%u", temp);
         cout << endl << endl;
     }
-    /*
-    uint8_t *buffer = new uint8_t[1024];
-    f->vdiSeek(1024,SEEK_SET);
-    f->vdiRead(buffer,1024);
-    displayBuffer(buffer, 1024,0);
-    delete[] buffer;
-     */
 }
-
+void dumpSuperBlock(Ext2File *ext2 ){
+    cout << "Superblock contents:" << endl;
+    cout << "Number of Inodes: "; printf("%u",ext2->superBlock.s_inodes_count); cout << endl;
+    cout << "Number of Blocks: ";
+    cout << "Number of reserved blocks: ";
+    cout << "Number of free blocks: ";
+    cout << "Number of free inodes: ";
+    cout << "First data Block: ";
+    cout << "Log block size: ";
+    cout << "Log fragment size: ";
+    cout << "Blocks per group: ";
+    cout << "Fragments per group: ";
+    cout << "Inodes per group: ";
+    cout << "Last mount time: ";
+    cout << "Last write time: ";
+    cout << "Mount count: ";
+    cout << "Max mount count: ";
+    cout << "Magic Number: ";
+    cout << "State: ";
+    cout << "error processing: ";
+    cout << "Revision level: ";
+    cout << "Last system check: ";
+    cout << "Check interval: ";
+    cout << "OS creator: ";
+    cout << "Default reserve UID: ";
+    cout << "Default reserve GID: ";
+    cout << "First inode number: ";
+    cout << "Inode size: ";
+    cout << "Block group number: ";
+    cout << "Feature compatibility bits: ";
+    cout << "Feature incompatibility bits: ";
+    cout << "Feature read/only compatibility bits: ";
+    cout << "UUID: ";
+    cout << "Volume name: ";
+    cout << "Last mount point: ";
+    cout << "Alogrithm bitmap: ";
+    cout << "Number of blocks to preallocate: ";
+    cout << "NNumber of blocks to preallocate for directories: ";
+    cout << "Journal UUID: ";
+    cout << "Journal inode number: ";
+    cout << "Journal device number: ";
+    cout << "Journal last orphan inode number: ";
+    cout << "Deafault hash version: ";
+    cout << "Deafult mount option bitmap: ";
+    cout << "First meta block group: ";
+}
 
