@@ -53,14 +53,8 @@ int32_t Ext2File::fetchSuperBlock(uint32_t blockNum, struct SuperBlock *sb){
 }
 
 uint32_t Ext2File::fetchBlock(uint32_t blockNum, void *buf) {
-    int RealLocation;
-    if(blockSize == 1024) {
-        RealLocation = blockSize*blockNum + 1024;
-    }
-    else {
-        RealLocation = blockSize*blockNum;
-    }
-    partition->partitionSeek(RealLocation, SEEK_SET);
+
+    partition->partitionSeek(blockSize*blockNum, SEEK_SET);
     int BlocksRead = partition->partitionRead(buf, blockSize);
 
     if(BlocksRead != blockSize) {
@@ -69,25 +63,7 @@ uint32_t Ext2File::fetchBlock(uint32_t blockNum, void *buf) {
     return 0;
 }
 uint32_t Ext2File::writeBlock(uint32_t blockNum, void *buf){
-    int RealLocation;
-    if(blockSize == 1024){
-        RealLocation = blockSize*blockNum + 1024;
-    }
-    else{
-        RealLocation = blockSize*blockNum;
-    }
-    partition->partitionSeek(RealLocation, SEEK_SET);
-
-    int blocksWritten;
-    if(sizeof(buf) >= blockSize) {
-        blocksWritten = partition->partitionWrite(buf, blockSize);
-        if(blocksWritten != blockSize)
-            return -1;
-    }
-    else {
-        blocksWritten = partition->partitionWrite(buf, sizeof(buf));
-        if(blocksWritten != sizeof(buf))
-            return -1;
-    }
+    partition->partitionSeek(blockSize*blockNum, SEEK_SET);
+    int BlocksRead = partition->partitionWrite(buf, blockSize);
     return 0;
 }

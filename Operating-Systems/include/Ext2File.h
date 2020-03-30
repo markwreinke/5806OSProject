@@ -56,6 +56,7 @@ struct SuperBlock{
     uint8_t s_def_hash_version;
     uint32_t s_default_mount_options;
     uint32_t s_first_meta_bg;
+    uint8_t padding[760];
 
 };
 struct BlockGroupDescriptor{
@@ -68,9 +69,9 @@ struct BlockGroupDescriptor{
     uint16_t bg_pad;
     uint8_t bg_reserved[12];
 };
-struct BlockGroups{
-    struct BlockGroupDescriptor BlockGroupDescriptorTable[];
-};
+/*struct BlockGroups{  todo
+    struct BlockGroupDescriptor *BlockGroupDescriptorTable[];
+};*/
 class Ext2File {
 public:
     Ext2File();
@@ -82,7 +83,7 @@ public:
     uint32_t numBlockGroupsReturn() {return numBlockGroups;}
     struct SuperBlock superBlock;
     struct BlockGroupDescriptor BGDT;
-    struct BlockGroups blockGroups;
+    //struct BlockGroups blockGroups;
 private:
     VDIFile *vdiFile;
     Partition *partition;

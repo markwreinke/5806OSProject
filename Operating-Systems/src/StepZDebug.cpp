@@ -324,6 +324,7 @@ void StepZDebug::dumpSuperBlock(Ext2File *ext2 ){
         printf("%u",ext2->superBlock.s_first_meta_bg);
         cout << endl;
 }
+/*
 void StepZDebug::dumpBGDT(Ext2File *ext2){
     cout << "Block   Block   Inode   Inode  Free    Free    Used" << endl;
     cout << "Number  Bitmap  Bitmap  Table  Blocks  Inodes  Dirs" << endl;
@@ -345,3 +346,4 @@ void StepZDebug::dumpBGDT(Ext2File *ext2){
         cout << endl;
     }
 }
+*/

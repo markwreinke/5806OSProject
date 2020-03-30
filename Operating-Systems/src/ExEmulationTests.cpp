@@ -257,6 +257,7 @@ void ExEmulationTests::step3Ex1() {
     Ext2File *ext2File = new Ext2File();
     bool success = ext2File->ext2Open(filename);
    // StepZDebug::displayBuffer(ext2File->superBlock, 1024, 1024)
+   cout << "superblock size " <<  sizeof(ext2File->superBlock) << endl;
     ext2File->ext2Close();
     delete[] ext2File;
     delete[] buffer;
