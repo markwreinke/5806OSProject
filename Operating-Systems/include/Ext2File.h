@@ -58,7 +58,7 @@ struct SuperBlock{
     uint32_t s_first_meta_bg;
 
 };
-struct BlockGroupDescriptorTable{
+struct BlockGroupDescriptor{
     uint32_t bg_block_bitmap;
     uint32_t bg_inode_bitmap;
     uint32_t bg_inode_table;
@@ -67,7 +67,9 @@ struct BlockGroupDescriptorTable{
     uint16_t bg_used_dirs_count;
     uint16_t bg_pad;
     uint8_t bg_reserved[12];
-
+};
+struct BlockGroups{
+    struct BlockGroupDescriptor BlockGroupDescriptorTable[];
 };
 class Ext2File {
 public:
@@ -77,8 +79,10 @@ public:
     uint32_t fetchBlock(uint32_t blockNum, void *buf);
     uint32_t writeBlock(uint32_t blockNum, void *buf);
     int32_t fetchSuperBlock(uint32_t blockNum, struct SuperBlock *sb);
+    uint32_t numBlockGroupsReturn() {return numBlockGroups;}
     struct SuperBlock superBlock;
-
+    struct BlockGroupDescriptor BGDT;
+    struct BlockGroups blockGroups;
 private:
     VDIFile *vdiFile;
     Partition *partition;
