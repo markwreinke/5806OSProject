@@ -256,7 +256,7 @@ void ExEmulationTests::step3Ex1() {
     uint8_t *buffer = new uint8_t[1024];
     Ext2File *ext2File = new Ext2File();
     bool success = ext2File->ext2Open(filename);
-    cout << success << endl;
+   // StepZDebug::displayBuffer(ext2File->superBlock, 1024, 1024)
     ext2File->ext2Close();
     delete[] ext2File;
     delete[] buffer;

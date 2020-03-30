@@ -8,7 +8,7 @@
 /* Declaration of constructor with transMapSize input. Because it is explicit, it must be called VDIFile(int 3)*/
 VDIFile::VDIFile(int transSize) {
     transMapSize = transSize;
-    VDITransMapPointer = new int{transMapSize};
+    VDITransMapPointer = new int[transMapSize];
     cursor = 0;
 }
 
