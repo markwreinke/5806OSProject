@@ -16,19 +16,5 @@ using namespace std;
 
 int main() {
     ExEmulationTests::runEmTest(3,1);
-    /* uint8_t buffer[64];
- dedZeros.str() << end;
-
-
-
-     for (int x = 0; x < 64; x++) {
-         printf("%02x", buffer[x]);
-         cout << endl;
-     }
-   StepZDebug::displayBufferPage(buffer, 64, 190, 256);*/
-
-
-
-
 
 }
