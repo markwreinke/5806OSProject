@@ -232,7 +232,7 @@ void StepZDebug::dumpSuperBlock(Ext2File *ext2 ){
         printf("%u",ext2->superBlock.s_inodes_per_group);
         cout << endl;
     cout << "Last mount time: ";
-        printf("%u",ext2->superBlock.s_mtime);
+        printf("%u",ext2->superBlock.s_mtime); // ctime function ctime(time variables) not static, declare variables as char arrays 32, string copy(s_m_time, ctime(amper, superBlock->s_mtime))
         cout << endl;
     cout << "Last write time: ";
         printf("%u",ext2->superBlock.s_wtime);

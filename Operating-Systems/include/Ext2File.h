@@ -69,9 +69,7 @@ struct BlockGroupDescriptor{
     uint16_t bg_pad;
     uint8_t bg_reserved[12];
 };
-/*struct BlockGroups{  todo
-    struct BlockGroupDescriptor *BlockGroupDescriptorTable[];
-};*/
+
 class Ext2File {
 public:
     Ext2File();
@@ -80,6 +78,7 @@ public:
     uint32_t fetchBlock(uint32_t blockNum, void *buf);
     uint32_t writeBlock(uint32_t blockNum, void *buf);
     int32_t fetchSuperBlock(uint32_t blockNum, struct SuperBlock *sb);
+    int32_t writeSuperBlock(uint32_t blockNum, struct SuperBlock *sb);
     uint32_t numBlockGroupsReturn() {return numBlockGroups;}
     struct SuperBlock superBlock;
     struct BlockGroupDescriptor BGDT;
@@ -89,6 +88,7 @@ private:
     Partition *partition;
     uint32_t blockSize;
     uint32_t numBlockGroups;
+    struct BlockGroupDescriptor *BlockGroupDescriptorTable;
 };
 
 
