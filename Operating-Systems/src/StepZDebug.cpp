@@ -244,7 +244,8 @@ void StepZDebug::dumpSuperBlock(Ext2File *ext2 ){
         printf("%u",ext2->superBlock.s_max_mnt_count);
         cout << endl;
     cout << "Magic Number: ";
-        printf("%s %x","0x",ext2->superBlock.s_magic);
+        cout << "0x";
+        printf("%x",ext2->superBlock.s_magic);
         cout << endl;
     cout << "State: ";
         printf("%u",ext2->superBlock.s_state);
@@ -253,7 +254,7 @@ void StepZDebug::dumpSuperBlock(Ext2File *ext2 ){
         printf("%u",ext2->superBlock.s_errors);
         cout << endl;
     cout << "Revision level: ";
-        printf("%u",ext2->superBlock.s_rev_level);
+        printf("%2.1u",ext2->superBlock.s_rev_level);
         cout << endl;
     cout << "Last system check: ";
         printf("%u",ext2->superBlock.s_lastcheck);
@@ -280,13 +281,16 @@ void StepZDebug::dumpSuperBlock(Ext2File *ext2 ){
         printf("%u",ext2->superBlock.s_block_group_nr);
         cout << endl;
     cout << "Feature compatibility bits: ";
-        printf("%x",ext2->superBlock.s_feature_compat);
+        cout << "0x";
+        printf("%08x",ext2->superBlock.s_feature_compat);
         cout << endl;
     cout << "Feature incompatibility bits: ";
-        printf("%x",ext2->superBlock.s_feature_incompat);
+    cout << "0x";
+        printf("%08x",ext2->superBlock.s_feature_incompat);
         cout << endl;
     cout << "Feature read/only compatibility bits: ";
-        printf("%x",ext2->superBlock.s_feature_ro_compat);
+        cout << "0x";
+        printf("%08x",ext2->superBlock.s_feature_ro_compat);
         cout << endl;
    // cout << "UUID: ";
     cout << "Volume name: ";
@@ -296,7 +300,7 @@ void StepZDebug::dumpSuperBlock(Ext2File *ext2 ){
         printf("%s",ext2->superBlock.s_last_mounted);
         cout << endl;
     cout << "Alogrithm bitmap: ";
-        printf("%x08",ext2->superBlock.s_algo_bitmap);
+        printf("%08x",ext2->superBlock.s_algo_bitmap);
         cout << endl;
     cout << "Number of blocks to preallocate: ";
         printf("%u",ext2->superBlock.s_prealloc_blocks);
@@ -318,32 +322,33 @@ void StepZDebug::dumpSuperBlock(Ext2File *ext2 ){
         printf("%u",ext2->superBlock.s_def_hash_version);
         cout << endl;
     cout << "Default mount option bitmap: ";
-        printf("%x08",ext2->superBlock.s_default_mount_options);
+        cout << "0x";
+        printf("%08x",ext2->superBlock.s_default_mount_options);
         cout << endl;
     cout << "First meta block group: ";
         printf("%u",ext2->superBlock.s_first_meta_bg);
         cout << endl;
+        cout << endl;
 }
-/*
+
 void StepZDebug::dumpBGDT(Ext2File *ext2){
     cout << "Block   Block   Inode   Inode  Free    Free    Used" << endl;
     cout << "Number  Bitmap  Bitmap  Table  Blocks  Inodes  Dirs" << endl;
     cout << "------  ------  ------  -----  ------  ------  ----" << endl;
     for(int bgNum = 0; bgNum < ext2->numBlockGroupsReturn(); bgNum++){
-        printf("%u-6",bgNum);
+        printf("%-6u",bgNum);
         cout << "  ";
-        printf("%u-6",ext2->blockGroups.BlockGroupDescriptorTable[bgNum].bg_block_bitmap);
+        printf("%-6u",ext2->BGDT[bgNum].bg_block_bitmap);
         cout << "  ";
-        printf("%u-6",ext2->blockGroups.BlockGroupDescriptorTable[bgNum].bg_inode_bitmap);
+        printf("%-6u",ext2->BGDT[bgNum].bg_inode_bitmap);
         cout << "  ";
-        printf("%u-5",ext2->blockGroups.BlockGroupDescriptorTable[bgNum].bg_inode_table);
+        printf("%-5u",ext2->BGDT[bgNum].bg_inode_table);
         cout << "  ";
-        printf("%u-6",ext2->blockGroups.BlockGroupDescriptorTable[bgNum].bg_free_blocks_count);
+        printf("%-6u",ext2->BGDT[bgNum].bg_free_blocks_count);
         cout << "  ";
-        printf("%u-6",ext2->blockGroups.BlockGroupDescriptorTable[bgNum].bg_free_inodes_count);
+        printf("%-6u",ext2->BGDT[bgNum].bg_free_inodes_count);
         cout << "  ";
-        printf("%u-4",ext2->blockGroups.BlockGroupDescriptorTable[bgNum].bg_used_dirs_count);
+        printf("%-4u",ext2->BGDT[bgNum].bg_used_dirs_count);
         cout << endl;
     }
 }
-*/

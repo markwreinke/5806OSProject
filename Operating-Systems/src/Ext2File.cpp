@@ -17,13 +17,15 @@ bool Ext2File::ext2Open(char *fn) {
     bool PartitionOpenSuccess = partition->partitionOpen(vdiFile);
 
 
-    ///populate superBlock todo
+    ///populate superBlock
     fetchSuperBlock((uint32_t) 0, &superBlock);
-    ///populate block structure todo
-
-    ///populate other values todo
-
-
+    ///populate other values
+    this->blockSize = 1024*(2^superBlock.s_log_block_size);
+    this->numBlockGroups = superBlock.s_blocks_count / superBlock.s_blocks_per_group;
+    this->BGDT = new BlockGroupDescriptor [numBlockGroups];
+    for(int blNum = 0; blNum < this->numBlockGroups; blNum++){
+        fetchBGDT(blNum,this->BGDT);
+    }
 
     return PartitionOpenSuccess;
 
@@ -35,6 +37,7 @@ void Ext2File::ext2Close() {
     vdiFile->vdiClose();
     delete[] partition;
     delete[] vdiFile;
+    delete[] BGDT;
 }
 
 int32_t Ext2File::fetchSuperBlock(uint32_t blockNum, struct SuperBlock *sb){
@@ -78,4 +81,13 @@ uint32_t Ext2File::writeBlock(uint32_t blockNum, void *buf){
     partition->partitionSeek(blockSize*blockNum, SEEK_SET);
     int BlocksWritten = partition->partitionWrite(buf, blockSize);
     return 0;
+}
+int32_t Ext2File::fetchBGDT(uint32_t blockNum, struct BlockGroupDescriptor *bgdt){
+    partition->partitionSeek(blockSize*blockNum,SEEK_SET);
+    fetchBlock(blockNum,bgdt);
+    this->BGDT[blockNum] = *bgdt;
+}
+int32_t Ext2File::writeBGDT(uint32_t blockNum,struct BlockGroupDescriptor * bgdt){
+    partition->partitionSeek(blockSize*blockNum,SEEK_SET);
+    writeBlock(blockNum,bgdt);
 }
