@@ -252,15 +252,11 @@ void ExEmulationTests::step2Ex3() {
 void ExEmulationTests::step3Ex1() {
     cout << "Displaying Step 3, Example 1" << endl;
 
-    char *filename = "../testFiles/Test-fixed-1k.vdi";
+    char *filename = "../testFiles/Test-dynamic-1k.vdi";
     uint8_t *buffer = new uint8_t[1024];
     Ext2File *ext2File = new Ext2File();
     bool success = ext2File->ext2Open(filename);
-    ///StepZDebug::displayBuffer(static_cast<uint8_t>(ext2File->superBlock), 1024, 1024);
-    for(int x = 0; x < ext2File->numBlockGroupsReturn(); x++)
-    {
-        ext2File->fetchBGDT(x,ext2File->BGDT);
-    }
+    StepZDebug::displayBuffer(reinterpret_cast<uint8_t*>(&ext2File->superBlock), 1024, 1024);
     StepZDebug::dumpSuperBlock(ext2File);
     StepZDebug::dumpBGDT(ext2File);
     ext2File->ext2Close();
