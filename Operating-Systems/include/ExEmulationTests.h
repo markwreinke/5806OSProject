@@ -33,6 +33,8 @@ public:
     static void step2Ex2();
     static void step2Ex3();
     static void step3Ex1();
+    static void step3Ex2();
+    static void step3Ex3();
 };
 
 

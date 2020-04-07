@@ -47,6 +47,12 @@ void ExEmulationTests::runEmTest(int step, int example){
         case 3: if(example == 1) {
                 step3Ex1();
                 break;
+                } else if(example == 2) {
+                step3Ex2();
+                break;
+                } else if(example == 3) {
+                step3Ex3();
+                break;
                 }
         default:
             cout << "These are not the  step " << step << " example " << example << " emulation tests you are looking for." << endl;
@@ -252,6 +258,21 @@ void ExEmulationTests::step2Ex3() {
 void ExEmulationTests::step3Ex1() {
     cout << "Displaying Step 3, Example 1" << endl;
 
+    char *filename = "../testFiles/Test-fixed-1k.vdi";
+    uint8_t *buffer = new uint8_t[1024];
+    Ext2File *ext2File = new Ext2File();
+    bool success = ext2File->ext2Open(filename);
+    StepZDebug::displayBuffer(reinterpret_cast<uint8_t*>(&ext2File->superBlock), 1024, 1024);
+    StepZDebug::dumpSuperBlock(ext2File);
+    StepZDebug::dumpBGDT(ext2File);
+    ext2File->ext2Close();
+    delete[] ext2File;
+    delete[] buffer;
+}
+
+void ExEmulationTests::step3Ex2() {
+    cout << "Displaying Step 3, Example 2" << endl;
+
     char *filename = "../testFiles/Test-dynamic-1k.vdi";
     uint8_t *buffer = new uint8_t[1024];
     Ext2File *ext2File = new Ext2File();
@@ -262,5 +283,19 @@ void ExEmulationTests::step3Ex1() {
     ext2File->ext2Close();
     delete[] ext2File;
     delete[] buffer;
+}
 
+void ExEmulationTests::step3Ex3() {
+    cout << "Displaying Step 3, Example 3" << endl;
+
+    char *filename = "../testFiles/Test-fixed-4k.vdi";
+    uint8_t *buffer = new uint8_t[1024];
+    Ext2File *ext2File = new Ext2File();
+    bool success = ext2File->ext2Open(filename);
+    StepZDebug::displayBuffer(reinterpret_cast<uint8_t*>(&ext2File->superBlock), 1024, 1024);
+    StepZDebug::dumpSuperBlock(ext2File);
+    StepZDebug::dumpBGDT(ext2File);
+    ext2File->ext2Close();
+    delete[] ext2File;
+    delete[] buffer;
 }
