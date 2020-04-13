@@ -46,8 +46,9 @@ class Inode {
         int32_t inodeInUse(struct Ext2File *f, uint32_t inum);
         uint32_t allocateInode(struct Ext2File *f, int32_t group);
         int32_t freeInode(struct Ext2File *f, uint32_t inum);
+        struct InodeStruct *inodeStruct;
     private:
-    struct InodeStruct iNodeStruct;
+
 };
 
 

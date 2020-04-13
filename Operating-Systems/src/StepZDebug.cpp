@@ -2,6 +2,7 @@
 // Created by csis on 1/26/20.
 //
 
+#include <cstring>
 #include "../include/StepZDebug.h"
 #include "../include/Ext2File.h"
 
@@ -197,6 +198,9 @@ void StepZDebug::dumpPartitionTable(VDIFile *f, struct PartitionEntry *P){
     }
 }
 void StepZDebug::dumpSuperBlock(Ext2File *ext2 ){
+    char mtime[32],wtime[32],chkTime[32];
+    time_t tmp;
+
     cout << "Superblock contents:" << endl;
     cout << "Number of Inodes: ";
         printf("%u",ext2->superBlock.s_inodes_count);
@@ -232,11 +236,13 @@ void StepZDebug::dumpSuperBlock(Ext2File *ext2 ){
         printf("%u",ext2->superBlock.s_inodes_per_group);
         cout << endl;
     cout << "Last mount time: ";
-        printf("%u",ext2->superBlock.s_mtime); // ctime function ctime(time variables) not static, declare variables as char arrays 32, string copy(s_m_time, ctime(amper, superBlock->s_mtime))
-        cout << endl;
+        tmp = ext2->superBlock.s_mtime;
+        strcpy(mtime,ctime(&tmp));
+        printf("%s",mtime);
     cout << "Last write time: ";
-        printf("%u",ext2->superBlock.s_wtime);
-        cout << endl;
+        tmp = ext2->superBlock.s_wtime;
+        strcpy(wtime,ctime(&tmp));
+        printf("%s",wtime);
     cout << "Mount count: ";
         printf("%u",ext2->superBlock.s_mnt_count);
         cout << endl;
@@ -257,8 +263,9 @@ void StepZDebug::dumpSuperBlock(Ext2File *ext2 ){
         printf("%2.1u",ext2->superBlock.s_rev_level);
         cout << endl;
     cout << "Last system check: ";
-        printf("%u",ext2->superBlock.s_lastcheck);
-        cout << endl;
+        tmp = ext2->superBlock.s_lastcheck;
+        strcpy(chkTime,ctime(&tmp));
+        printf("%s",chkTime);
     cout << "Check interval: ";
         printf("%u",ext2->superBlock.s_checkinterval);
         cout << endl;
@@ -351,4 +358,68 @@ void StepZDebug::dumpBGDT(Ext2File *ext2){
         printf("%-4u",ext2->BGDT[bgNum].bg_used_dirs_count);
         cout << endl;
     }
+}
+void StepZDebug::dumpInode(Inode *inode, uint32_t inum) {
+    char crTime[32],atime[32],mtime[32],dtime[32];
+    time_t tmp;
+
+
+    cout << "Inode" << inum << ":" << endl;
+ displayBuffer(reinterpret_cast<uint8_t*>(inode), sizeof(inode),0);
+ cout << "Mode: ";
+    printf("%u /n",inode->inodeStruct->i_mode);
+ cout << "Size: ";
+    printf("%u /n",inode->inodeStruct->i_size);
+ cout << "Blocks: ";
+    printf("%u /n",inode->inodeStruct->i_blocks);
+ cout << "UID / GID:";
+    printf("%u",inode->inodeStruct->i_uid);
+    cout << " / ";
+    printf("%u /n",inode->inodeStruct->i_gid);
+ cout << "Links: ";
+    printf("%u /n",inode->inodeStruct->i_links_count);
+ cout << "Created: ";
+    tmp = inode->inodeStruct->i_ctime;
+    strcpy(crTime,ctime(&tmp));
+    printf("%s",crTime);
+ cout << "Last Access: ";
+    tmp = inode->inodeStruct->i_atime;
+    strcpy(atime,ctime(&tmp));
+    printf("%s",atime);
+ cout << "Last modification: ";
+    tmp = inode->inodeStruct->i_mtime;
+    strcpy(mtime,ctime(&tmp));
+    printf("%s",mtime);
+ cout << "Deleted: ";
+    tmp = inode->inodeStruct->i_dtime;
+    strcpy(dtime,ctime(&tmp));
+    printf("%s",dtime);
+ cout << "Flags: ";
+    printf("%u /n",inode->inodeStruct->i_flags);
+ cout << "File Version: ";
+    printf("%u /n",inode->inodeStruct->i_generation);
+ cout << "ACL block: ";
+    printf("%u /n",inode->inodeStruct->i_file_acl);
+ cout << "Direct Blocks: ";
+ cout << "0-3: ";
+    printf("%5u ",inode->inodeStruct->i_block[0]);
+    printf("%5u ",inode->inodeStruct->i_block[1]);
+    printf("%5u ",inode->inodeStruct->i_block[2]);
+    printf("%5u /n",inode->inodeStruct->i_block[3]);
+ cout << "4-7: ";
+    printf("%5u ",inode->inodeStruct->i_block[4]);
+    printf("%5u ",inode->inodeStruct->i_block[5]);
+    printf("%5u ",inode->inodeStruct->i_block[6]);
+    printf("%5u /n",inode->inodeStruct->i_block[7]);
+ cout << "8-11: ";
+    printf("%5u ",inode->inodeStruct->i_block[8]);
+    printf("%5u ",inode->inodeStruct->i_block[9]);
+    printf("%5u ",inode->inodeStruct->i_block[10]);
+    printf("%5u /n",inode->inodeStruct->i_block[11]);
+ cout << "Single indirect block: ";
+    printf("%5u /n",inode->inodeStruct->i_block[12]);
+ cout << "Double indirect block: ";
+    printf("%5u /n",inode->inodeStruct->i_block[13]);
+ cout << "Triple indirect block: ";
+    printf("%5u /n",inode->inodeStruct->i_block[14]);
 }

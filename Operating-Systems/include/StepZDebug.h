@@ -10,6 +10,7 @@
 #include "VDIFile.h"
 #include "Partition.h"
 #include "Ext2File.h"
+#include "Inode.h"
 
 using namespace std;
 
@@ -21,6 +22,7 @@ public:
     static void dumpPartitionTable(VDIFile *f, PartitionEntry *P);
     static void dumpSuperBlock(Ext2File *ext2);
     static void dumpBGDT(Ext2File *ext2);
+    static void dumpInode(Inode *inode,uint32_t inum);
 };
 
 
