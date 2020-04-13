@@ -335,7 +335,7 @@ void StepZDebug::dumpBGDT(Ext2File *ext2){
     cout << "Block   Block   Inode   Inode  Free    Free    Used" << endl;
     cout << "Number  Bitmap  Bitmap  Table  Blocks  Inodes  Dirs" << endl;
     cout << "------  ------  ------  -----  ------  ------  ----" << endl;
-    for(int bgNum = 0; bgNum < ext2->numBlockGroupsReturn(); bgNum++){
+    for(int bgNum = 0; bgNum < ext2->getNumBlockGroups(); bgNum++){
         printf("%-6u",bgNum);
         cout << "  ";
         printf("%-6u",ext2->BGDT[bgNum].bg_block_bitmap);

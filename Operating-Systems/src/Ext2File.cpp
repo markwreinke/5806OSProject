@@ -12,34 +12,36 @@ Ext2File::Ext2File() {
     partition = new Partition();
 }
 
+/* Open the file with the given file name, populating an ext2file structure, consisting of the superblock, block group descriptor table, and calculating the block size and the number of block groups. */
 bool Ext2File::ext2Open(char *fn) {
-    ///make sure filename is correct;
+    /* Open the VDI file with the given filename, storing if the file open was successful or not in a boolean */
     vdiFile->vdiOpen(fn);
     bool PartitionOpenSuccess = partition->partitionOpen(vdiFile);
 
-
-    ///populate superBlock
+    /* Filling the super block */
     fetchSuperBlock((uint32_t) 0, &superBlock);
-    ///populate other values
+
+    /* Calculate block size and the number of block groups */
     this->blockSize = 1024*pow(2,superBlock.s_log_block_size);
     this->numBlockGroups = superBlock.s_blocks_count / superBlock.s_blocks_per_group + 1;
-    cout << numBlockGroups << endl;
+
+    /* Filling the block group descriptor table */
     this->BGDT = new BlockGroupDescriptor [numBlockGroups];
     fetchBGDT(1,BGDT);
-
 
     return PartitionOpenSuccess;
 
 }
-void Ext2File::ext2Close() {
-    ///delete anything created dynamically todo
 
+/* Close the VDI file, and delete dynamically allocated memory */
+void Ext2File::ext2Close() {
     partition->partitionClose();
     vdiFile->vdiClose();
     delete[] partition;
     delete[] vdiFile;
     delete[] BGDT;
 }
+
 ///assumes given a valid blockNum, will read superblock into structure
 int32_t Ext2File::fetchSuperBlock(uint32_t blockNum, struct SuperBlock *sb){
     if(blockNum == 0) {
@@ -56,6 +58,7 @@ int32_t Ext2File::fetchSuperBlock(uint32_t blockNum, struct SuperBlock *sb){
     }
     return 0;
 }
+
 ///assumes given a valid blockNum will write superblock
 int32_t Ext2File::writeSuperBlock(uint32_t blockNum, struct SuperBlock *sb) {
     if(blockNum == 0) {
@@ -85,14 +88,19 @@ uint32_t Ext2File::writeBlock(uint32_t blockNum, void *buf){
     return 0;
 }
 ///assumes given a valid blockNum that it will fill the BGDT
+
 int32_t Ext2File::fetchBGDT(uint32_t blockNum, struct BlockGroupDescriptor *bgdt){
     int bootAccount;
-    if(blockSize == 1024){
+    if(blockSize == 1024) {
         bootAccount = 1024;
-    }else{bootAccount = 0;}
-        partition->partitionSeek(blockSize*blockNum + bootAccount, SEEK_SET);
-        return partition->partitionRead(bgdt, 32*numBlockGroups);
+    } else {
+        bootAccount = 0;
+    }
+
+    partition->partitionSeek(blockSize*blockNum + bootAccount, SEEK_SET);
+    return partition->partitionRead(bgdt, 32*numBlockGroups);
 }
+
 ///assumes given a valid blockNum
 int32_t Ext2File::writeBGDT(uint32_t blockNum,struct BlockGroupDescriptor * bgdt){
     int bootAccount;

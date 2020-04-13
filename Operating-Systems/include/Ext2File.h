@@ -79,11 +79,14 @@ public:
     uint32_t writeBlock(uint32_t blockNum, void *buf);
     int32_t fetchSuperBlock(uint32_t blockNum, struct SuperBlock *sb);
     int32_t writeSuperBlock(uint32_t blockNum, struct SuperBlock *sb);
-    uint32_t numBlockGroupsReturn() {return numBlockGroups;}
+
     int32_t fetchBGDT(uint32_t blockNum, BlockGroupDescriptor *bgdt);
     int32_t writeBGDT(uint32_t blockNum, BlockGroupDescriptor *bgdt);
     struct SuperBlock superBlock;
     struct BlockGroupDescriptor *BGDT;
+
+    /* Getter function for numBlockGroups */
+    uint32_t getNumBlockGroups() {return numBlockGroups;}
 private:
     VDIFile *vdiFile;
     Partition *partition;
