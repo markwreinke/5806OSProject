@@ -22,7 +22,7 @@ public:
     static void dumpPartitionTable(VDIFile *f, PartitionEntry *P);
     static void dumpSuperBlock(Ext2File *ext2);
     static void dumpBGDT(Ext2File *ext2);
-    static void dumpInode(Inode *inode,uint32_t inum);
+    static void dumpInode(Ext2File *ext2, struct InodeStruct inodeStruct, uint32_t iNum);
 };
 
 

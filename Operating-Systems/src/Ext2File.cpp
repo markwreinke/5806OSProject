@@ -74,9 +74,9 @@ int32_t Ext2File::writeSuperBlock(uint32_t blockNum, struct SuperBlock *sb) {
 uint32_t Ext2File::fetchBlock(uint32_t blockNum, void *buf) {
 
     partition->partitionSeek(blockSize*blockNum, SEEK_SET);
-    int BlocksRead = partition->partitionRead(buf, blockSize);
+    int blocksRead = partition->partitionRead(buf, blockSize);
 
-    if(BlocksRead != blockSize) {
+    if(blocksRead != blockSize) {
         return -1;
     }
     return 0;

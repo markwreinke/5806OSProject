@@ -54,6 +54,10 @@ void ExEmulationTests::runEmTest(int step, int example){
                 step3Ex3();
                 break;
                 }
+        case 4: if(example == 1) {
+                step4Ex1();
+                break;
+                }
         default:
             cout << "These are not the  step " << step << " example " << example << " emulation tests you are looking for." << endl;
     }
@@ -298,4 +302,18 @@ void ExEmulationTests::step3Ex3() {
     ext2File->ext2Close();
     delete[] ext2File;
     delete[] buffer;
+}
+
+void ExEmulationTests::step4Ex1() {
+    cout << "Displaying Step 4, Example 1" << endl;
+
+    char *filename = "../testFiles/Test-fixed-1k.vdi";
+
+    Ext2File *ext2File = new Ext2File();
+    bool success = ext2File->ext2Open(filename);
+    struct InodeStruct inodeStruct;
+    Inode::fetchInode(ext2File, 2, &inodeStruct);
+    StepZDebug::dumpInode(ext2File, inodeStruct, 2);
+    ext2File->ext2Close();
+    delete[] ext2File;
 }

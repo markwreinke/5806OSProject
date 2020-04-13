@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include "Partition.h"
 #include "Ext2File.h"
+#include "Inode.h"
 using namespace std;
 
 class ExEmulationTests {
@@ -35,6 +36,7 @@ public:
     static void step3Ex1();
     static void step3Ex2();
     static void step3Ex3();
+    static void step4Ex1();
 };
 
 
