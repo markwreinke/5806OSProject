@@ -304,7 +304,7 @@ void ExEmulationTests::step3Ex3() {
 void ExEmulationTests::step4Ex1() {
     cout << "Displaying Step 4, Example 1" << endl;
 
-    char *filename = "../testFiles/Test-fixed-1k.vdi";
+    char *filename = "../testFiles/Write_Test-fixed-1k.vdi";
 
     Ext2File *ext2File = new Ext2File();
     bool success = ext2File->ext2Open(filename);
@@ -313,6 +313,13 @@ void ExEmulationTests::step4Ex1() {
     StepZDebug::dumpInode(ext2File, *inodeStruct, 2);
     Inode::fetchInode(ext2File, 11, inodeStruct);
     StepZDebug::dumpInode(ext2File, *inodeStruct, 11);
+
+    //test to see if inode 2 is being freed
+    Inode::freeInode(ext2File,2);
+    Inode::fetchInode(ext2File,2,inodeStruct);
+    StepZDebug::dumpInode(ext2File,*inodeStruct,2);
+
+
     ext2File->ext2Close();
     delete[] inodeStruct;
     delete[] ext2File;

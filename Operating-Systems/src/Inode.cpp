@@ -104,5 +104,15 @@ uint32_t Inode::allocateInode(struct Ext2File *f, int32_t group) {
 }
 
 int32_t Inode::freeInode(struct Ext2File *f, uint32_t iNum) {
+    int blockGroup = (iNum - 1) / f->superBlock.s_inodes_per_group;
+    int localInodeIndex = (iNum - 1) % f->superBlock.s_inodes_per_group;
+    int wantedInode = localInodeIndex / 8;
+    int wantedInodeIndex = localInodeIndex % 8;
+    int wantedBit = (8*wantedInode) + wantedInodeIndex;
 
+    f->BGDT[blockGroup].bg_inode_bitmap &= ~(1UL << wantedBit);
+
+    InodeStruct temp = (const struct InodeStruct){0};
+    writeInode(f,iNum, &temp);
+    StepZDebug::dumpInode(f,temp,iNum);
 }
