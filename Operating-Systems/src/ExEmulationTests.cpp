@@ -361,10 +361,11 @@ void ExEmulationTests::step4Ex2() {
     Inode::fetchInode(ext2File, 11, inodeStruct);
     StepZDebug::dumpInode(ext2File, *inodeStruct, 11);
 
-    //test to see if inode 2 and 11 is being freed
+    /* Free inodes 2 and 11 */
     Inode::freeInode(ext2File,2);
     Inode::freeInode(ext2File, 11);
 
+    /* Display after */
     Inode::fetchInode(ext2File, 2, inodeStruct);
     StepZDebug::dumpInode(ext2File, *inodeStruct, 2);
     cout << endl;

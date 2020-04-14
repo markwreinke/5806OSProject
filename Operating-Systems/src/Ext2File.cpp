@@ -108,7 +108,7 @@ int32_t Ext2File::fetchBGDT(uint32_t blockNum, struct BlockGroupDescriptor *bgdt
 }
 
 ///assumes given a valid blockNum
-int32_t Ext2File::writeBGDT(uint32_t blockNum,struct BlockGroupDescriptor * bgdt){
+int32_t Ext2File::writeBGDT(uint32_t blockNum, struct BlockGroupDescriptor * bgdt){
     int bootAccount;
     if(blockSize == 1024){
         bootAccount == 2048;
@@ -136,6 +136,22 @@ int32_t Ext2File::writeAllSuperBlocks(struct SuperBlock *superBlock) {
 
             if(successCheck == -1) {
                 cout << "A write superBlock failed i = " << i << endl;
+                return -1;
+            }
+        }
+    }
+
+    return successCheck;
+}
+
+int32_t Ext2File::writeAllBGDT(struct BlockGroupDescriptor *bgdt) {
+    int32_t successCheck = -1;
+    for(int i = 0; i < numBlockGroups; i++) {
+        if(Ext2File::containsCopyOfSuperBlockOrBGDT(i)){
+            successCheck = writeBGDT((i * superBlock.s_blocks_per_group) + 1, bgdt);
+
+            if(successCheck == -1) {
+                cout << "A writeBGDT failed i = " << i << endl;
                 return -1;
             }
         }

@@ -82,7 +82,8 @@ public:
     int32_t writeAllSuperBlocks(SuperBlock *superBlock);
 
     int32_t fetchBGDT(uint32_t blockNum, BlockGroupDescriptor *bgdt);
-    int32_t writeBGDT(uint32_t blockNum, BlockGroupDescriptor *bgdt);
+    int32_t writeAllBGDT(struct BlockGroupDescriptor *bgdt);
+
     struct SuperBlock superBlock;
     struct BlockGroupDescriptor *BGDT;
 
@@ -96,7 +97,11 @@ private:
     uint32_t numBlockGroups;
 
     int32_t writeSuperBlock(uint32_t blockNum, struct SuperBlock *sb);
+    int32_t writeBGDT(uint32_t blockNum, BlockGroupDescriptor *bgdt);
+
     bool containsCopyOfSuperBlockOrBGDT(uint32_t blockGroupNumber);
+
+
 };
 
 
