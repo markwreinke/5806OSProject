@@ -57,6 +57,9 @@ void ExEmulationTests::runEmTest(int step, int example){
         case 4: if(example == 1) {
                 step4Ex1();
                 break;
+                } else if(example == 2) {
+                step4Ex2();
+                break;
                 }
         default:
             cout << "These are not the  step " << step << " example " << example << " emulation tests you are looking for." << endl;
@@ -319,6 +322,54 @@ void ExEmulationTests::step4Ex1() {
     Inode::freeInode(ext2File,2);
     Inode::fetchInode(ext2File,2,inodeStruct);
     StepZDebug::dumpInode(ext2File,*inodeStruct,2);
+
+
+    ext2File->ext2Close();
+    delete[] inodeStruct;
+    delete[] ext2File;
+}
+
+void ExEmulationTests::step4Ex2() {
+    cout << "Displaying Step 4 Testing freeInode" << endl << endl;
+    char *filename = "../testFiles/Write_Test-fixed-1k.vdi";
+    char *reallocationFile = "../testFiles/Test-fixed-1k.vdi";
+
+    Ext2File *ext2File = new Ext2File();
+    Ext2File *reExt2File = new Ext2File();
+
+    bool success = ext2File->ext2Open(filename);
+    reExt2File->ext2Open(reallocationFile);
+
+    struct InodeStruct *inodeStruct = new InodeStruct;
+    struct InodeStruct *reallocationInodeStruct = new InodeStruct;
+
+    /* Return the possibly changed file to what it was */
+    Inode::fetchInode(reExt2File, 2, reallocationInodeStruct);
+    Inode::writeInode(ext2File, 2, reallocationInodeStruct);
+
+    Inode::fetchInode(reExt2File, 11, reallocationInodeStruct);
+    Inode::writeInode(ext2File, 11, reallocationInodeStruct);
+
+    reExt2File->ext2Close();
+    delete[] reallocationInodeStruct;
+    delete[] reExt2File;
+
+    /* Display before */
+    Inode::fetchInode(ext2File, 2, inodeStruct);
+    StepZDebug::dumpInode(ext2File, *inodeStruct, 2);
+    cout << endl;
+    Inode::fetchInode(ext2File, 11, inodeStruct);
+    StepZDebug::dumpInode(ext2File, *inodeStruct, 11);
+
+    //test to see if inode 2 and 11 is being freed
+    Inode::freeInode(ext2File,2);
+    Inode::freeInode(ext2File, 11);
+
+    Inode::fetchInode(ext2File, 2, inodeStruct);
+    StepZDebug::dumpInode(ext2File, *inodeStruct, 2);
+    cout << endl;
+    Inode::fetchInode(ext2File, 11, inodeStruct);
+    StepZDebug::dumpInode(ext2File, *inodeStruct, 11);
 
 
     ext2File->ext2Close();

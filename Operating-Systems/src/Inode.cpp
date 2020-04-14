@@ -108,5 +108,5 @@ int32_t Inode::freeInode(struct Ext2File *f, uint32_t iNum) {
 
     InodeStruct temp = (const struct InodeStruct){0};
     writeInode(f,iNum, &temp);
-    StepZDebug::dumpInode(f,temp,iNum);
+    //StepZDebug::dumpInode(f,temp,iNum);
 }

@@ -56,7 +56,7 @@ ssize_t Partition::partitionWrite(void *buf, size_t count) {
     if(count > partitionStart + partitionSize) {
         return -1;
     }
-    ssize_t Temp = this->vdiFile->vdiRead(buf, count);
+    ssize_t Temp = this->vdiFile->vdiWrite(buf, count);
     return Temp;
 }
 
