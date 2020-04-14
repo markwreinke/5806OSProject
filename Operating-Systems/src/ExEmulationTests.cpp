@@ -63,10 +63,6 @@ void ExEmulationTests::runEmTest(int step, int example){
     }
 }
 
-
-
-
-
 void ExEmulationTests::step0Ex1() {
     cout << "Displaying Step 0, Example 1" << endl;
 
@@ -205,6 +201,7 @@ void ExEmulationTests::step1Ex4() {
     f.vdiClose();
     delete[] buffer;
 }
+
 void ExEmulationTests::step2Ex1() {
     cout << "Displaying Step 2, Example 1 (It's Borked)" << endl;
 
@@ -311,9 +308,10 @@ void ExEmulationTests::step4Ex1() {
 
     Ext2File *ext2File = new Ext2File();
     bool success = ext2File->ext2Open(filename);
-    struct InodeStruct inodeStruct;
-    Inode::fetchInode(ext2File, 2, &inodeStruct);
-    StepZDebug::dumpInode(ext2File, inodeStruct, 2);
+    struct InodeStruct *inodeStruct = new InodeStruct;
+    Inode::fetchInode(ext2File, 2, inodeStruct);
+    StepZDebug::dumpInode(ext2File, *inodeStruct, 2);
     ext2File->ext2Close();
+    delete[] inodeStruct;
     delete[] ext2File;
 }
