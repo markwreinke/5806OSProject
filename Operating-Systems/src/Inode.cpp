@@ -65,12 +65,15 @@ int32_t Inode::writeInode(struct Ext2File *f, uint32_t iNum, struct InodeStruct 
 int32_t Inode::inodeInUse(struct Ext2File *f, uint32_t iNum) {
     int blockGroup = (iNum - 1) / f->superBlock.s_inodes_per_group;
     int localInodeIndex = (iNum - 1) % f->superBlock.s_inodes_per_group;
-
-
-    uint8_t *tmpBlock = new uint8_t[f->getBlockSize()];
-
     int wantedInode = localInodeIndex / 8;
     int wantedInodeIndex = localInodeIndex % 8;
+    int wantedBit = (8*wantedInode) + wantedInodeIndex;
+
+    if(f->BGDT[blockGroup].bg_inode_bitmap &(1 << (wantedBit))){
+        cout << "SET" << endl;
+        return 1;
+    }
+    else return 0;
 }
 
 uint32_t Inode::allocateInode(struct Ext2File *f, int32_t group) {
