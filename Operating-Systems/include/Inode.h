@@ -42,7 +42,7 @@ struct InodeStruct {
 
 class Inode {
     public:
-        static int32_t fetchInode(struct Ext2File *f, uint32_t iNum, struct InodeStruct *buf);
+        static int32_t fetchInode(struct Ext2File *extFile, uint32_t iNum, struct InodeStruct *buf);
         static int32_t writeInode(struct Ext2File *f, uint32_t iNum, struct InodeStruct *buf);
         static int32_t inodeInUse(struct Ext2File *f, uint32_t iNum);
         static uint32_t allocateInode(struct Ext2File *f, int32_t group);
