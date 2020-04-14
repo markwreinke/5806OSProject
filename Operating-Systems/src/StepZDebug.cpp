@@ -337,7 +337,6 @@ void StepZDebug::dumpSuperBlock(Ext2File *ext2 ){
         cout << endl;
         cout << endl;
 }
-
 void StepZDebug::dumpBGDT(Ext2File *ext2){
     cout << "Block   Block   Inode   Inode  Free    Free    Used" << endl;
     cout << "Number  Bitmap  Bitmap  Table  Blocks  Inodes  Dirs" << endl;
@@ -364,10 +363,10 @@ void StepZDebug::dumpInode(Ext2File *ext2, struct InodeStruct inodeStruct, uint3
     time_t tmp;
 
 
-    cout << "Inode" << iNum << ":" << endl;
+    cout << "Inode " << iNum << ":" << endl;
  displayBuffer(reinterpret_cast<uint8_t*>(&inodeStruct), ext2->superBlock.s_inode_size,0);
  cout << "Mode: ";
-    printf("%u \n",inodeStruct.i_mode);
+    printf("%o \n",inodeStruct.i_mode);
  cout << "Size: ";
     printf("%u \n",inodeStruct.i_size);
  cout << "Blocks: ";

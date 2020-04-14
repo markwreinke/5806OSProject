@@ -311,6 +311,8 @@ void ExEmulationTests::step4Ex1() {
     struct InodeStruct *inodeStruct = new InodeStruct;
     Inode::fetchInode(ext2File, 2, inodeStruct);
     StepZDebug::dumpInode(ext2File, *inodeStruct, 2);
+    Inode::fetchInode(ext2File, 11, inodeStruct);
+    StepZDebug::dumpInode(ext2File, *inodeStruct, 11);
     ext2File->ext2Close();
     delete[] inodeStruct;
     delete[] ext2File;
