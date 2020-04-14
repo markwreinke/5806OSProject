@@ -363,7 +363,7 @@ void StepZDebug::dumpInode(Ext2File *ext2, struct InodeStruct inodeStruct, uint3
     time_t tmp;
 
 
-    cout << "Inode " << iNum << ":" << endl;
+    cout << "Inode " << dec << iNum << ":" << endl;
  displayBuffer(reinterpret_cast<uint8_t*>(&inodeStruct), ext2->superBlock.s_inode_size,0);
  cout << "Mode: ";
     printf("%o \n",inodeStruct.i_mode);

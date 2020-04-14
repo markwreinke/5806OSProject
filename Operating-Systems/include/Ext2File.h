@@ -11,13 +11,13 @@
 #include "Partition.h"
 
 struct SuperBlock{
-    uint32_t s_inodes_count;
-    uint32_t s_blocks_count;
-    uint32_t s_r_blocks_count;
-    uint32_t  s_free_blocks_count;
-    uint32_t s_free_inodes_count;
-    uint32_t s_first_data_block;
-    uint32_t s_log_block_size;
+    uint32_t s_inodes_count; // Total number of inodes
+    uint32_t s_blocks_count; // Number of blocks in the system (including used, free and reserved)
+    uint32_t s_r_blocks_count; // Number of blocks reserved for usage of the super user
+    uint32_t  s_free_blocks_count; // Number of free blocks, including s_r_blocks_count. Sum of all free blocks of all the block groups.
+    uint32_t s_free_inodes_count; // Sum of all free inodes of all block groups.
+    uint32_t s_first_data_block; // first data block, in other words, the id of the block containing the superblock structure. ( always 0 for file systems with block size > 1KB, and always 1 for block size = 1KB. Superblock always starts at the 1024th byte of the disk)
+    uint32_t s_log_block_size; // block size == 1024*pow(2, s_log_block_size)
     uint32_t s_log_frag_size;
     uint32_t s_blocks_per_group;
     uint32_t s_frags_per_group;
@@ -77,8 +77,9 @@ public:
     void ext2Close();
     uint32_t fetchBlock(uint32_t blockNum, void *buf);
     uint32_t writeBlock(uint32_t blockNum, void *buf);
+
     int32_t fetchSuperBlock(uint32_t blockNum, struct SuperBlock *sb);
-    int32_t writeSuperBlock(uint32_t blockNum, struct SuperBlock *sb);
+    int32_t writeAllSuperBlocks(SuperBlock *superBlock);
 
     int32_t fetchBGDT(uint32_t blockNum, BlockGroupDescriptor *bgdt);
     int32_t writeBGDT(uint32_t blockNum, BlockGroupDescriptor *bgdt);
@@ -94,7 +95,8 @@ private:
     uint32_t blockSize;
     uint32_t numBlockGroups;
 
-
+    int32_t writeSuperBlock(uint32_t blockNum, struct SuperBlock *sb);
+    bool containsCopyOfSuperBlockOrBGDT(uint32_t blockGroupNumber);
 };
 
 

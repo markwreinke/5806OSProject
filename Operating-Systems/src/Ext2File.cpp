@@ -61,14 +61,16 @@ int32_t Ext2File::fetchSuperBlock(uint32_t blockNum, struct SuperBlock *sb){
 
 ///assumes given a valid blockNum will write superblock
 int32_t Ext2File::writeSuperBlock(uint32_t blockNum, struct SuperBlock *sb) {
+    int32_t successCheck = -1;
     if(blockNum == 0) {
         partition->partitionSeek(1024, SEEK_SET);
-        partition->partitionWrite(sb, 1024);
+        successCheck = partition->partitionWrite(sb, 1024);
     }
     else {
         partition->partitionSeek(blockNum*blockSize, SEEK_SET);
-        partition->partitionWrite(sb, 1024);
+        successCheck = partition->partitionWrite(sb, 1024);
     }
+    return successCheck;
 }
 
 uint32_t Ext2File::fetchBlock(uint32_t blockNum, void *buf) {
@@ -124,4 +126,46 @@ int32_t Ext2File::writeBGDT(uint32_t blockNum,struct BlockGroupDescriptor * bgdt
     if(Test < 0)
         {return -1;}
     return 0;
+}
+
+int32_t Ext2File::writeAllSuperBlocks(struct SuperBlock *superBlock) {
+    int32_t successCheck = -1;
+    for(int i = 0; i < numBlockGroups; i++) {
+        if(Ext2File::containsCopyOfSuperBlockOrBGDT(i)){
+            successCheck = writeSuperBlock(i * superBlock->s_blocks_per_group, superBlock);
+
+            if(successCheck == -1) {
+                cout << "A write superBlock failed i = " << i << endl;
+                return -1;
+            }
+        }
+    }
+
+    return successCheck;
+}
+
+/* Checks if the given block group contains a superblock or BGDT copy */
+bool Ext2File::containsCopyOfSuperBlockOrBGDT(uint32_t blockGroupNumber) {
+    if(blockGroupNumber == 0 || blockGroupNumber == 1) {
+        return true;
+    }
+
+    /* Check if the block group is a power of 3 */
+    double checkMultiples = log((double) blockGroupNumber) / log((double) 3);
+    double threeCheck = checkMultiples - (int) checkMultiples;
+
+    /* Check if the block group is a power of 5 */
+    checkMultiples = log((double) blockGroupNumber) / log((double) 5);
+    double fiveCheck = checkMultiples - (int) checkMultiples;
+
+
+    /* Check if the block group is a power of 7 */
+    checkMultiples = log((double) blockGroupNumber) / log((double) 7);
+    double sevenCheck = checkMultiples - (int) checkMultiples;
+
+    if(threeCheck == 0 || fiveCheck == 0 || sevenCheck == 0) {
+        return true;
+    } else {
+        return false;
+    }
 }
