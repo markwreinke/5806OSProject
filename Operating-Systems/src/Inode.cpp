@@ -73,7 +73,8 @@ int32_t Inode::inodeInUse(struct Ext2File *f, uint32_t iNum) {
         cout << "SET" << endl;
         return 1;
     }
-    else return 0;
+    cout << "NOT SET" << endl;
+    return 0;
 }
 
 uint32_t Inode::allocateInode(struct Ext2File *f, int32_t group) {
@@ -112,4 +113,8 @@ int32_t Inode::freeInode(struct Ext2File *f, uint32_t iNum) {
     InodeStruct temp = (const struct InodeStruct){0};
     writeInode(f,iNum, &temp);
     //StepZDebug::dumpInode(f,temp,iNum);
+}
+void Inode::clearInode(Ext2File *f, uint32_t iNum){
+    InodeStruct temp = (const struct InodeStruct){0};
+    writeInode(f,iNum, &temp);
 }
