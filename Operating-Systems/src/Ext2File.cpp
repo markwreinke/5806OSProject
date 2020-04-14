@@ -85,6 +85,10 @@ uint32_t Ext2File::fetchBlock(uint32_t blockNum, void *buf) {
 uint32_t Ext2File::writeBlock(uint32_t blockNum, void *buf){
     partition->partitionSeek(blockSize*blockNum, SEEK_SET);
     int BlocksWritten = partition->partitionWrite(buf, blockSize);
+
+    if(BlocksWritten != blockSize){
+        return -1;
+    }
     return 0;
 }
 ///assumes given a valid blockNum that it will fill the BGDT

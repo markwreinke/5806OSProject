@@ -87,6 +87,7 @@ public:
 
     /* Getter function for numBlockGroups */
     uint32_t getNumBlockGroups() {return numBlockGroups;}
+    uint32_t getBlockSize() {return blockSize;}
 private:
     VDIFile *vdiFile;
     Partition *partition;
