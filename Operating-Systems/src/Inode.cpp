@@ -49,9 +49,9 @@ int32_t Inode::writeInode(struct Ext2File *f, uint32_t iNum, struct InodeStruct 
     int localInodeIndex = (iNum - 1) % f->superBlock.s_inodes_per_group;
 
 
-    uint8_t *tmpBlock = new uint8_t[1024];
+    uint8_t *tmpBlock = new uint8_t[f->getBlockSize()];
 
-    int inodesPerBlock = 1024 / f->superBlock.s_inode_size;
+    int inodesPerBlock = f->getBlockSize() / f->superBlock.s_inode_size;
     int wantedBlock = localInodeIndex / inodesPerBlock;
     int wantedBlockIndex = localInodeIndex % inodesPerBlock;
 
@@ -73,7 +73,7 @@ int32_t Inode::inodeInUse(struct Ext2File *f, uint32_t iNum) {
     int localInodeIndex = (iNum - 1) % f->superBlock.s_inodes_per_group;
 
 
-    uint8_t *tmpBlock = new uint8_t[1024];
+    uint8_t *tmpBlock = new uint8_t[f->getBlockSize()];
 
     int wantedInode = localInodeIndex / 8;
     int wantedInodeIndex = localInodeIndex % 8;

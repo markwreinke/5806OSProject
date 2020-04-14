@@ -302,7 +302,7 @@ void ExEmulationTests::step3Ex3() {
 }
 
 void ExEmulationTests::step4Ex1() {
-    cout << "Displaying Step 4, Example 1" << endl;
+    cout << "Displaying Step 4, Example 1" << endl << endl;
 
     char *filename = "../testFiles/Test-fixed-1k.vdi";
 
@@ -311,6 +311,7 @@ void ExEmulationTests::step4Ex1() {
     struct InodeStruct *inodeStruct = new InodeStruct;
     Inode::fetchInode(ext2File, 2, inodeStruct);
     StepZDebug::dumpInode(ext2File, *inodeStruct, 2);
+    cout << endl;
     Inode::fetchInode(ext2File, 11, inodeStruct);
     StepZDebug::dumpInode(ext2File, *inodeStruct, 11);
     ext2File->ext2Close();

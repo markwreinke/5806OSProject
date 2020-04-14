@@ -79,6 +79,8 @@ ssize_t VDIFile::vdiRead(void *buf, size_t count) {
       bytesRemaining -= bytesJustRead;
       vdiSeek(bytesJustRead, SEEK_CUR);
   }
+
+  return bytesRead;
 }
 
 
@@ -131,6 +133,8 @@ ssize_t VDIFile::vdiWrite(void *buf, size_t count) {
         bytesRemaining -= bytesJustWritten;
         vdiSeek(bytesJustWritten, SEEK_CUR);
     }
+
+    return bytesWritten;
 }
 
 off_t VDIFile::vdiSeek(off_t offset, int anchor) {
