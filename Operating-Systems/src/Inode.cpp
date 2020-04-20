@@ -102,8 +102,44 @@ uint32_t Inode::allocateInode(struct Ext2File *f, int32_t group) {
 
  for(int currentGroup = lowLimit; currentGroup <= highLimit; currentGroup++) {
      if(f->BGDT[currentGroup].bg_free_inodes_count > 0) {
+         uint8_t *tmpBlock = new uint8_t[f->getBlockSize()];
 
+         uint32_t bitMapLocation = f->BGDT[currentGroup].bg_inode_bitmap;
+         uint32_t successFlag = -1;
+         successFlag = f->fetchBlock(bitMapLocation, tmpBlock);
+         if(successFlag < 0) {
+             cout << "FetchBlock failed." << endl;
+             return successFlag;
+         }
 
+         /* Iterates through all uint8_ts of the bit map looking for the first one !=0xff, then returns the location of the first free inode */
+         for(int currentBitChunk = 0; currentBitChunk < f->getBlockSize()/sizeof(uint8_t); currentBitChunk++){
+             if(tmpBlock[currentBitChunk] != 0xff) {
+                 for(int i = 0; i < 8; i++) {
+                     if(!((tmpBlock[currentBitChunk] >> i) & 1U)) {
+                         returningInode = i + currentBitChunk*8 + currentGroup*f->superBlock.s_inodes_per_group + 1;
+                         tmpBlock[currentBitChunk] ^= 1UL << i;
+                         successFlag = f->writeBlock(bitMapLocation, tmpBlock);
+                         if(successFlag < 0) {
+                             cout << "WriteBlock Failed." << endl;
+                             return successFlag;
+                         }
+                         delete[] tmpBlock;
+                     }
+                 }
+             }
+         }
+
+         if(returningInode < 0) {
+             cout << "Did not find a free inode" << endl;
+         } else {
+             f->BGDT[(returningInode - 1)/f->superBlock.s_inodes_per_group].bg_free_inodes_count--;
+             f->superBlock.s_free_inodes_count--;
+         }
+
+         f->writeAllBGDT(f->BGDT);
+         f->writeAllSuperBlocks(&f->superBlock);
+         return returningInode;
      }
  }
  if(returningInode < 0) {
