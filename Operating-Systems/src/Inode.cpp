@@ -29,7 +29,6 @@ int32_t Inode::fetchInode(struct Ext2File *extFile, uint32_t iNum, struct InodeS
     }
 
     memcpy(buf, tmpBlock + (wantedBlockIndex * extFile->superBlock.s_inode_size), extFile->superBlock.s_inode_size);
-
     delete[] tmpBlock;
 
     return successFlag;
@@ -58,6 +57,11 @@ int32_t Inode::writeInode(struct Ext2File *f, uint32_t iNum, struct InodeStruct 
     memcpy(tmpBlock + (wantedBlockIndex *f->superBlock.s_inode_size), buf, f->superBlock.s_inode_size);
     successFlag = f->writeBlock(f->BGDT[blockGroup].bg_inode_table + wantedBlock, tmpBlock);
     delete[] tmpBlock;
+
+    if(inodeInUse(f,iNum) == 0){
+        setInodeToUsed(f,iNum);
+    }
+
     return successFlag;
 
 }
@@ -72,9 +76,10 @@ int32_t Inode::inodeInUse(struct Ext2File *f, uint32_t iNum) {
     if(f->BGDT[blockGroup].bg_inode_bitmap & (1 << (wantedBit))){
         cout << "SET" << endl;
         return 1;
+    }else {
+        cout << "NOT SET" << endl;
+        return 0;
     }
-    cout << "NOT SET" << endl;
-    return 0;
 }
 
 uint32_t Inode::allocateInode(struct Ext2File *f, int32_t group) {
@@ -118,4 +123,14 @@ int32_t Inode::freeInode(struct Ext2File *f, uint32_t iNum) {
 void Inode::clearInode(Ext2File *f, uint32_t iNum){
     InodeStruct temp = (const struct InodeStruct){0};
     writeInode(f,iNum, &temp);
+}
+void Inode::setInodeToUsed(Ext2File *f, uint32_t iNum){
+    int blockGroup = (iNum - 1) / f->superBlock.s_inodes_per_group;
+    int localInodeIndex = (iNum - 1) % f->superBlock.s_inodes_per_group;
+    int wantedInode = localInodeIndex / 8;
+    int wantedInodeIndex = localInodeIndex % 8;
+    int wantedBit = (8*wantedInode) + wantedInodeIndex;
+
+    f->BGDT[blockGroup].bg_inode_bitmap |= (1UL << wantedBit);
+
 }

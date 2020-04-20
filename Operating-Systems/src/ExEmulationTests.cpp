@@ -397,11 +397,8 @@ void ExEmulationTests::step4Ex3() {
     /* Display before */
     cout << "*********First look at inodes, Both are set by default**********" << endl;
     Inode::fetchInode(ext2File, 2, inodeStruct);
-    StepZDebug::dumpInode(ext2File, *inodeStruct,2);
     cout << endl;
     Inode::fetchInode(ext2File, 11, inodeStruct);
-    StepZDebug::dumpInode(ext2File, *inodeStruct,11);
-
     /* Call inodeInUse */
     Inode::inodeInUse(ext2File,2);
     Inode::inodeInUse(ext2File,11);
@@ -414,11 +411,9 @@ void ExEmulationTests::step4Ex3() {
     Inode::inodeInUse(ext2File,11);
     cout << endl;
 
-    cout << "**********Displaying After**********" << endl;
+    cout << "**********Displaying After********** should return set" << endl;
     Inode::fetchInode(ext2File, 11, inodeStruct);
-    StepZDebug::dumpInode(ext2File, *inodeStruct,11);
     Inode::fetchInode(ext2File, 2, inodeStruct);
-    StepZDebug::dumpInode(ext2File, *inodeStruct,2);
 
     /* Return the possibly changed file to what it was */
     Inode::fetchInode(reExt2File, 2, reallocationInodeStruct);
@@ -427,6 +422,8 @@ void ExEmulationTests::step4Ex3() {
     Inode::fetchInode(reExt2File, 11, reallocationInodeStruct);
     Inode::writeInode(ext2File, 11, reallocationInodeStruct);
 
+    Inode::inodeInUse(ext2File,2);
+    Inode::inodeInUse(ext2File,11);
     reExt2File->ext2Close();
     delete[] reallocationInodeStruct;
     delete[] reExt2File;
