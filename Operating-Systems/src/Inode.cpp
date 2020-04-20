@@ -210,11 +210,11 @@ void Inode::setInodeToUsed(Ext2File *f, uint32_t iNum){
 
     ///set tmpBlock to the block we wanted
     uint8_t *tmpBlock = new uint8_t[f->getBlockSize()];
-    f->fetchBlock(f->BGDT[blockGroup].bg_inode_table + wantedBlock, tmpBlock);
+    f->fetchBlock(f->BGDT[blockGroup].bg_inode_bitmap + wantedBlock, tmpBlock);
 
     ///change the bit in the wanted byte to 1
     tmpBlock[wantedByte] |= (1UL << wantedBit);
 
     ///rewrite the tempBlock
-    f->writeBlock(f->BGDT[blockGroup].bg_inode_table + wantedBlock, tmpBlock);
+    f->writeBlock(f->BGDT[blockGroup].bg_inode_bitmap+ wantedBlock, tmpBlock);
 }

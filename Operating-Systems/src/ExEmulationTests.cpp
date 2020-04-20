@@ -410,13 +410,16 @@ void ExEmulationTests::step4Ex3() {
     Inode::fetchInode(ext2File, 11, inodeStruct);
     Inode::fetchInode(ext2File, 2, inodeStruct);
 
+
+
     /* Return the possibly changed file to what it was */
     Inode::fetchInode(reExt2File, 2, reallocationInodeStruct);
     Inode::writeInode(ext2File, 2, reallocationInodeStruct);
 
     Inode::fetchInode(reExt2File, 11, reallocationInodeStruct);
     Inode::writeInode(ext2File, 11, reallocationInodeStruct);
-
+    Inode::setInodeToUsed(ext2File,2);
+    Inode::setInodeToUsed(ext2File,11);
     Inode::inodeInUse(ext2File,2);
     Inode::inodeInUse(ext2File,11);
     reExt2File->ext2Close();
