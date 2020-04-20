@@ -37,25 +37,31 @@ int32_t Inode::fetchInode(struct Ext2File *extFile, uint32_t iNum, struct InodeS
 }
 
 int32_t Inode::writeInode(struct Ext2File *f, uint32_t iNum, struct InodeStruct *buf) {
-    uint32_t successFlag = 0;
-    int blockGroup = (iNum - 1) / f->superBlock.s_inodes_per_group;
-    int localInodeIndex = (iNum - 1) % f->superBlock.s_inodes_per_group;
+
+    uint32_t successFlag = 0;//flag to catch if our fetchblock failed
+    int blockGroup = (iNum - 1) / f->superBlock.s_inodes_per_group; //value of the blockgroup containing the given inode
+    int localInodeIndex = (iNum - 1) % f->superBlock.s_inodes_per_group;/// where in the blockgroup the inode is located IE is it the 10th inode in the group
 
 
     uint8_t *tmpBlock = new uint8_t[f->getBlockSize()];
 
+    ///find the wanted block for the inode and which inode in the block is needed
     int inodesPerBlock = f->getBlockSize() / f->superBlock.s_inode_size;
     int wantedBlock = localInodeIndex / inodesPerBlock;
     int wantedBlockIndex = localInodeIndex % inodesPerBlock;
-
+    /// fetch the block and store it into a temp block, check to make sure it didn't fail
     successFlag = f->fetchBlock(f->BGDT[blockGroup].bg_inode_table + wantedBlock, tmpBlock);
     if(successFlag != 0) {
         cout << "Fetchblock failed" << endl;
         delete[] tmpBlock;
         return successFlag;
     }
+    //it didnt fail so copy over the new inode into the location in memory where the original inode was located
     memcpy(tmpBlock + (wantedBlockIndex *f->superBlock.s_inode_size), buf, f->superBlock.s_inode_size);
+    ///rewrite the given inode in the BGDT
     successFlag = f->writeBlock(f->BGDT[blockGroup].bg_inode_table + wantedBlock, tmpBlock);
+
+    ///delete the extra stuff
     delete[] tmpBlock;
 
     return successFlag;
@@ -67,8 +73,8 @@ int32_t Inode::inodeInUse(struct Ext2File *f, uint32_t iNum) {
     int localInodeIndex = (iNum - 1) % f->superBlock.s_inodes_per_group; // Returns the index within the block group that the wanted inode is in
     int inodesPerBlock = f->getBlockSize() / f->superBlock.s_inode_size; // Get the number of inodes in a block
     int wantedBlock = localInodeIndex / inodesPerBlock; // Return what specific block within the blocks of inodes the wanted inode is in
-    int wantedByte = localInodeIndex / 8;
-    int wantedBit = localInodeIndex % 8;
+    int wantedByte = localInodeIndex / 8;///return the specific byte wanted
+    int wantedBit = localInodeIndex % 8;///return the specific bit wanted
 
 
 
@@ -176,8 +182,8 @@ int32_t Inode::freeInode(struct Ext2File *f, uint32_t iNum) {
     int localInodeIndex = (iNum - 1) % f->superBlock.s_inodes_per_group; // Returns the index within the block group that the wanted inode is in
     int inodesPerBlock = f->getBlockSize() / f->superBlock.s_inode_size; // Get the number of inodes in a block
     int wantedBlock = localInodeIndex / inodesPerBlock; // Return what specific block within the blocks of inodes the wanted inode is in
-    int wantedByte = localInodeIndex / 8;
-    int wantedBit = localInodeIndex % 8;
+    int wantedByte = localInodeIndex / 8;///return the wanted byte
+    int wantedBit = localInodeIndex % 8;////return the wanted bit
 
 
 
@@ -193,7 +199,15 @@ int32_t Inode::freeInode(struct Ext2File *f, uint32_t iNum) {
 
     /* Clear the Inode */
     clearInode(f, iNum);
+
+    ///Increment the number of free inodes available
+    f->BGDT[blockGroup].bg_free_inodes_count++;
+    f->superBlock.s_free_inodes_count++;
+    ///rewrite the BGDT and superblock over all copies
+    f->writeAllBGDT(f->BGDT);
+    f->writeAllSuperBlocks(&f->superBlock);
 }
+///Sets all values in the inode to 0
 void Inode::clearInode(Ext2File *f, uint32_t iNum){
     InodeStruct temp = (const struct InodeStruct){0};
     writeInode(f,iNum, &temp);
@@ -203,8 +217,8 @@ void Inode::setInodeToUsed(Ext2File *f, uint32_t iNum){
     int localInodeIndex = (iNum - 1) % f->superBlock.s_inodes_per_group; // Returns the index within the block group that the wanted inode is in
     int inodesPerBlock = f->getBlockSize() / f->superBlock.s_inode_size; // Get the number of inodes in a block
     int wantedBlock = localInodeIndex / inodesPerBlock; // Return what specific block within the blocks of inodes the wanted inode is in
-    int wantedByte = localInodeIndex / 8;
-    int wantedBit = localInodeIndex % 8;
+    int wantedByte = localInodeIndex / 8;// return the wanted byte
+    int wantedBit = localInodeIndex % 8;// return the wanted bit
 
 
 
@@ -217,4 +231,10 @@ void Inode::setInodeToUsed(Ext2File *f, uint32_t iNum){
 
     ///rewrite the tempBlock
     f->writeBlock(f->BGDT[blockGroup].bg_inode_bitmap+ wantedBlock, tmpBlock);
+    ///decrement the number of free inodes available
+    f->BGDT[blockGroup].bg_free_inodes_count--;
+    f->superBlock.s_free_inodes_count--;
+    ///rewrite the BGDT and superblock over all copies
+    f->writeAllBGDT(f->BGDT);
+    f->writeAllSuperBlocks(&f->superBlock);
 }
