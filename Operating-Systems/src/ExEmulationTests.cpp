@@ -392,21 +392,20 @@ void ExEmulationTests::step4Ex3() {
     /* Display before */
     cout << "*********First look at inodes, Both are set by default**********" << endl;
     Inode::fetchInode(ext2File, 2, inodeStruct);
-    cout << endl;
     Inode::fetchInode(ext2File, 11, inodeStruct);
     /* Call inodeInUse */
     Inode::inodeInUse(ext2File,2);
     Inode::inodeInUse(ext2File,11);
     cout << endl;
     //test to see if inode 2 and 11 is being freed
-    cout << "Freeing Inodes, Should return UNSET for both" << endl;
+    cout << "**********Freeing Inodes, Should return UNSET for both**********" << endl;
     Inode::freeInode(ext2File,2);
     Inode::freeInode(ext2File, 11);
     Inode::inodeInUse(ext2File,2);
     Inode::inodeInUse(ext2File,11);
     cout << endl;
 
-    cout << "**********Displaying After********** should return set" << endl;
+    cout << "**********Resetting inodes (should return to set)********** " << endl;
     Inode::fetchInode(ext2File, 11, inodeStruct);
     Inode::fetchInode(ext2File, 2, inodeStruct);
 
