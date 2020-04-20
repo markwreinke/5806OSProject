@@ -50,7 +50,7 @@ class Inode {
         static uint32_t allocateInode(struct Ext2File *f, int32_t group);
         static int32_t freeInode(struct Ext2File *f, uint32_t iNum);
     private:
-    void clearInode(Ext2File *f, uint32_t iNum);
+        static void clearInode(Ext2File *f, uint32_t iNum);
 };
 
 

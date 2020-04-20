@@ -347,6 +347,7 @@ void ExEmulationTests::step4Ex2() {
     struct InodeStruct *reallocationInodeStruct = new InodeStruct;
 
     /* Display before */
+    cout << "**********Showing before freeInode**********" << endl;
     Inode::fetchInode(ext2File, 2, inodeStruct);
     StepZDebug::dumpInode(ext2File, *inodeStruct, 2);
     cout << endl;
@@ -358,6 +359,7 @@ void ExEmulationTests::step4Ex2() {
     Inode::freeInode(ext2File, 11);
 
     /* Display after */
+    cout << endl << "**********Showing after freeInode*********** " << endl;
     Inode::fetchInode(ext2File, 2, inodeStruct);
     StepZDebug::dumpInode(ext2File, *inodeStruct, 2);
     cout << endl;
@@ -379,50 +381,56 @@ void ExEmulationTests::step4Ex2() {
     delete[] ext2File;
 }
 void ExEmulationTests::step4Ex3() {
-cout << "Displaying Step 4 Testing inodeInUse" << endl << endl;
-char *filename = "../testFiles/Write_Test-fixed-1k.vdi";
-char *reallocationFile = "../testFiles/Test-fixed-1k.vdi";
+    cout << "Displaying Step 4 Testing inodeInUse" << endl << endl;
+    char *filename = "../testFiles/Write_Test-fixed-1k.vdi";
+    char *reallocationFile = "../testFiles/Test-fixed-1k.vdi";
 
-Ext2File *ext2File = new Ext2File();
-Ext2File *reExt2File = new Ext2File();
+    Ext2File *ext2File = new Ext2File();
+    Ext2File *reExt2File = new Ext2File();
 
-bool success = ext2File->ext2Open(filename);
-reExt2File->ext2Open(reallocationFile);
+    bool success = ext2File->ext2Open(filename);
+    reExt2File->ext2Open(reallocationFile);
 
-struct InodeStruct *inodeStruct = new InodeStruct;
-struct InodeStruct *reallocationInodeStruct = new InodeStruct;
+    struct InodeStruct *inodeStruct = new InodeStruct;
+    struct InodeStruct *reallocationInodeStruct = new InodeStruct;
 
-/* Display before */
-cout << "First look at inodes, Both are set by default" << endl;
-Inode::fetchInode(ext2File, 2, inodeStruct);
-StepZDebug::dumpInode(ext2File,*inodeStruct,2);
-Inode::fetchInode(ext2File, 11, inodeStruct);
-Inode::inodeInUse(ext2File,2);
-Inode::inodeInUse(ext2File,11);
-cout << endl;
-//test to see if inode 2 and 11 is being freed
-cout << "Freeing Inodes, Should return UNSET for both" << endl;
-Inode::freeInode(ext2File,2);
-Inode::freeInode(ext2File, 11);
-Inode::inodeInUse(ext2File,2);
-Inode::inodeInUse(ext2File,11);
-cout << endl;
+    /* Display before */
+    cout << "*********First look at inodes, Both are set by default**********" << endl;
+    Inode::fetchInode(ext2File, 2, inodeStruct);
+    StepZDebug::dumpInode(ext2File, *inodeStruct,2);
+    cout << endl;
+    Inode::fetchInode(ext2File, 11, inodeStruct);
+    StepZDebug::dumpInode(ext2File, *inodeStruct,11);
 
+    /* Call inodeInUse */
+    Inode::inodeInUse(ext2File,2);
+    Inode::inodeInUse(ext2File,11);
+    cout << endl;
+    //test to see if inode 2 and 11 is being freed
+    cout << "Freeing Inodes, Should return UNSET for both" << endl;
+    Inode::freeInode(ext2File,2);
+    Inode::freeInode(ext2File, 11);
+    Inode::inodeInUse(ext2File,2);
+    Inode::inodeInUse(ext2File,11);
+    cout << endl;
 
-Inode::fetchInode(ext2File, 11, inodeStruct);
+    cout << "**********Displaying After**********" << endl;
+    Inode::fetchInode(ext2File, 11, inodeStruct);
+    StepZDebug::dumpInode(ext2File, *inodeStruct,11);
+    Inode::fetchInode(ext2File, 2, inodeStruct);
+    StepZDebug::dumpInode(ext2File, *inodeStruct,2);
 
+    /* Return the possibly changed file to what it was */
+    Inode::fetchInode(reExt2File, 2, reallocationInodeStruct);
+    Inode::writeInode(ext2File, 2, reallocationInodeStruct);
 
-/* Return the possibly changed file to what it was */
-Inode::fetchInode(reExt2File, 2, reallocationInodeStruct);
-Inode::writeInode(ext2File, 2, reallocationInodeStruct);
+    Inode::fetchInode(reExt2File, 11, reallocationInodeStruct);
+    Inode::writeInode(ext2File, 11, reallocationInodeStruct);
 
-Inode::fetchInode(reExt2File, 11, reallocationInodeStruct);
-Inode::writeInode(ext2File, 11, reallocationInodeStruct);
-
-reExt2File->ext2Close();
-delete[] reallocationInodeStruct;
-delete[] reExt2File;
-ext2File->ext2Close();
-delete[] inodeStruct;
-delete[] ext2File;
+    reExt2File->ext2Close();
+    delete[] reallocationInodeStruct;
+    delete[] reExt2File;
+    ext2File->ext2Close();
+    delete[] inodeStruct;
+    delete[] ext2File;
 }

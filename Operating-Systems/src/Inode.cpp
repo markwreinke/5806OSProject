@@ -69,7 +69,7 @@ int32_t Inode::inodeInUse(struct Ext2File *f, uint32_t iNum) {
     int wantedInodeIndex = localInodeIndex % 8;
     int wantedBit = (8*wantedInode) + wantedInodeIndex;
 
-    if(f->BGDT[blockGroup].bg_inode_bitmap &(1 << (wantedBit))){
+    if(f->BGDT[blockGroup].bg_inode_bitmap & (1 << (wantedBit))){
         cout << "SET" << endl;
         return 1;
     }
@@ -110,8 +110,9 @@ int32_t Inode::freeInode(struct Ext2File *f, uint32_t iNum) {
 
     f->BGDT[blockGroup].bg_inode_bitmap &= ~(1UL << wantedBit);
 
-    InodeStruct temp = (const struct InodeStruct){0};
-    writeInode(f,iNum, &temp);
+    /* Clear the Inode */
+    clearInode(f, iNum);
+
     //StepZDebug::dumpInode(f,temp,iNum);
 }
 void Inode::clearInode(Ext2File *f, uint32_t iNum){
