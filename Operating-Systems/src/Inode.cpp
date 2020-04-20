@@ -109,32 +109,36 @@ uint32_t Inode::allocateInode(struct Ext2File *f, int32_t group) {
      highLimit = group;
  }
 
-
+ /* First we must find a block group that has a free inode, which is the first one found, or if we are given a wanted group, it will check that */
  for(int currentGroup = lowLimit; currentGroup <= highLimit; currentGroup++) {
+     /* If the BG we are looking at has a free inode */
      if(f->BGDT[currentGroup].bg_free_inodes_count > 0) {
-         uint8_t *tmpBlock = new uint8_t[f->getBlockSize()];
+         uint8_t *tmpBlock = new uint8_t[f->getBlockSize()]; // Create a temp block to pull to.
 
-         uint32_t bitMapLocation = f->BGDT[currentGroup].bg_inode_bitmap;
-         uint32_t successFlag = -1;
-         successFlag = f->fetchBlock(bitMapLocation, tmpBlock);
-         if(successFlag < 0) {
+         uint32_t bitMapLocation = f->BGDT[currentGroup].bg_inode_bitmap; // The location of the bitmap
+         uint32_t successFlag = -1; // A flag to ensure fetch/write operations don't fail
+         successFlag = f->fetchBlock(bitMapLocation, tmpBlock); // Fetch the bitmap for the current block
+         if(successFlag < 0) { // If the fetch fails.
              cout << "FetchBlock failed." << endl;
              return successFlag;
          }
 
          /* Iterates through all uint8_ts of the bit map looking for the first one !=0xff, then returns the location of the first free inode */
          for(int currentBitChunk = 0; currentBitChunk < f->getBlockSize()/sizeof(uint8_t); currentBitChunk++){
+             /* If the looked at uint8_t of bitmap isn't full */
              if(tmpBlock[currentBitChunk] != 0xff) {
+                 /* Iterate through bits of the looked at byte, finding the first 0(empty inode) */
                  for(int i = 0; i < 8; i++) {
                      if(!((tmpBlock[currentBitChunk] >> i) & 1U)) {
-                         returningInode = i + currentBitChunk*8 + currentGroup*f->superBlock.s_inodes_per_group + 1;
-                         tmpBlock[currentBitChunk] ^= 1UL << i;
-                         successFlag = f->writeBlock(bitMapLocation, tmpBlock);
-                         if(successFlag < 0) {
+                         returningInode = i + currentBitChunk*8 + currentGroup*f->superBlock.s_inodes_per_group + 1; // Calculate the inode that is free
+                         tmpBlock[currentBitChunk] ^= 1UL << i; // Toggle the bit from open to used
+                         successFlag = f->writeBlock(bitMapLocation, tmpBlock); // write the block
+                         delete[] tmpBlock;
+                         if(successFlag < 0) { // If the write block fails.
                              cout << "WriteBlock Failed." << endl;
                              return successFlag;
                          }
-                         delete[] tmpBlock;
+                         /* Set all indices to their max, leaving all loops (Since we successfully allocated a inode)*/
                          i = 8;
                          currentBitChunk = f->getBlockSize()/sizeof(uint8_t);
                          currentGroup = f->getNumBlockGroups();
@@ -142,39 +146,20 @@ uint32_t Inode::allocateInode(struct Ext2File *f, int32_t group) {
                  }
              }
          }
-
-         if(returningInode < 0) {
-             cout << "Did not find a free inode" << endl;
-         } else {
-             f->BGDT[(returningInode - 1)/f->superBlock.s_inodes_per_group].bg_free_inodes_count--;
-             f->superBlock.s_free_inodes_count--;
-         }
-
-         f->writeAllBGDT(f->BGDT);
-         f->writeAllSuperBlocks(&f->superBlock);
-         return returningInode;
      }
  }
+
+ /* If we didn't find a free inode, we return error message, else we decrement the free inodes in the BGDT and superblock */
  if(returningInode < 0) {
-     cout << "Failed to find a free inode! " << endl;
-     return returningInode;
+     cout << "Did not find a free inode" << endl;
+ } else {
+     f->BGDT[(returningInode - 1)/f->superBlock.s_inodes_per_group].bg_free_inodes_count--;
+     f->superBlock.s_free_inodes_count--;
  }
-     //read descriptor table, should have field for free inodes, find one with free inodes
-     //low limit = 0, high limit = number of groups - 1
-     // if(group >= 0) {low limit = high limit = group}
-
-     //for(i = low limit; i <= high limit; i++){
-     // look for free inodes
-     // if(
-     //}
-
-     // once you find group with free inodes, load bitmap, find one without all ones, and calculate bit number of the 0 digit
-
-     // set bit,
-
-     // decrement free inode count
-     //write to superblock + other things
-
+ /* Update BGDTs and SuperBlocks */
+ f->writeAllBGDT(f->BGDT);
+ f->writeAllSuperBlocks(&f->superBlock);
+ return returningInode;
 }
 
 int32_t Inode::freeInode(struct Ext2File *f, uint32_t iNum) {
@@ -212,6 +197,7 @@ void Inode::clearInode(Ext2File *f, uint32_t iNum){
     InodeStruct temp = (const struct InodeStruct){0};
     writeInode(f,iNum, &temp);
 }
+
 void Inode::setInodeToUsed(Ext2File *f, uint32_t iNum){
     int blockGroup = (iNum - 1) / f->superBlock.s_inodes_per_group; // Returns the block group that the wanted inode is in
     int localInodeIndex = (iNum - 1) % f->superBlock.s_inodes_per_group; // Returns the index within the block group that the wanted inode is in
