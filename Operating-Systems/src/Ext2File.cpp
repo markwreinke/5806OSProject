@@ -128,6 +128,7 @@ int32_t Ext2File::writeBGDT(uint32_t blockNum, struct BlockGroupDescriptor * bgd
     return 0;
 }
 
+/* Write to all super blocks */
 int32_t Ext2File::writeAllSuperBlocks(struct SuperBlock *superBlock) {
     int32_t successCheck = -1;
     for(int i = 0; i < numBlockGroups; i++) {
@@ -144,6 +145,7 @@ int32_t Ext2File::writeAllSuperBlocks(struct SuperBlock *superBlock) {
     return successCheck;
 }
 
+/* Writes to all block group descriptor table */
 int32_t Ext2File::writeAllBGDT(struct BlockGroupDescriptor *bgdt) {
     int32_t successCheck = -1;
     for(int i = 0; i < numBlockGroups; i++) {
