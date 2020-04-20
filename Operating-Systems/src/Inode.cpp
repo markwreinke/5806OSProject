@@ -81,8 +81,30 @@ uint32_t Inode::allocateInode(struct Ext2File *f, int32_t group) {
  /*
   * write function to clear the inode you are writing to, and call before alloacteInode
   */
+ uint8_t returningInode = -1;
+ if(group >= f->getNumBlockGroups()) {
+     cout << "There are not that many block groups! Desired group: " << group << " number of block groups: " << f->getNumBlockGroups() << endl;
+     return returningInode;
+ }
+ uint8_t lowLimit = 0;
+ uint8_t highLimit = f->getNumBlockGroups() - 1;
+
+ if(group >= 0) {
+     lowLimit = group;
+     highLimit = group;
+ }
 
 
+ for(int currentGroup = lowLimit; currentGroup <= highLimit; currentGroup++) {
+     if(f->BGDT[currentGroup].bg_free_inodes_count > 0) {
+
+
+     }
+ }
+ if(returningInode < 0) {
+     cout << "Failed to find a free inode! " << endl;
+     return returningInode;
+ }
      //read descriptor table, should have field for free inodes, find one with free inodes
      //low limit = 0, high limit = number of groups - 1
      // if(group >= 0) {low limit = high limit = group}
