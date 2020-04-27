@@ -91,7 +91,7 @@ public:
     uint32_t getNumBlockGroups() {return numBlockGroups;}
     uint32_t getBlockSize() {return blockSize;}
 
-    uint32_t allocateBlock(int32_t blockGroup);
+    uint32_t allocateBlock(int32_t blockGroup = -1);
 
 private:
     VDIFile *vdiFile;

@@ -188,6 +188,7 @@ bool Ext2File::containsCopyOfSuperBlockOrBGDT(uint32_t blockGroupNumber) {
     }
 }
 
+/* Allocates a block if it hasn't been. If you want a specific blockGroup, pass its number in, else have no input */
 uint32_t Ext2File::allocateBlock(int32_t blockGroup) {
     uint8_t returningBlock = -1;
     if(blockGroup >= getNumBlockGroups()) {
@@ -245,6 +246,11 @@ uint32_t Ext2File::allocateBlock(int32_t blockGroup) {
     /* If we didn't find a free block, we return error message, else we decrement the free blocks in the BGDT and superblock */
     if(returningBlock < 0) {
         cout << "Did not find a free inode" << endl;
+
+        /* If it was given a blockgroup, and the group is full, then it will search for a free block in any group */
+        if(blockGroup != -1) {
+            returningBlock = allocateBlock();
+        }
     } else {
         BGDT[(returningBlock - 1) / superBlock.s_blocks_per_group].bg_free_blocks_count--;
         superBlock.s_free_blocks_count--;

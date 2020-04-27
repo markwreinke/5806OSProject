@@ -46,6 +46,7 @@ int32_t FileAccess::fetchBlockFromFile(Ext2File *ext2,uint32_t bNum, void *buf){
     delete iS;
     return flag;
 }
+
 int32_t FileAccess::writeBlockToFile(Ext2File *ext2,uint32_t bNum, void* buf, uint32_t iNum){
     uint32_t numDataBlock = ext2->getBlockSize() / 4;
     uint32_t tempBuffer[numDataBlock];
@@ -53,9 +54,17 @@ int32_t FileAccess::writeBlockToFile(Ext2File *ext2,uint32_t bNum, void* buf, ui
     Inode::fetchInode(ext2,0,iS);
     uint32_t *blockList;
     int32_t flag;
+    /* Figure out what blockGroup to write to */
+    uint32_t bNumMinusOne = -1;
+    if(bNum > 0) {
+        bNumMinusOne = iS->i_block[bNum-1];
+    }
+    uint32_t activeBlockGroup = bNumMinusOne/ext2->superBlock.s_blocks_per_group;
+
+
     if(bNum < 12){
         if(iS->i_block[bNum] == 0) {
-            iS->i_block[bNum] = ext2->allocateBlock(-1);
+            iS->i_block[bNum] = ext2->allocateBlock(activeBlockGroup);
             Inode::writeInode(ext2, iNum, iS);
         }
 
@@ -64,8 +73,9 @@ int32_t FileAccess::writeBlockToFile(Ext2File *ext2,uint32_t bNum, void* buf, ui
         flag = writeDirect();
 
     }else if(bNum < 12 + numDataBlock){
+
         if(iS->i_block[12] == 0) {
-            iS->i_block[12] = ext2->allocateBlock(-1);
+            iS->i_block[12] = ext2->allocateBlock(activeBlockGroup);
             Inode::writeInode(ext2, iNum, iS);
         }
 
@@ -78,7 +88,7 @@ int32_t FileAccess::writeBlockToFile(Ext2File *ext2,uint32_t bNum, void* buf, ui
 
     }else if(bNum < 12 + numDataBlock + pow(numDataBlock,2)){
         if(iS->i_block[13] == 0) {
-            iS->i_block[13] = ext2->allocateBlock(-1);
+            iS->i_block[13] = ext2->allocateBlock(activeBlockGroup);
             Inode::writeInode(ext2, iNum, iS);
         }
         ext2->fetchBlock(iS->i_block[13],tempBuffer);
@@ -86,10 +96,10 @@ int32_t FileAccess::writeBlockToFile(Ext2File *ext2,uint32_t bNum, void* buf, ui
         uint32_t iBlockNum = iS->i_block[12];
         blockList = new uint32_t [numDataBlock];
         blockList = tempBuffer;
-        bNum = bNum - 12 - numDataBlock
-    }else{
+        bNum = bNum - 12 - numDataBlock;
+    } else{
         if(iS->i_block[14] == 0) {
-            iS->i_block[14] = ext2->allocateBlock(-1);
+            iS->i_block[14] = ext2->allocateBlock(activeBlockGroup);
             Inode::writeInode(ext2, iNum, iS);
         }
         delete[] blockList;
@@ -97,6 +107,7 @@ int32_t FileAccess::writeBlockToFile(Ext2File *ext2,uint32_t bNum, void* buf, ui
         return flag;
     }
 }
+
 int32_t FileAccess::readDirect(uint32_t blockList[], uint32_t bNum, void* buf, Ext2File *ext2){
 
 if(blockList[bNum] == 0)
