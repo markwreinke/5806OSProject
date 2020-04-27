@@ -3,7 +3,7 @@
 //
 
 #include "../include/FileAccess.h"
-int32_t FileAccess::fetchBlockFromFile(Ext2File *ext2,uint32_t bNum, void *buf, uint32_t iNum){
+int32_t FileAccess::fetchBlockFromFile(Ext2File *ext2, uint32_t bNum, void *buf, uint32_t iNum){
     int32_t numDataBlocks =  ext2->getBlockSize() / 4;
     InodeStruct *iS = new InodeStruct;
     Inode::fetchInode(ext2,iNum,iS);
@@ -54,12 +54,9 @@ int32_t FileAccess::writeBlockToFile(Ext2File *ext2,uint32_t bNum, void* buf, ui
     Inode::fetchInode(ext2,iNum,iS);
     uint32_t *blockList;
     int32_t flag;
+
     /* Figure out what blockGroup to write to */
-    uint32_t bNumMinusOne = -1;
-    if(bNum > 0) {
-        bNumMinusOne = iS->i_block[bNum-1];
-    }
-    uint32_t activeBlockGroup = bNumMinusOne/ext2->superBlock.s_blocks_per_group;
+    uint32_t activeBlockGroup = iS->i_block[0]/ext2->superBlock.s_blocks_per_group;
 
 
     if(bNum < 12){
@@ -152,18 +149,24 @@ int32_t FileAccess::readDoubled(uint32_t blockList[], uint32_t bNum, void *buf, 
     return readSingle(blockList, bNum, buf, numDataBlocks, ext2);
 }
 int32_t FileAccess::writeDirect(uint32_t blockList[], int32_t bNum, uint32_t iBlockNum, Ext2File *ext2, void* buf){
+    /* Figure out what blockGroup to write to */
+    uint32_t activeBlockGroup = blockList[0]/ext2->superBlock.s_blocks_per_group;
+
     if(blockList[bNum] == 0){
-        blockList[bNum] = ext2->allocateBlock(-1);
+        blockList[bNum] = ext2->allocateBlock(activeBlockGroup);
         ext2->writeBlock(iBlockNum,blockList);
     }
     return ext2->writeBlock(blockList[bNum],buf);
 }
 int32_t FileAccess::writeSingle(uint32_t blockList[], int32_t bNum, uint32_t iBlockNum, int32_t numDataBlocks, Ext2File *ext2, void* buf){
+    /* Figure out what blockGroup to write to */
+    uint32_t activeBlockGroup = blockList[0]/ext2->superBlock.s_blocks_per_group;
+
     int32_t index = bNum / numDataBlocks;
     bNum = bNum % numDataBlocks;
     uint32_t tempBuffer[numDataBlocks];
     if(blockList[index] == 0){
-        blockList[index] = ext2->allocateBlock(-1);
+        blockList[index] = ext2->allocateBlock(activeBlockGroup);
         ext2->writeBlock(iBlockNum,blockList);
     }
 
@@ -173,11 +176,14 @@ int32_t FileAccess::writeSingle(uint32_t blockList[], int32_t bNum, uint32_t iBl
     return writeDirect(blockList,bNum,iBlockNum,ext2,buf);
 }
 int32_t FileAccess::writeDouble(uint32_t blockList[], int32_t bNum, uint32_t iBlockNum, int32_t numDataBlocks, Ext2File *ext2, void* buf){
+    /* Figure out what blockGroup to write to */
+    uint32_t activeBlockGroup = blockList[0]/ext2->superBlock.s_blocks_per_group;
+
     int32_t index = bNum / pow(numDataBlocks,2);
     bNum = bNum % (uint32_t)pow(numDataBlocks,2);
     uint32_t tempBuffer[numDataBlocks];
     if(blockList[index] == 0){
-        blockList[index] = ext2->allocateBlock(-1);
+        blockList[index] = ext2->allocateBlock(activeBlockGroup);
         ext2->writeBlock(iBlockNum,blockList);
     }
     iBlockNum = blockList[index];
