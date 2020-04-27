@@ -73,7 +73,7 @@ struct BlockGroupDescriptor{
 class Ext2File {
 public:
     Ext2File();
-    bool ext2Open(char *fn); /// LEFT PNUM OUT BECAUSE OF HOW OUR PARTITION OPEN WORKS ********************************KASHDLGJKA;SLDKGH;ASKLDGHKL;GAHKL;SDGAWDGASDGAHKL
+    bool ext2Open(char *fn);
     void ext2Close();
     uint32_t fetchBlock(uint32_t blockNum, void *buf);
     uint32_t writeBlock(uint32_t blockNum, void *buf);

@@ -52,6 +52,7 @@ class Inode {
         static void setInodeToUsed(Ext2File *f, uint32_t iNum);
     private:
         static void clearInode(Ext2File *f, uint32_t iNum);
+
 };
 
 
