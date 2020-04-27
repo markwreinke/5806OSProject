@@ -67,7 +67,7 @@ int32_t FileAccess::writeBlockToFile(Ext2File *ext2,uint32_t bNum, void* buf, ui
 
         blockList = new uint32_t[11];
         blockList = iS->i_block;
-        flag = writeDirect();
+        flag = writeDirect(blockList,bNum,bNum,ext2,buf);
 
     }else if(bNum < 12 + numDataBlock){
 
@@ -81,7 +81,7 @@ int32_t FileAccess::writeBlockToFile(Ext2File *ext2,uint32_t bNum, void* buf, ui
         blockList = new uint32_t[numDataBlock];
         blockList = tempBuffer;
         bNum = bNum - 12;
-        flag = writeDirect();
+        flag = writeDirect(blockList,bNum,iBlockNum,ext2,buf);
 
     }else if(bNum < 12 + numDataBlock + pow(numDataBlock,2)){
         if(iS->i_block[13] == 0) {
@@ -94,7 +94,7 @@ int32_t FileAccess::writeBlockToFile(Ext2File *ext2,uint32_t bNum, void* buf, ui
         blockList = new uint32_t [numDataBlock];
         blockList = tempBuffer;
         bNum = bNum - 12 - numDataBlock;
-        flag = writeSingle();
+        flag = writeSingle(blockList,bNum,iBlockNum,numDataBlock,ext2,buf);
     }else{
         if(iS->i_block[14] == 0) {
             iS->i_block[14] = ext2->allocateBlock(activeBlockGroup);
@@ -106,7 +106,7 @@ int32_t FileAccess::writeBlockToFile(Ext2File *ext2,uint32_t bNum, void* buf, ui
         blockList = new uint32_t[numDataBlock];
         blockList = tempBuffer;
         bNum = bNum - 12 - numDataBlock - pow(numDataBlock,2);
-       flag = writeDouble();
+       flag = writeDouble(blockList,bNum,iBlockNum,numDataBlock,ext2,buf);
     }
     delete[] blockList;
     delete iS;
@@ -134,7 +134,7 @@ int32_t FileAccess::readSingle(uint32_t blockList[], uint32_t bNum, void *buf, i
     if(flag == -1)
         buf = {0};
     blockList = (uint32_t*)buf;
-    return readDirect(blockList, bNum, buf);
+    return readDirect(blockList, bNum, buf,ext2);
 }
 int32_t FileAccess::readDoubled(uint32_t blockList[], uint32_t bNum, void *buf, int32_t numDataBlocks, Ext2File *ext2){
     uint32_t index = bNum/ pow(numDataBlocks,2);
