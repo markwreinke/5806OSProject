@@ -12,7 +12,7 @@ Ext2File::Ext2File() {
     partition = new Partition();
 }
 
-/* Open the file with the given file name, populating an ext2file structure, consisting of the superblock, block group descriptor table, and calculating the block size and the number of block groups. */
+/* Open the file with the given file name, populating an ext2file structure, consisting of the superblock, block blockGroup descriptor table, and calculating the block size and the number of block groups. */
 bool Ext2File::ext2Open(char *fn) {
     /* Open the VDI file with the given filename, storing if the file open was successful or not in a boolean */
     vdiFile->vdiOpen(fn);
@@ -25,7 +25,7 @@ bool Ext2File::ext2Open(char *fn) {
     this->blockSize = 1024*pow(2,superBlock.s_log_block_size);
     this->numBlockGroups = superBlock.s_blocks_count / superBlock.s_blocks_per_group + 1;
 
-    /* Filling the block group descriptor table */
+    /* Filling the block blockGroup descriptor table */
     this->BGDT = new BlockGroupDescriptor [numBlockGroups];
     fetchBGDT(1,BGDT);
 
@@ -145,7 +145,7 @@ int32_t Ext2File::writeAllSuperBlocks(struct SuperBlock *superBlock) {
     return successCheck;
 }
 
-/* Writes to all block group descriptor table */
+/* Writes to all block blockGroup descriptor table */
 int32_t Ext2File::writeAllBGDT(struct BlockGroupDescriptor *bgdt) {
     int32_t successCheck = -1;
     for(int i = 0; i < numBlockGroups; i++) {
@@ -162,22 +162,22 @@ int32_t Ext2File::writeAllBGDT(struct BlockGroupDescriptor *bgdt) {
     return successCheck;
 }
 
-/* Checks if the given block group contains a superblock or BGDT copy */
+/* Checks if the given block blockGroup contains a superblock or BGDT copy */
 bool Ext2File::containsCopyOfSuperBlockOrBGDT(uint32_t blockGroupNumber) {
     if(blockGroupNumber == 0 || blockGroupNumber == 1) {
         return true;
     }
 
-    /* Check if the block group is a power of 3 */
+    /* Check if the block blockGroup is a power of 3 */
     double checkMultiples = log((double) blockGroupNumber) / log((double) 3);
     double threeCheck = checkMultiples - (int) checkMultiples;
 
-    /* Check if the block group is a power of 5 */
+    /* Check if the block blockGroup is a power of 5 */
     checkMultiples = log((double) blockGroupNumber) / log((double) 5);
     double fiveCheck = checkMultiples - (int) checkMultiples;
 
 
-    /* Check if the block group is a power of 7 */
+    /* Check if the block blockGroup is a power of 7 */
     checkMultiples = log((double) blockGroupNumber) / log((double) 7);
     double sevenCheck = checkMultiples - (int) checkMultiples;
 
@@ -186,4 +186,71 @@ bool Ext2File::containsCopyOfSuperBlockOrBGDT(uint32_t blockGroupNumber) {
     } else {
         return false;
     }
+}
+
+uint32_t Ext2File::allocateBlock(int32_t blockGroup) {
+    uint8_t returningBlock = -1;
+    if(blockGroup >= getNumBlockGroups()) {
+        cout << "There are not that many block groups! Desired blockGroup: " << blockGroup << " number of block groups: " << getNumBlockGroups() << endl;
+        return returningBlock;
+    }
+    uint8_t lowLimit = 0;
+    uint8_t highLimit = getNumBlockGroups() - 1;
+
+    if(blockGroup >= 0) {
+        lowLimit = blockGroup;
+        highLimit = blockGroup;
+    }
+
+    /* First we must find a block blockGroup that has a free block, which is the first one found, or if we are given a wanted blockGroup, it will check that */
+    for(int currentGroup = lowLimit; currentGroup <= highLimit; currentGroup++) {
+        /* If the BG we are looking at has a free block */
+        if(BGDT[currentGroup].bg_free_blocks_count > 0) {
+            uint8_t *tmpBlock = new uint8_t[getBlockSize()]; // Create a temp block to pull to.
+
+            uint32_t bitMapLocation = BGDT[currentGroup].bg_block_bitmap; // The location of the bitmap
+            uint32_t successFlag = -1; // A flag to ensure fetch/write operations don't fail
+            successFlag = fetchBlock(bitMapLocation, tmpBlock); // Fetch the bitmap for the current block
+            if(successFlag < 0) { // If the fetch fails.
+                cout << "FetchBlock failed." << endl;
+                return successFlag;
+            }
+
+            /* Iterates through all uint8_ts of the bit map looking for the first one !=0xff, then returns the location of the first free inode */
+            for(int currentBitChunk = 0; currentBitChunk < getBlockSize()/sizeof(uint8_t); currentBitChunk++){
+                /* If the looked at uint8_t of bitmap isn't full */
+                if(tmpBlock[currentBitChunk] != 0xff) {
+                    /* Iterate through bits of the looked at byte, finding the first 0(empty inode) */
+                    for(int i = 0; i < 8; i++) {
+                        if(!((tmpBlock[currentBitChunk] >> i) & 1U)) {
+                            returningBlock = i + currentBitChunk * 8 + currentGroup * superBlock.s_blocks_per_group + 1; // Calculate the block that is free
+                            tmpBlock[currentBitChunk] ^= 1UL << i; // Toggle the bit from open to used
+                            successFlag = writeBlock(bitMapLocation, tmpBlock); // write the block
+                            delete[] tmpBlock;
+                            if(successFlag < 0) { // If the write block fails.
+                                cout << "WriteBlock Failed." << endl;
+                                return successFlag;
+                            }
+                            /* Set all indices to their max, leaving all loops (Since we successfully allocated a block)*/
+                            i = 8;
+                            currentBitChunk = getBlockSize()/sizeof(uint8_t);
+                            currentGroup = getNumBlockGroups();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /* If we didn't find a free block, we return error message, else we decrement the free blocks in the BGDT and superblock */
+    if(returningBlock < 0) {
+        cout << "Did not find a free inode" << endl;
+    } else {
+        BGDT[(returningBlock - 1) / superBlock.s_blocks_per_group].bg_free_blocks_count--;
+        superBlock.s_free_blocks_count--;
+    }
+    /* Update BGDTs and SuperBlocks */
+    writeAllBGDT(BGDT);
+    writeAllSuperBlocks(&superBlock);
+    return returningBlock;
 }
