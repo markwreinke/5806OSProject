@@ -248,6 +248,11 @@ uint32_t Ext2File::allocateBlock(int32_t blockGroup) {
     } else {
         BGDT[(returningBlock - 1) / superBlock.s_blocks_per_group].bg_free_blocks_count--;
         superBlock.s_free_blocks_count--;
+
+        /* Write a block of 0s to the allocated block to remove any nonsense data */
+        uint8_t *tmpBlock = new uint8_t[getBlockSize()]{0};
+        writeBlock(returningBlock, tmpBlock);
+        delete[] tmpBlock;
     }
     /* Update BGDTs and SuperBlocks */
     writeAllBGDT(BGDT);
