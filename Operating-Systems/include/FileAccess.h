@@ -17,6 +17,9 @@ private:
     int32_t readDirect(uint32_t *blockList, uint32_t bNum, void *buf, Ext2File *ext2);
     int32_t readSingle(uint32_t *blockList, uint32_t bNum, void *buf, int32_t numDataBlocks, Ext2File *ext2);
     int32_t readDoubled(uint32_t *blockList, uint32_t bNum, void *buf, int32_t numDataBlocks, Ext2File *ext2);
+    int32_t writeDouble(uint32_t *blockList, int32_t bNum, uint32_t iBlockNum, int32_t numDataBlocks, Ext2File *ext2, void *buf);
+    int32_t writeSingle(uint32_t *blockList, int32_t bNum, uint32_t iBlockNum, int32_t numDataBlocks, Ext2File *ext2, void *buf);
+    int32_t writeDirect(uint32_t *blockList, int32_t bNum, uint32_t iBlockNum, Ext2File *ext2, void *buf);
 };
 
 

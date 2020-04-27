@@ -3,10 +3,10 @@
 //
 
 #include "../include/FileAccess.h"
-int32_t FileAccess::fetchBlockFromFile(Ext2File *ext2,uint32_t bNum, void *buf){
+int32_t FileAccess::fetchBlockFromFile(Ext2File *ext2,uint32_t bNum, void *buf, uint32_t iNum){
     int32_t numDataBlocks =  ext2->getBlockSize() / 4;
     InodeStruct *iS = new InodeStruct;
-    Inode::fetchInode(ext2,0,iS);
+    Inode::fetchInode(ext2,iNum,iS);
     uint32_t *blockList;
     int32_t flag = 0;
 
@@ -51,7 +51,7 @@ int32_t FileAccess::writeBlockToFile(Ext2File *ext2,uint32_t bNum, void* buf, ui
     uint32_t numDataBlock = ext2->getBlockSize() / 4;
     uint32_t tempBuffer[numDataBlock];
     InodeStruct *iS = new InodeStruct;
-    Inode::fetchInode(ext2,0,iS);
+    Inode::fetchInode(ext2,iNum,iS);
     uint32_t *blockList;
     int32_t flag;
     /* Figure out what blockGroup to write to */
@@ -93,19 +93,27 @@ int32_t FileAccess::writeBlockToFile(Ext2File *ext2,uint32_t bNum, void* buf, ui
         }
         ext2->fetchBlock(iS->i_block[13],tempBuffer);
 
-        uint32_t iBlockNum = iS->i_block[12];
+        uint32_t iBlockNum = iS->i_block[13];
         blockList = new uint32_t [numDataBlock];
         blockList = tempBuffer;
         bNum = bNum - 12 - numDataBlock;
-    } else{
+        flag = writeSingle();
+    }else{
         if(iS->i_block[14] == 0) {
             iS->i_block[14] = ext2->allocateBlock(activeBlockGroup);
             Inode::writeInode(ext2, iNum, iS);
         }
-        delete[] blockList;
-        delete iS;
-        return flag;
+        ext2->fetchBlock(iS->i_block[14],tempBuffer);
+
+        uint32_t iBlockNum = iS->i_block[14];
+        blockList = new uint32_t[numDataBlock];
+        blockList = tempBuffer;
+        bNum = bNum - 12 - numDataBlock - pow(numDataBlock,2);
+       flag = writeDouble();
     }
+    delete[] blockList;
+    delete iS;
+    return flag;
 }
 
 int32_t FileAccess::readDirect(uint32_t blockList[], uint32_t bNum, void* buf, Ext2File *ext2){
@@ -133,7 +141,7 @@ int32_t FileAccess::readSingle(uint32_t blockList[], uint32_t bNum, void *buf, i
 }
 int32_t FileAccess::readDoubled(uint32_t blockList[], uint32_t bNum, void *buf, int32_t numDataBlocks, Ext2File *ext2){
     uint32_t index = bNum/ pow(numDataBlocks,2);
-    bNum = bNum % pow(numDataBlocks,2);
+    bNum = bNum % (uint32_t)pow(numDataBlocks,2);
     if(blockList[index] == 0)
         return -1;
     uint32_t flag = ext2->fetchBlock(blockList[index],buf);
@@ -142,4 +150,38 @@ int32_t FileAccess::readDoubled(uint32_t blockList[], uint32_t bNum, void *buf, 
 
     blockList = (uint32_t*)buf;
     return readSingle(blockList, bNum, buf, numDataBlocks, ext2);
+}
+int32_t FileAccess::writeDirect(uint32_t blockList[], int32_t bNum, uint32_t iBlockNum, Ext2File *ext2, void* buf){
+    if(blockList[bNum] == 0){
+        blockList[bNum] = ext2->allocateBlock(-1);
+        ext2->writeBlock(iBlockNum,blockList);
+    }
+    return ext2->writeBlock(blockList[bNum],buf);
+}
+int32_t FileAccess::writeSingle(uint32_t blockList[], int32_t bNum, uint32_t iBlockNum, int32_t numDataBlocks, Ext2File *ext2, void* buf){
+    int32_t index = bNum / numDataBlocks;
+    bNum = bNum % numDataBlocks;
+    uint32_t tempBuffer[numDataBlocks];
+    if(blockList[index] == 0){
+        blockList[index] = ext2->allocateBlock(-1);
+        ext2->writeBlock(iBlockNum,blockList);
+    }
+
+    iBlockNum = blockList[index];
+    ext2->fetchBlock(blockList[index],tempBuffer);
+    blockList = tempBuffer;
+    return writeDirect(blockList,bNum,iBlockNum,ext2,buf);
+}
+int32_t FileAccess::writeDouble(uint32_t blockList[], int32_t bNum, uint32_t iBlockNum, int32_t numDataBlocks, Ext2File *ext2, void* buf){
+    int32_t index = bNum / pow(numDataBlocks,2);
+    bNum = bNum % (uint32_t)pow(numDataBlocks,2);
+    uint32_t tempBuffer[numDataBlocks];
+    if(blockList[index] == 0){
+        blockList[index] = ext2->allocateBlock(-1);
+        ext2->writeBlock(iBlockNum,blockList);
+    }
+    iBlockNum = blockList[index];
+    ext2->fetchBlock(blockList[index],tempBuffer);
+    blockList = tempBuffer;
+    return writeSingle(blockList,bNum,iBlockNum,numDataBlocks,ext2,buf);
 }
