@@ -44,7 +44,7 @@ class UtilityUUID {
         //  pointer to statically allocated character string with hex form of uuid
         //
         // Notes
-        // - Is not reentrant, uses a single static buffer
+        // - Is not reentrant, uses a readSingle static buffer
         //
 
         static char *uuid2ascii(struct UUID *uuid) {
