@@ -64,6 +64,10 @@ void ExEmulationTests::runEmTest(int step, int example){
                 step4Ex3();
                 break;
         }
+        case 5: if(example == 1){
+                step5Ex1();
+                break;
+        }
         default:
             cout << "These are not the  step " << step << " example " << example << " emulation tests you are looking for." << endl;
     }
@@ -427,4 +431,45 @@ void ExEmulationTests::step4Ex3() {
     ext2File->ext2Close();
     delete[] inodeStruct;
     delete[] ext2File;
+}
+void ExEmulationTests::step5Ex1(){
+    cout << "Displaying Step 5, Example 1" << endl;
+
+    char *filename = "../testFiles/Write_Test-fixed-1k.vdi";
+    ///open the ext2file with the filename given above
+    Ext2File *ext2File = new Ext2File();
+    ext2File->ext2Open(filename);
+    ///Each of the inodes being displayed given seperate structures
+    InodeStruct *inodeTwo = new InodeStruct;
+    InodeStruct *inodeEleven = new InodeStruct;
+    InodeStruct *inodeTwelve = new InodeStruct;
+
+    ///fill those structures
+    Inode::fetchInode(ext2File,2,inodeTwo);
+    Inode::fetchInode(ext2File,11,inodeEleven);
+    Inode::fetchInode(ext2File,12,inodeTwelve);
+
+    uint8_t *tempBuffer = new uint8_t[ext2File->getBlockSize()];//will display information the size of the block
+
+    StepZDebug::dumpInode(ext2File,*inodeTwo,2);
+    cout << endl;
+    FileAccess::fetchBlockFromFile(ext2File,0,tempBuffer,2);
+    StepZDebug::displayBuffer(tempBuffer,ext2File->getBlockSize(),0);
+    cout << endl << endl << endl;
+
+    StepZDebug::dumpInode(ext2File,*inodeEleven,11);
+    cout << endl;
+    FileAccess::fetchBlockFromFile(ext2File,0,tempBuffer,11);
+    StepZDebug::displayBuffer(tempBuffer,ext2File->getBlockSize(),0);
+    cout << endl << endl << endl;
+
+    StepZDebug::dumpInode(ext2File,*inodeTwelve,12);
+    cout << endl;
+    //FileAccess::fetchBlockFromFile(ext2File,0,tempBuffer,12);
+    //StepZDebug::displayBuffer(tempBuffer,ext2File->getBlockSize(),0);
+    delete[]tempBuffer;
+    delete inodeTwo;
+    delete inodeTwelve;
+    delete inodeEleven;
+    delete ext2File;
 }
