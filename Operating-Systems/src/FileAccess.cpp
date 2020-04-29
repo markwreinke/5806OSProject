@@ -3,52 +3,141 @@
 //
 
 #include "../include/FileAccess.h"
-int32_t FileAccess::fetchBlockFromFile(Ext2File *ext2, uint32_t bNum, void *buf, uint32_t iNum){
-    int32_t numDataBlocks =  ext2->getBlockSize() / 4;
-    InodeStruct *iS = new InodeStruct; //hold the iblock information
-    Inode::fetchInode(ext2,iNum,iS);///fills the inodestruct
-    uint32_t *blockList;///contains an array of uint32_t addresses that point to different blocks
-    int32_t flag = 0;///flag for returning the values from our reads after deleting anything created dynamically
+int32_t FileAccess::fetchBlockFromFile(Ext2File *ext2, uint32_t bNum, void *buf, uint32_t iNum) {
 
-    if(bNum < 12) {
-        blockList = new uint32_t[11];
-        flag = readDirect(blockList, bNum, buf, ext2);
-    }else if(bNum < 12 + numDataBlocks){
-        /// if the block isnt allocated theres nothing to fetch so return -1
-        if(iS->i_block[12] == 0)
-            return -1;
-        //otherwuise fetch the block into the buffer, update the blocklist with the given buffer, and then update the bNum to account fo skipped nodes.
-        ext2->fetchBlock(iS->i_block[12],buf);
-        blockList = new uint32_t[numDataBlocks];
-        blockList = (uint32_t*)buf;
-        bNum = bNum - 12;
-        flag = readDirect(blockList, bNum, buf, ext2);
-    }else if(bNum < 12 + numDataBlocks + pow(numDataBlocks,2)){
-        ///if the block isnt allocated theres nothing to fetch so return -1
-        if(iS->i_block[13] == 0)
-            return -1;
-        //otherwuise fetch the block into the buffer, update the blocklist with the given buffer, and then update the bNum to account fo skipped nodes.
-        ext2->fetchBlock(iS->i_block[13],buf);
-        blockList = new uint32_t[numDataBlocks];
-        blockList = (uint32_t*)buf;
-        bNum = bNum - 12 - numDataBlocks;
-        flag = readSingle(blockList, bNum, buf, numDataBlocks, ext2);
+    /* Get the k value (number of children each indirect node has) indirect node has pointers to k data nodes,
+     * each doubly indirect node has pointers to k indirect nodes, and each triply indirect node has pointers to
+     * k doubly indirect nodes */
+    int32_t kValue = ext2->getBlockSize() / 4;
 
-    } else{
-        ///if this isnt allocated return -1
-        if(iS->i_block[14] == 0)
-            return -1;
-        //otherwuise fetch the block into the buffer, update the blocklist with the given buffer, and then update the bNum to account fo skipped nodes.
-        ext2->fetchBlock(iS->i_block[14],buf);
-        blockList = new uint32_t[numDataBlocks];
-        blockList = (uint32_t*)buf;
-        bNum = bNum - 12 - numDataBlocks - pow(numDataBlocks,2);
-        flag = readDouble(blockList, bNum, buf, numDataBlocks, ext2);
+    /* Create an inode structure to hold the information for the file being written to, fetching the inode into it. */
+    InodeStruct *tempInodeStruct = new InodeStruct;///holds i_block information
+    Inode::fetchInode(ext2, iNum, tempInodeStruct);///fills the InodeStruct that was just created with the iNum given
+
+    uint32_t *blockList;///A dynamically sized array of uin32_t that contains the addresses to different blocks
+
+    int32_t flag = -1; /// flag to return our Writes after deleting anything created dynamically
+    uint32_t index;
+    uint32_t dBIindex;
+
+    /** If the block number is directly stored in i_block (i_block[0] through i_block[11]) **/
+    if (bNum < 12) {
+        blockList = tempInodeStruct->i_block;
+        goto direct;
     }
-    ///delete anything created dynamically and then return our value of -1 or 1
-    delete[] blockList;
-    delete iS;
-    return flag;
+
+        /** If the block number is stored in the indirect block (i_block[12]) **/
+    else if (bNum < 12 + kValue) {
+        /* If the SIB is not allocated, then bNum certainly isn't */
+        if (tempInodeStruct->i_block[12] == 0) {
+            flag = -1;
+            goto ending;
+        }
+
+        /* Fetch the SIB into the buffer */
+        ext2->fetchBlock(tempInodeStruct->i_block[12], buf);
+
+        /* Set the blockList to point to the buffer (Buffer holds the SIB) */
+        blockList = (uint32_t *) buf;
+
+        /* Adjust the value of bNum to be an index within blockList */
+        bNum = bNum - 12;
+
+        goto direct;
+    }
+
+        /** If the block number is stored in the doubly indirect block (i_block[13]) **/
+    else if (bNum < 12 + kValue + pow(kValue, 2)) {
+        /* If the DIB is not allocated, then bNum certainly isn't */
+        if (tempInodeStruct->i_block[13] == 0) {
+            flag = -1;
+            goto ending;
+        }
+
+        /* Fetch the DIB into the buffer */
+        ext2->fetchBlock(tempInodeStruct->i_block[13], buf);
+
+        /* Set the blockList to point to the buffer (Buffer holds the DIB) */
+        blockList = (uint32_t *) buf;
+
+        /* Adjust the value of bNum to be an index within blockList */
+        bNum = bNum - 12 - kValue;
+
+        goto singleIndirect;
+
+    }
+
+        /** If the block number is stored in the triply indirect block (i_block[14]) **/
+    else {
+        /* If the TIB is not allocated, then bNum certainly isn't */
+        if (tempInodeStruct->i_block[14] == 0) {
+            flag = -1;
+            goto ending;
+        }
+
+        /* Fetch the TIB into the buffer */
+        ext2->fetchBlock(tempInodeStruct->i_block[14], buf);
+
+        /* Set the blockList to point to the buffer (Buffer holds the TIB) */
+        blockList = (uint32_t *) buf;
+
+        /* Adjust the value of bNum to be an index within blockList */
+        bNum = bNum - 12 - kValue - pow(kValue, 2);
+
+        goto doubleIndirect;
+    }
+    doubleIndirect:
+        dBIindex = bNum / pow(kValue, 2); ///the actual index of the block withing our blockList
+        bNum = bNum % (uint32_t) pow(kValue, 2); // the updated blockNumber if bNum was greater than the numDataBlocks
+
+        /* If the DIB is not allocated, then bNum certainly isn't */
+        if (blockList[dBIindex] == 0) {
+            flag = -1;
+            goto ending;
+        }
+
+        /* Fetch the DIB into the buffer */
+        flag = ext2->fetchBlock(blockList[dBIindex],buf);
+
+        /* Set the blockList to point to the buffer (Buffer holds an IB) */
+        blockList = (uint32_t*)buf;
+
+    singleIndirect:
+        index = bNum / kValue;///the actual index of the block withing our blockList
+        bNum = bNum % kValue; // the updated blockNumber if bNum was greater than the kValue
+
+        /* If the blockList is not allocated, then return false */
+        if (blockList[index] == 0) {
+            flag = -1;
+            goto ending;
+        }
+
+        /* Fetch the SIB full of data blocks */
+        flag = ext2->fetchBlock(blockList[index], buf);
+
+        /* Set the blockList to point to the buffer (Buffer holds the DIB) */
+        blockList = (uint32_t*)buf;
+
+
+    direct:
+        /* If the blockList is not allocated, then return false */
+        if(blockList[bNum] == 0) {
+            flag = -1;
+            goto ending;
+        }
+
+        //set our flag equal to the value from fetchBlock
+        flag = ext2->fetchBlock(blockList[bNum],buf);
+
+
+    ending:
+        /* If we failed a read, set buffer to 0 */
+        if(flag == -1) {
+            buf = {0};
+        }
+
+        delete tempInodeStruct;
+        return flag;
 }
 
 int32_t FileAccess::writeBlockToFile(Ext2File *ext2, uint32_t blockNum, void* buf, uint32_t iNum) {
@@ -251,49 +340,6 @@ int32_t FileAccess::writeBlockToFile(Ext2File *ext2, uint32_t blockNum, void* bu
     delete tempInodeStruct;
     return flag;
 }
-
-int32_t FileAccess::readDirect(uint32_t blockList[], uint32_t bNum, void* buf, Ext2File *ext2){
-///if the block list is not allocated return -1 because we cant read it
-if(blockList[bNum] == 0)
-    return -1;
-//set our flag equal to the value from fetch block
-uint32_t flag = ext2->fetchBlock(blockList[bNum],buf);
-///if flag == -1 then there was an error fetching, set the buf to 0
-if(flag == -1)
-        buf = {0};
-return 1;
-}
-int32_t FileAccess::readSingle(uint32_t blockList[], uint32_t bNum, void *buf, int32_t numDataBlocks, Ext2File *ext2){
-    uint32_t index = bNum / numDataBlocks;///the actual index of the block withing our blockList
-    bNum = bNum % numDataBlocks; // the updated blockNumber if bNum was greater than the numDataBlocks
-    ///if the block at index is unallocated return -1
-    if(blockList[index] == 0)
-        return -1;
-    ///set a flag equal to the value from fetching a block into the buffer pointed to by blocklist[index]
-    uint32_t flag =ext2->fetchBlock(blockList[index],buf);
-    //if flag == -1 fetchblock failed, set buf = 0
-    if(flag == -1)
-        buf = {0};
-    ///set blocklist equal to the buffer, we must cast the buffer as a uint32_t*
-    blockList = (uint32_t*)buf;
-    return readDirect(blockList, bNum, buf,ext2);
-}
-int32_t FileAccess::readDouble(uint32_t *blockList, uint32_t bNum, void *buf, int32_t numDataBlocks, Ext2File *ext2){
-    uint32_t index = bNum/ pow(numDataBlocks,2); ///the actual index of the block withing our blockList
-    bNum = bNum % (uint32_t)pow(numDataBlocks,2); // the updated blockNumber if bNum was greater than the numDataBlocks
-    ///if the block at index is unallocated return -1
-    if(blockList[index] == 0)
-        return -1;
-    ///set a flag equal to the value from fetching a block into the buffer pointed to by blocklist[index]
-    uint32_t flag = ext2->fetchBlock(blockList[index],buf);
-    //if flag == -1 fetchblock failed, set buf = 0
-    if(flag == -1)
-        buf = {0};
-    ///set blocklist equal to the buffer, we must cast the buffer as a uint32_t*
-    blockList = (uint32_t*)buf;
-    return readSingle(blockList, bNum, buf, numDataBlocks, ext2);
-}
-
 
 
 
