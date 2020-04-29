@@ -224,7 +224,7 @@ uint32_t Ext2File::allocateBlock(int32_t blockGroup) {
                     /* Iterate through bits of the looked at byte, finding the first 0(empty inode) */
                     for(int i = 0; i < 8; i++) {
                         if(!((tmpBlock[currentBitChunk] >> i) & 1U)) {
-                            returningBlock = i + currentBitChunk * 8 + currentGroup * superBlock.s_blocks_per_group + 1; // Calculate the block that is free
+                            returningBlock = i + currentBitChunk * 8 + currentGroup * superBlock.s_blocks_per_group; // Calculate the block that is free
                             tmpBlock[currentBitChunk] ^= 1UL << i; // Toggle the bit from open to used
                             successFlag = writeBlock(bitMapLocation, tmpBlock); // write the block
                             delete[] tmpBlock;
