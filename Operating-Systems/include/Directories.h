@@ -7,7 +7,7 @@
 
 #include <cstdint>
 #include "Inode.h"
-
+#include "FileAccess.h"
 struct Dirent{
     uint32_t iNum;
     uint16_t recLen;
@@ -17,12 +17,12 @@ struct Dirent{
 };
 struct Directory{
     uint32_t cursor;
-    uint8_t *blockNum;
+    uint8_t *blockData;///an array of ext2File.returnBlockSize, holds the information of the given block
     uint32_t iNum;
     InodeStruct iS;
     uint8_t *pointer;
     Dirent* dirent;
-    ///might need an ext2file inside here
+    Ext2File *ext2
 };
 class Directories {
     struct Directory *openDirectory(Ext2File* ext2, uint32_t iNum);
