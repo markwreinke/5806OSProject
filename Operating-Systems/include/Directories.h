@@ -20,15 +20,15 @@ struct Directory{
     uint8_t *blockData;///an array of ext2File.returnBlockSize, holds the information of the given block
     uint32_t iNum;
     InodeStruct iS;
-    uint8_t *pointer;
     Dirent* dirent;
-    Ext2File *ext2
+    Ext2File *ext2;
 };
 class Directories {
-    struct Directory *openDirectory(Ext2File* ext2, uint32_t iNum);
-    bool getNextDirent(struct Directory *d, uint32_t &iNum, char*name);
-    void rewindDir(struct Directory *d);
-    void closeDir(struct Directory *d);
+public:
+    static bool getNextDirent(struct Directory *d, uint32_t &iNum, char*name);
+    static void rewindDir(struct Directory *d);
+    static void closeDir(struct Directory *d);
+    static struct Directory *openDirectory(Ext2File* ext2, uint32_t iNum);
 };
 
 

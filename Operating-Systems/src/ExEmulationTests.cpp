@@ -3,7 +3,7 @@
 //
 
 #include "../include/ExEmulationTests.h"
-
+#include "../include/Directories.h"
 
 
 void ExEmulationTests::runEmTest(int step, int example){
@@ -67,6 +67,10 @@ void ExEmulationTests::runEmTest(int step, int example){
         case 5: if(example == 1){
                 step5Ex1();
                 break;
+        }
+        case 6: if(example == 1){
+            step6Ex1();
+            break;
         }
         default:
             cout << "These are not the  step " << step << " example " << example << " emulation tests you are looking for." << endl;
@@ -472,4 +476,31 @@ void ExEmulationTests::step5Ex1(){
     delete inodeTwelve;
     delete inodeEleven;
     delete ext2File;
+}
+void ExEmulationTests::step6Ex1() {
+    cout << "Displaying Step 6, Example 1" << endl;
+
+    char *filename = "../testFiles/Test-fixed-1k.vdi";
+    ///open the ext2file with the filename given above
+    Ext2File *ext2File = new Ext2File();
+    ext2File->ext2Open(filename);
+
+    char name[256];
+    uint32_t iNum;
+    Directory *d;
+
+    cout << "Root directory contents" << endl;
+    d = Directories::openDirectory(ext2File,2);
+    while(Directories::getNextDirent(d,iNum,name)){
+        cout << "Inode: " << iNum << "     name: [" << name << ']' << endl;
+    }
+    Directories::closeDir(d);
+
+    cout << "\n\nlast+found directory contents" << endl;
+    d = Directories::openDirectory(ext2File,11);
+    while(Directories::getNextDirent(d,iNum,name)){
+        if(iNum != 0)
+            cout << "Inode: " << iNum << "     name: [" << name << ']' << endl;
+    }
+    Directories::closeDir(d);
 }
