@@ -11,7 +11,7 @@ struct Directory* Directories::openDirectory(Ext2File* ext2, uint32_t iNum){
     d->blockData = new uint8_t[ext2->getBlockSize()];
     Inode::fetchInode(ext2,2,&d->iS);
     d->ext2 = ext2;
-
+    d->dirent = new Dirent;
     return d;
 }
 bool Directories::getNextDirent(struct Directory *d, uint32_t &iNum, char *name){
@@ -43,5 +43,6 @@ void Directories::rewindDir(struct Directory *d){
 void Directories::closeDir(struct Directory *d){
     ///delete anything created dynamically
     delete[] d->blockData;
+    delete d->dirent;
     delete d;
 }

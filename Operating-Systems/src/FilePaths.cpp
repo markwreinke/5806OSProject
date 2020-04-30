@@ -49,11 +49,11 @@ uint32_t FilePaths::traversePath(Ext2File *ext2, char* path){
     ///while not at the end of the filePath and search directory doesn't fail traverse through directories
     while(start < length && iNum != 0){
         ///set to start +1 because there must always be 1 more space before the end otherwise start == length and we dont enter here
-        uint32_t end = start + 1;
+        int end = start + 1;
         //while the path hasn't had a terminator increase end until it does, then set that symbol to 0;
         while(path[end] != 0 && path[end]  != '/')
             end++;
-        path[end] = 0;
+        path[end] = '0';
         //search for the directory in ext2 at iNum with the fileName being whatever is path+start until a 0 appears
         iNum = searchDirectory(ext2,iNum,path + start);
         //increment start = end+1 so that we skip the null terminator

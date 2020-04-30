@@ -520,10 +520,10 @@ void ExEmulationTests::step7Ex1() {
     char *filepathWanted = "/examples/08.Strings/StringComparisonOperators";
 
     char name[256];
-    uint32_t iNum;
+    uint32_t iNum = 2;
     Directory *d;
 
-    Directories::openDirectory(ext2File, 2);
-    uint32_t returnedINum = FilePaths::searchDirectory(ext2File, iNum, filepathWanted);
+    d = Directories::openDirectory(ext2File, 2);
+    uint32_t returnedINum = FilePaths::traversePath(ext2File, filepathWanted);
     StepZDebug::dumpInode(ext2File, d->iS, returnedINum);
 }
