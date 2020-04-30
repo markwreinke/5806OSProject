@@ -491,6 +491,7 @@ void ExEmulationTests::step6Ex1() {
 
     cout << "Root directory contents" << endl;
     d = Directories::openDirectory(ext2File,2);
+    iNum = 2;
     while(Directories::getNextDirent(d,iNum,name)){
         cout << "Inode: " << iNum << "     name: [" << name << ']' << endl;
     }
@@ -498,6 +499,7 @@ void ExEmulationTests::step6Ex1() {
 
     cout << "\n\nlast+found directory contents" << endl;
     d = Directories::openDirectory(ext2File,11);
+    iNum = 11;
     while(Directories::getNextDirent(d,iNum,name)){
         if(iNum != 0)
             cout << "Inode: " << iNum << "     name: [" << name << ']' << endl;
