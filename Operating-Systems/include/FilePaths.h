@@ -13,7 +13,7 @@
 class FilePaths {
 public:
     static uint32_t searchDirectory(Ext2File *ext2, uint32_t iNum, char* targetFile);
-    static uint32_t traversePath(Ext2File *f, char path[]);
+    static uint32_t traversePath(Ext2File *f, char* path);
 };
 
 
