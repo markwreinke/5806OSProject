@@ -8,6 +8,7 @@
 
 #include <cstdint>
 #include "Ext2File.h"
+#include "Directories.h"
 
 class FilePaths {
 public:

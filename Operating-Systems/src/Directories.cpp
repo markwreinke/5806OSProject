@@ -11,14 +11,15 @@ struct Directory* Directories::openDirectory(Ext2File* ext2, uint32_t iNum){
     d->blockData = new uint8_t[ext2->getBlockSize()];
     Inode::fetchInode(ext2,2,&d->iS);
     d->ext2 = ext2;
+
     return d;
 }
-bool Directories::getNextDirent(struct Directory *d, uint32_t &iNum, char*name){
+bool Directories::getNextDirent(struct Directory *d, uint32_t &iNum, char *name){
     while(d->cursor < d->iS.i_size){
         int blockNum = d->cursor / d->ext2->getBlockSize();
         int offset = d->cursor % d->ext2->getBlockSize();
 
-        FileAccess::fetchBlockFromFile(d->ext2,blockNum,d->blockData,d->iNum);
+        FileAccess::fetchBlockFromFile(d->ext2,blockNum, d->blockData, d->iNum);
 
         d->dirent = (Dirent*)(d->blockData + offset);
         d->cursor += d->dirent->recLen;
@@ -35,6 +36,7 @@ bool Directories::getNextDirent(struct Directory *d, uint32_t &iNum, char*name){
     }
     return false;
 }
+
 void Directories::rewindDir(struct Directory *d){
     d->cursor = 0;
 }

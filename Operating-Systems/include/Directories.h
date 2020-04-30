@@ -15,6 +15,7 @@ struct Dirent{
     uint8_t fileType;
     uint8_t name[1];
 };
+
 struct Directory{
     uint32_t cursor;
     uint8_t *blockData;///an array of ext2File.returnBlockSize, holds the information of the given block
@@ -23,6 +24,7 @@ struct Directory{
     Dirent* dirent;
     Ext2File *ext2;
 };
+
 class Directories {
 public:
     static bool getNextDirent(struct Directory *d, uint32_t &iNum, char*name);
