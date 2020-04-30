@@ -72,6 +72,10 @@ void ExEmulationTests::runEmTest(int step, int example){
             step6Ex1();
             break;
         }
+        case 7: if(example == 1){
+            step7Ex1();
+            break;
+        }
         default:
             cout << "These are not the  step " << step << " example " << example << " emulation tests you are looking for." << endl;
     }
@@ -505,4 +509,21 @@ void ExEmulationTests::step6Ex1() {
             cout << "Inode: " << iNum << "     name: [" << name << ']' << endl;
     }
     Directories::closeDir(d);
+}
+void ExEmulationTests::step7Ex1() {
+    cout << "Displaying Step 7, Example 1" << endl;
+
+    char *filename = "../testFiles/Test-fixed-1k.vdi";
+    ///open the ext2file with the filename given above
+    Ext2File *ext2File = new Ext2File();
+    ext2File->ext2Open(filename);
+    char *filepathWanted = "/examples/08.Strings/StringComparisonOperators";
+
+    char name[256];
+    uint32_t iNum;
+    Directory *d;
+
+    Directories::openDirectory(ext2File, 2);
+    uint32_t returnedINum = FilePaths::searchDirectory(ext2File, iNum, filepathWanted);
+    StepZDebug::dumpInode(ext2File, d->iS, returnedINum);
 }
