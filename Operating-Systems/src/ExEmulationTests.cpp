@@ -517,7 +517,7 @@ void ExEmulationTests::step7Ex1() {
     ///open the ext2file with the filename given above
     Ext2File *ext2File = new Ext2File();
     ext2File->ext2Open(filename);
-    char *filepathWanted = "/examples/08.Strings/StringComparisonOperators";
+    char filepathWanted[] = "/examples/08.Strings/StringComparisonOperators";
 
     char name[256];
     uint32_t iNum = 2;
