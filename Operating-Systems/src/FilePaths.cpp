@@ -38,7 +38,7 @@ uint32_t FilePaths::searchDirectory(Ext2File *ext2, uint32_t iNum, char targetFi
     return 0;
 }
 
-uint32_t FilePaths::traversePath(Ext2File *ext2, char* path){
+uint32_t FilePaths::traversePath(Ext2File *ext2, char *path){
     //where to start in the path, we start at 1 because every path begins with a '/'
     //we need to ignore this so skip the first character
     ///length is the full length of the path including '/'
