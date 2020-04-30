@@ -9,9 +9,10 @@ struct Directory* Directories::openDirectory(Ext2File* ext2, uint32_t iNum){
     d->cursor = 0;
     d->iNum = iNum;
     d->blockData = new uint8_t[ext2->getBlockSize()];
+    d->dirent = new struct Dirent;
     Inode::fetchInode(ext2,2,&d->iS);
     d->ext2 = ext2;
-    d->dirent = new Dirent;
+
     return d;
 }
 bool Directories::getNextDirent(struct Directory *d, uint32_t &iNum, char *name){
