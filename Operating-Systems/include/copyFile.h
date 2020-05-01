@@ -10,7 +10,9 @@
 #include "FilePaths.h"
 
 class copyFile {
+public:
     static ssize_t copy(char* vdiName, char* src, char* dest);
+    static void viewVDIDirectories(char* filename);
 };
 
 

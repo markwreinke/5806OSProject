@@ -84,10 +84,10 @@ int32_t Inode::inodeInUse(struct Ext2File *f, uint32_t iNum) {
 
     ///ill store the block in a temp block cause im big brain
     if(tmpBlock[wantedByte] & (1 << (wantedBit))){
-        cout << "SET" << endl;
+        ///cout << "SET" << endl;
         return 1;
     }else{
-        cout << "NOT SET" << endl;
+        //cout << "NOT SET" << endl;
         return 0;
     }
 }

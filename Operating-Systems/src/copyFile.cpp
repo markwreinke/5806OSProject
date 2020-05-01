@@ -4,9 +4,10 @@
 
 
 #include <fcntl.h>
+#include <cstring>
 #include "../include/copyFile.h"
 
-static ssize_t copy(char* vdiName, char* src, char* dest){
+ssize_t copyFile::copy(char* vdiName, char* src, char* dest){
 
     Ext2File vdiFile;
 
@@ -53,4 +54,35 @@ static ssize_t copy(char* vdiName, char* src, char* dest){
     delete inodeStruct;
     vdiFile.ext2Close();
     return 1;
+}
+void copyFile::viewVDIDirectories(char* filename) {
+    ///open the ext2file with the filename given above
+    Ext2File *ext2File = new Ext2File();
+    ext2File->ext2Open(filename);
+    uint32_t numInodes = ext2File->superBlock.s_inodes_count;
+
+    char name[256];
+    uint32_t iNum;
+    Directory *d;
+    uint32_t currentInode = 1;
+    char* dot = ".";
+    char* dotdot = "..";
+
+    while (currentInode < numInodes) {
+        iNum = currentInode;
+        if(Inode::inodeInUse(ext2File,iNum)) {
+
+            d = Directories::openDirectory(ext2File, currentInode);
+
+            while (Directories::getNextDirent(d, iNum, name)) {
+                if(iNum < numInodes && strcmp(dot, name) != 0 && strcmp(dotdot, name) != 0)
+                    cout << "Inode: " << iNum << "     name: [" << name << ']' << endl;
+
+            }
+
+            Directories::closeDir(d);
+
+        }
+        currentInode++;
+    }
 }

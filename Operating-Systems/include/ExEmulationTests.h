@@ -21,6 +21,7 @@
 #include "FileAccess.h"
 #include "Directories.h"
 #include "FilePaths.h"
+#include "copyFile.h"
 using namespace std;
 
 class ExEmulationTests {
@@ -45,6 +46,7 @@ public:
     static void step5Ex1();
     static void step6Ex1();
     static void step7Ex1();
+    static void step8Ex1();
 };
 
 

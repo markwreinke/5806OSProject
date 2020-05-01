@@ -76,6 +76,10 @@ void ExEmulationTests::runEmTest(int step, int example){
             step7Ex1();
             break;
         }
+        case 8: if(example == 1){
+            step8Ex1();
+            break;
+        }
         default:
             cout << "These are not the  step " << step << " example " << example << " emulation tests you are looking for." << endl;
     }
@@ -526,4 +530,9 @@ void ExEmulationTests::step7Ex1() {
     d = Directories::openDirectory(ext2File, 2);
     uint32_t returnedINum = FilePaths::traversePath(ext2File, filepathWanted);
     StepZDebug::dumpInode(ext2File, d->iS, returnedINum);
+}
+void ExEmulationTests::step8Ex1(){
+    cout << "Displaying all inode information" << endl;
+    char *filename = "../testFiles/Test-fixed-1k.vdi";
+    copyFile::viewVDIDirectories(filename);
 }
