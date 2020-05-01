@@ -73,11 +73,20 @@ static ssize_t copyFileToVDI(char* vdiName, char* src, char* dest){
         vdiFile.ext2Close();
         return -1;
     }
+    int sourceFD = open(src,O_RDONLY);
+    int numBytesInFile = lseek(sourceFD,0,SEEK_END);
+    InodeStruct *tempInode = new InodeStruct;
+    Inode::fetchInode(&vdiFile,2,TempInode);
 
     InodeStruct *inodeStruct = new InodeStruct;
     Inode::fetchInode(&vdiFile, destInode, inodeStruct);
     inodeStruct->i_ctime = time(NULL);
-
+    inodeStruct->i_atime = time(NULL);
+    inodeStruct->i_mtime = time(NULL);
+    inodeStruct->i_blocks = (numBytesInFile + 511) / 512;
+    inodeStruct->i_links_count = 1;
+    inodeStruct->i_file_acl = tempInode->i_file_acl;
+    delete tempInode;
     /* Open or create the src file. Return -1 if failed */
     ssize_t srcFD = open(src, O_RDONLY, 0666);
     if(srcFD < 0) {
@@ -118,7 +127,6 @@ void copyFile::viewVDIDirectories(char* filename) {
     uint32_t currentInode = 1;
     char* dot = ".";
     char* dotdot = "..";
-
     while (currentInode < numInodes) {
         iNum = currentInode;
         if(Inode::inodeInUse(ext2File,iNum)) {
@@ -126,8 +134,10 @@ void copyFile::viewVDIDirectories(char* filename) {
             d = Directories::openDirectory(ext2File, currentInode);
 
             while (Directories::getNextDirent(d, iNum, name)) {
-                if(iNum < numInodes && strcmp(dot, name) != 0 && strcmp(dotdot, name) != 0)
+                if(iNum < numInodes && strcmp(dot, name) != 0 && strcmp(dotdot, name) != 0) {
+
                     cout << "Inode: " << iNum << "     name: [" << name << ']' << endl;
+                }
 
             }
 
