@@ -109,6 +109,32 @@ ssize_t copyFile::copyFileToVDI(char* vdiName, char* src, char* dest) {
             vdiFile.ext2Close();
             return -1;
         }
+        Directory *d = new Directory;
+        Directories::openDirectory(&vdiFile,2);
+        Dirent *UpdateDirent = new Dirent;
+        uint32_t tempInum;
+        char* tempName = new char;
+        while(Directories::getNextDirent(d,tempInum,tempName)){}
+        int blockNum = d->cursor / d->ext2->getBlockSize();
+        int index = d->cursor % d->ext2->getBlockSize();
+        FileAccess::fetchBlockFromFile(d->ext2,blockNum,d->blockData,d->iNum);
+        for(int x = 0; x < UpdateDirent->recLen;x++) {
+            if (x == 0) {
+                d->blockData[index + x] = UpdateDirent->iNum;
+                x += 3;
+            }else if(x == 4) {
+                d->blockData[index + x] = UpdateDirent->recLen;
+                x++;
+            }else if(x== 6){
+                d->blockData[index + x] = UpdateDirent->nameLen;
+            }else if(x == 7){
+                d->blockData[index + x] = UpdateDirent->fileType;
+            }else if(x <= x + UpdateDirent->nameLen) {
+                d->blockData[index + x] = UpdateDirent->name[x - 8];
+            }else
+                d->blockData[index + x] = 0x0;
+        }
+        FileAccess::writeBlockToFile(&vdiFile,blockNum,d->blockData,d->iNum);
         FileAccess::writeBlockToFile(&vdiFile, i, tmpBlock, destInode);
     }
 
