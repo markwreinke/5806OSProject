@@ -56,7 +56,7 @@ int32_t Inode::writeInode(struct Ext2File *f, uint32_t iNum, struct InodeStruct 
         delete[] tmpBlock;
         return successFlag;
     }
-    //it didnt fail so copy over the new inode into the location in memory where the original inode was located
+    //it didnt fail so copyFileToHost over the new inode into the location in memory where the original inode was located
     memcpy(tmpBlock + (wantedBlockIndex *f->superBlock.s_inode_size), buf, f->superBlock.s_inode_size);
     ///rewrite the given inode in the BGDT
     successFlag = f->writeBlock(f->BGDT[blockGroup].bg_inode_table + wantedBlock, tmpBlock);
@@ -92,9 +92,10 @@ int32_t Inode::inodeInUse(struct Ext2File *f, uint32_t iNum) {
     }
 }
 
+/* Allocate a new Inode, return its number or -1 if failed */
 uint32_t Inode::allocateInode(struct Ext2File *f, int32_t group) {
  /*
-  * write function to clear the inode you are writing to, and call before alloacteInode
+  * write function to clear the inode you are writing to, and call before allocateInode
   */
  uint8_t returningInode = -1;
  if(group >= f->getNumBlockGroups()) {
@@ -192,6 +193,7 @@ int32_t Inode::freeInode(struct Ext2File *f, uint32_t iNum) {
     f->writeAllBGDT(f->BGDT);
     f->writeAllSuperBlocks(&f->superBlock);
 }
+
 ///Sets all values in the inode to 0
 void Inode::clearInode(Ext2File *f, uint32_t iNum){
     InodeStruct temp = (const struct InodeStruct){0};

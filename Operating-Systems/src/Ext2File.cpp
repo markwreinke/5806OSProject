@@ -162,7 +162,7 @@ int32_t Ext2File::writeAllBGDT(struct BlockGroupDescriptor *bgdt) {
     return successCheck;
 }
 
-/* Checks if the given block blockGroup contains a superblock or BGDT copy */
+/* Checks if the given block blockGroup contains a superblock or BGDT copyFileToHost */
 bool Ext2File::containsCopyOfSuperBlockOrBGDT(uint32_t blockGroupNumber) {
     if(blockGroupNumber == 0 || blockGroupNumber == 1) {
         return true;
