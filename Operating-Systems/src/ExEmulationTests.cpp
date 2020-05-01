@@ -72,17 +72,21 @@ void ExEmulationTests::runEmTest(int step, int example){
                 break;
                 }
         case 6: if(example == 1){
-            step6Ex1();
-            break;
-        }
+                step6Ex1();
+                break;
+                }
         case 7: if(example == 1){
-            step7Ex1();
-            break;
+                step7Ex1();
+                break;
                 }
         case 8: if(example == 1){
-            step8Ex1();
-            break;
-        }
+                step8Ex1();
+                break;
+                }
+                if(example == 2) {
+                step8Ex2();
+                break;
+                }
         default:
             cout << "These are not the  step " << step << " example " << example << " emulation tests you are looking for." << endl;
     }
@@ -329,6 +333,7 @@ void ExEmulationTests::step3Ex3() {
 void ExEmulationTests::step4Ex1() {
     cout << "Displaying Step 4, Example 1" << endl << endl;
 
+
     char *filename = "../testFiles/Test-fixed-4k.vdi";
 
     Ext2File *ext2File = new Ext2File();
@@ -567,7 +572,7 @@ void ExEmulationTests::step7Ex1() {
     ///open the ext2file with the filename given above
     Ext2File *ext2File = new Ext2File();
     ext2File->ext2Open(filename);
-    char *filepathWanted = "/examples/02.Digital/toneMelody/toneMelody.ino";
+    char *filepathWanted = "/examples/02.Digital/toneMelody";
 
     char name[256];
     uint32_t iNum = 2;
@@ -583,4 +588,15 @@ void ExEmulationTests::step8Ex1(){
     cout << "Displaying all inode information" << endl;
     char *filename = "../testFiles/Test-fixed-1k.vdi";
     copyFile::viewVDIDirectories(filename);
+}
+
+void ExEmulationTests::step8Ex2(){
+    cout << "Displaying Step 8, Example 2" << endl;
+    char *filename = "../testFiles/Write_Test-fixed-1k.vdi";
+    char *srcFileName = "../testFiles/marksTestFile.txt";
+    char *dest = "poop";
+    int32_t flag = copyFile::copyFileToVDI(filename, srcFileName, dest);
+    if(flag >=0 ){
+        copyFile::viewVDIDirectories(filename);
+    }
 }

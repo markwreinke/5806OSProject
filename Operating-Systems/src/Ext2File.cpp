@@ -190,7 +190,7 @@ bool Ext2File::containsCopyOfSuperBlockOrBGDT(uint32_t blockGroupNumber) {
 
 /* Allocates a block if it hasn't been. If you want a specific blockGroup, pass its number in, else have no input */
 uint32_t Ext2File::allocateBlock(int32_t blockGroup) {
-    uint8_t returningBlock = -1;
+    int8_t returningBlock = -1;
     if(blockGroup >= getNumBlockGroups()) {
         cout << "There are not that many block groups! Desired blockGroup: " << blockGroup << " number of block groups: " << getNumBlockGroups() << endl;
         return returningBlock;

@@ -98,7 +98,7 @@ uint32_t Inode::allocateInode(struct Ext2File *f, int32_t group) {
   * write function to clear the inode you are writing to, and call before allocateInode
   */
  uint8_t returningInode = -1;
- if(group >= f->getNumBlockGroups()) {
+ if(group >= (int32_t)f->getNumBlockGroups()) {
      cout << "There are not that many block groups! Desired group: " << group << " number of block groups: " << f->getNumBlockGroups() << endl;
      return returningInode;
  }

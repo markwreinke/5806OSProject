@@ -15,6 +15,6 @@ using namespace std;
 
 
 int main() {
-   ExEmulationTests::runEmTest(8,1);
+   ExEmulationTests::runEmTest(8, 2);
 
 }

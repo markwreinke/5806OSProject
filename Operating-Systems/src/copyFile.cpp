@@ -7,7 +7,7 @@
 #include <cstring>
 #include "../include/copyFile.h"
 
-static ssize_t copyFileToHost(char* vdiName, char* src, char* dest){
+ssize_t copyFile::copyFileToHost(char* vdiName, char* src, char* dest){
 
     Ext2File vdiFile;
 
@@ -58,7 +58,7 @@ static ssize_t copyFileToHost(char* vdiName, char* src, char* dest){
 
 
 // todo need to figure out how to fill the inode? As well as what directory to add it to
-static ssize_t copyFileToVDI(char* vdiName, char* src, char* dest){
+ssize_t copyFile::copyFileToVDI(char* vdiName, char* src, char* dest) {
 
     Ext2File vdiFile;
 
@@ -76,7 +76,7 @@ static ssize_t copyFileToVDI(char* vdiName, char* src, char* dest){
     int sourceFD = open(src,O_RDONLY);
     int numBytesInFile = lseek(sourceFD,0,SEEK_END);
     InodeStruct *tempInode = new InodeStruct;
-    Inode::fetchInode(&vdiFile,2,TempInode);
+    Inode::fetchInode(&vdiFile,2,tempInode);
 
     InodeStruct *inodeStruct = new InodeStruct;
     Inode::fetchInode(&vdiFile, destInode, inodeStruct);
@@ -86,8 +86,11 @@ static ssize_t copyFileToVDI(char* vdiName, char* src, char* dest){
     inodeStruct->i_blocks = (numBytesInFile + 511) / 512;
     inodeStruct->i_links_count = 1;
     inodeStruct->i_file_acl = tempInode->i_file_acl;
+
+    Inode::writeInode(&vdiFile, destInode, inodeStruct);
     delete tempInode;
-    /* Open or create the src file. Return -1 if failed */
+
+    /* Open the src file. Return -1 if failed */
     ssize_t srcFD = open(src, O_RDONLY, 0666);
     if(srcFD < 0) {
         vdiFile.ext2Close();

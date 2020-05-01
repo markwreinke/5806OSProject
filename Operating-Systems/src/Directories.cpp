@@ -18,7 +18,7 @@ struct Directory* Directories::openDirectory(Ext2File* ext2, uint32_t iNum){
 bool Directories::getNextDirent(struct Directory *d, uint32_t &iNum, char *name){
     int count = 0;
     while(d->cursor < d->iS.i_size){
-        if(count == 2){break;}
+    if(count == 3) {break;}
         int blockNum = d->cursor / d->ext2->getBlockSize();
         int offset = d->cursor % d->ext2->getBlockSize();
 
@@ -35,9 +35,8 @@ bool Directories::getNextDirent(struct Directory *d, uint32_t &iNum, char *name)
             }
             name[d->dirent->nameLen] = 0;
             return true;
-            count = 0;
         }
-        count++;
+    count++;
     }
     return false;
 }
