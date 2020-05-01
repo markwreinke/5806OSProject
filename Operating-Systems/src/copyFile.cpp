@@ -98,7 +98,7 @@ ssize_t copyFile::copyFileToVDI(char* vdiName, char* src, char* dest) {
     }
 
     /* Temp block to fetch to */
-    uint8_t *tmpBlock = new uint8_t[vdiFile.getBlockSize()];
+    uint8_t *tmpBlock = new uint8_t[vdiFile.getBlockSize()]{0};
 
     Directory *d = new Directory;
     d = Directories::openDirectory(&vdiFile,2);
@@ -147,6 +147,11 @@ ssize_t copyFile::copyFileToVDI(char* vdiName, char* src, char* dest) {
         }
 
         FileAccess::writeBlockToFile(&vdiFile, i, tmpBlock, destInode);
+        Inode::fetchInode(&vdiFile, destInode, inodeStruct);
+
+        if(readFlag < vdiFile.getBlockSize()) {
+            i = inodeStruct->i_blocks;
+        }
     }
 
     /* Delete dynamic memory, return 1 for success */

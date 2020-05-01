@@ -217,8 +217,8 @@ uint32_t Ext2File::allocateBlock(int32_t blockGroup) {
                 return successFlag;
             }
 
-            /* Iterates through all uint8_ts of the bit map looking for the first one !=0xff, then returns the location of the first free inode */
-            for(int currentBitChunk = 0; currentBitChunk < getBlockSize()/sizeof(uint8_t); currentBitChunk++){
+            /* Iterates through all uint8_ts of the bit map looking for the first one !=0xff, then returns the location of the first free block */
+            for(int currentBitChunk = 0; currentBitChunk < getBlockSize()/8; currentBitChunk++){
                 /* If the looked at uint8_t of bitmap isn't full */
                 if(tmpBlock[currentBitChunk] != 0xff) {
                     /* Iterate through bits of the looked at byte, finding the first 0(empty inode) */

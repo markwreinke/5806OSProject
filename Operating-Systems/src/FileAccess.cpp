@@ -160,7 +160,7 @@ int32_t FileAccess::writeBlockToFile(Ext2File *ext2, uint32_t blockNum, void* bu
 
 
     /* Variables for other things */
-    uint32_t iBlockNum = -1;
+    int32_t iBlockNum = -1;
     int32_t index;
     int32_t dIBindex;
 
