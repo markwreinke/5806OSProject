@@ -150,3 +150,18 @@ void copyFile::viewVDIDirectories(char* filename) {
         currentInode++;
     }
 }
+char* copyFile::traverseGivenFileName(char* fileName){
+    uint32_t end = strlen(fileName);
+    uint32_t start = end - 1;
+    char* finalName = new char;
+        //while the path hasn't had a terminator increase end until it does, then set that symbol to 0;
+        while(fileName[start] != 0 && fileName[start]  != '/'){
+            start--;
+        }
+
+        string temp = (string)fileName;
+        temp = temp.substr(start + 1,end-start);
+        strcpy(finalName,temp.c_str());
+
+    return finalName;
+};

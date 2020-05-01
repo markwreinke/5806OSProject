@@ -49,6 +49,7 @@ public:
     static void step7Ex1();
     static void step8Ex1();
     static void step8Ex2();
+    static void step8Ex3();
 };
 
 

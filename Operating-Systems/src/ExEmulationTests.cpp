@@ -83,8 +83,11 @@ void ExEmulationTests::runEmTest(int step, int example){
                 step8Ex1();
                 break;
                 }
-                if(example == 2) {
+                else if(example == 2) {
                 step8Ex2();
+                break;
+                }else if(example == 3){
+                step8Ex3();
                 break;
                 }
         default:
@@ -599,4 +602,10 @@ void ExEmulationTests::step8Ex2(){
     if(flag >=0 ){
         copyFile::viewVDIDirectories(filename);
     }
+}
+void ExEmulationTests::step8Ex3() {
+    cout<<"this test was for a private function" << endl;
+    char* fileName = "/examples/02.Digital/toneMelody/toneMelody.ino";
+    char* Name = copyFile::traverseGivenFileName(fileName);
+    cout << Name;
 }

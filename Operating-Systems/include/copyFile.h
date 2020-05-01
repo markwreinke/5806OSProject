@@ -14,6 +14,8 @@ public:
     static ssize_t copyFileToHost(char* vdiName, char* src, char* dest);
     static ssize_t copyFileToVDI(char* vdiName, char* src, char* dest = "-1");
     static void viewVDIDirectories(char* filename);
+
+    static char *traverseGivenFileName(char *fileName);
 };
 
 
