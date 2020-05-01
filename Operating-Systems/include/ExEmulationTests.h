@@ -44,6 +44,7 @@ public:
     static void step4Ex2();
     static void step4Ex3();
     static void step5Ex1();
+    static void step5Ex2();
     static void step6Ex1();
     static void step7Ex1();
     static void step8Ex1();

@@ -67,7 +67,10 @@ void ExEmulationTests::runEmTest(int step, int example){
         case 5: if(example == 1){
                 step5Ex1();
                 break;
-        }
+                }else if (example == 2){
+                step5Ex2();
+                break;
+                }
         case 6: if(example == 1){
             step6Ex1();
             break;
@@ -75,7 +78,7 @@ void ExEmulationTests::runEmTest(int step, int example){
         case 7: if(example == 1){
             step7Ex1();
             break;
-        }
+                }
         case 8: if(example == 1){
             step8Ex1();
             break;
@@ -485,6 +488,49 @@ void ExEmulationTests::step5Ex1(){
     delete inodeEleven;
     delete ext2File;
 }
+///used to test writing a block to a file, in this case were going to write over inum 11 with inum 2 and then rewrite inum 11
+void ExEmulationTests::step5Ex2() {
+    cout << "Displaying Step 5, Example 2" << endl;
+    char *filename = "../testFiles/Write_Test-fixed-1k.vdi";
+    ///open the ext2file with the filename given above
+    Ext2File *ext2File = new Ext2File();
+    ext2File->ext2Open(filename);
+    ///Each of the inodes being displayed given seperate structures
+    InodeStruct *inodeTwo = new InodeStruct;
+    InodeStruct *inodeEleven = new InodeStruct;
+    InodeStruct *inodeTwelve = new InodeStruct;
+
+    ///fill those structures
+    Inode::fetchInode(ext2File,2,inodeTwo);
+    Inode::fetchInode(ext2File,11,inodeEleven);
+    Inode::fetchInode(ext2File,12,inodeTwelve);
+
+    uint8_t *bufferHoldingBlockTwo = new uint8_t[ext2File->getBlockSize()];
+    uint8_t *bufferHoldingBlockEleven = new uint8_t[ext2File->getBlockSize()];
+    uint8_t *tempBuffer = new uint8_t[ext2File->getBlockSize()];
+    ///read those two blocks
+    FileAccess::fetchBlockFromFile(ext2File,0,bufferHoldingBlockTwo,2);
+    FileAccess::fetchBlockFromFile(ext2File,0,bufferHoldingBlockEleven,11);
+    ///display what is in them originally
+    cout << "Block Two: " << endl;
+    StepZDebug::displayBuffer(bufferHoldingBlockTwo,ext2File->getBlockSize(),0);
+    cout << endl << endl << endl;
+    cout << "Block Eleven: " << endl;
+    StepZDebug::displayBuffer(bufferHoldingBlockEleven,ext2File->getBlockSize(),0);
+
+    ///overwrite block 0 inode 11 and then fetch into the temp buffer, display the temp buffer;
+    FileAccess::writeBlockToFile(ext2File,0,bufferHoldingBlockTwo,11);
+    FileAccess::fetchBlockFromFile(ext2File,0,tempBuffer,11);
+    cout << endl << endl << endl;
+    cout << " Updated Block Eleven: (should look like block two) " << endl;
+    StepZDebug::displayBuffer(tempBuffer,ext2File->getBlockSize(),0);
+    ///rewrite original blockEleven into block eleven, read into the temp buffer and then display once more
+    FileAccess::writeBlockToFile(ext2File,0,bufferHoldingBlockEleven,11);
+    FileAccess::fetchBlockFromFile(ext2File,0,tempBuffer,11);
+    cout << endl << endl << endl;
+    cout << " Updated Block Eleven: (should look like original block elevel) " << endl;
+    StepZDebug::displayBuffer(tempBuffer,ext2File->getBlockSize(),0);
+}
 void ExEmulationTests::step6Ex1() {
     cout << "Displaying Step 6, Example 1" << endl;
 
@@ -531,6 +577,8 @@ void ExEmulationTests::step7Ex1() {
     uint32_t returnedINum = FilePaths::traversePath(ext2File, filepathWanted);
     StepZDebug::dumpInode(ext2File, d->iS, returnedINum);
 }
+
+///used to print all the VDIDirectories in filename
 void ExEmulationTests::step8Ex1(){
     cout << "Displaying all inode information" << endl;
     char *filename = "../testFiles/Test-fixed-1k.vdi";
