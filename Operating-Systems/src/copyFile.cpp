@@ -7,7 +7,7 @@
 #include <cstring>
 #include "../include/copyFile.h"
 
-ssize_t copyFile::copy(char* vdiName, char* src, char* dest){
+static ssize_t copyFileToHost(char* vdiName, char* src, char* dest){
 
     Ext2File vdiFile;
 
@@ -47,6 +47,57 @@ ssize_t copyFile::copy(char* vdiName, char* src, char* dest){
             vdiFile.ext2Close();
             return -1;
         }
+    }
+
+    /* Delete dynamic memory, return 1 for success */
+    delete[] tmpBlock;
+    delete inodeStruct;
+    vdiFile.ext2Close();
+    return 1;
+}
+
+
+// todo need to figure out how to fill the inode? As well as what directory to add it to
+static ssize_t copyFileToVDI(char* vdiName, char* src, char* dest){
+
+    Ext2File vdiFile;
+
+    /* Open vdi file, returns -1 if fails */
+    if(!vdiFile.ext2Open(vdiName)){
+        return -1;
+    }
+
+    /* Allocate an inode, returning -1 if fails */
+    uint32_t destInode = Inode::allocateInode(&vdiFile, -1);
+    if(destInode == -1) {
+        vdiFile.ext2Close();
+        return -1;
+    }
+
+    InodeStruct *inodeStruct = new InodeStruct;
+    Inode::fetchInode(&vdiFile, destInode, inodeStruct);
+    inodeStruct->i_ctime = time(NULL);
+
+    /* Open or create the src file. Return -1 if failed */
+    ssize_t srcFD = open(src, O_RDONLY, 0666);
+    if(srcFD < 0) {
+        vdiFile.ext2Close();
+        return -1;
+    }
+
+    /* Temp block to fetch to */
+    uint8_t *tmpBlock = new uint8_t[vdiFile.getBlockSize()];
+
+    /* Loop through all data blocks of the file, copying to destination file. Return -1 if failure */
+    for(int i = 0; i < inodeStruct->i_blocks; i++) {
+        int32_t readFlag = read(srcFD, tmpBlock, vdiFile.getBlockSize());
+        if(readFlag < 0) {
+            delete[] tmpBlock;
+            delete inodeStruct;
+            vdiFile.ext2Close();
+            return -1;
+        }
+        FileAccess::writeBlockToFile(&vdiFile, i, tmpBlock, destInode);
     }
 
     /* Delete dynamic memory, return 1 for success */
