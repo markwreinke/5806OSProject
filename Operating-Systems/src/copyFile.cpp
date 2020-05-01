@@ -100,6 +100,42 @@ ssize_t copyFile::copyFileToVDI(char* vdiName, char* src, char* dest) {
     /* Temp block to fetch to */
     uint8_t *tmpBlock = new uint8_t[vdiFile.getBlockSize()];
 
+    Directory *d = new Directory;
+    d = Directories::openDirectory(&vdiFile,2);
+    Dirent *updateDirent = new Dirent;
+    updateDirent->iNum = destInode;
+    char* inputFileName = copyFile::traverseGivenFileName(src);
+
+    updateDirent->recLen = strlen(inputFileName) + 8 + (4 - ((strlen(inputFileName) + 8) % 4));
+    updateDirent->nameLen = strlen(inputFileName);
+    updateDirent->fileType = 1;
+
+
+    uint32_t tempInum;
+    char* tempName = new char;
+    while(Directories::getNextDirent(d,tempInum,tempName)){}
+    int blockNum = d->cursor / d->ext2->getBlockSize();
+    int index = d->cursor % d->ext2->getBlockSize();
+    FileAccess::fetchBlockFromFile(d->ext2,blockNum,d->blockData,d->iNum);
+    for(int x = 0; x < updateDirent->recLen; x++) {
+        if (x == 0) {
+            d->blockData[index + x] = updateDirent->iNum;
+            x += 3;
+        }else if(x == 4) {
+            d->blockData[index + x] = updateDirent->recLen;
+            x++;
+        }else if(x== 6){
+            d->blockData[index + x] = updateDirent->nameLen;
+        }else if(x == 7){
+            d->blockData[index + x] = updateDirent->fileType;
+        }else if(x <= x + updateDirent->nameLen) {
+            d->blockData[index + x] = inputFileName[x - 8];
+        }else
+            d->blockData[index + x] = 0x0;
+    }
+
+    FileAccess::writeBlockToFile(&vdiFile,blockNum,d->blockData,d->iNum);
+
     /* Loop through all data blocks of the file, copying to destination file. Return -1 if failure */
     for(int i = 0; i < inodeStruct->i_blocks; i++) {
         int32_t readFlag = read(srcFD, tmpBlock, vdiFile.getBlockSize());
@@ -109,32 +145,7 @@ ssize_t copyFile::copyFileToVDI(char* vdiName, char* src, char* dest) {
             vdiFile.ext2Close();
             return -1;
         }
-        Directory *d = new Directory;
-        Directories::openDirectory(&vdiFile,2);
-        Dirent *UpdateDirent = new Dirent;
-        uint32_t tempInum;
-        char* tempName = new char;
-        while(Directories::getNextDirent(d,tempInum,tempName)){}
-        int blockNum = d->cursor / d->ext2->getBlockSize();
-        int index = d->cursor % d->ext2->getBlockSize();
-        FileAccess::fetchBlockFromFile(d->ext2,blockNum,d->blockData,d->iNum);
-        for(int x = 0; x < UpdateDirent->recLen;x++) {
-            if (x == 0) {
-                d->blockData[index + x] = UpdateDirent->iNum;
-                x += 3;
-            }else if(x == 4) {
-                d->blockData[index + x] = UpdateDirent->recLen;
-                x++;
-            }else if(x== 6){
-                d->blockData[index + x] = UpdateDirent->nameLen;
-            }else if(x == 7){
-                d->blockData[index + x] = UpdateDirent->fileType;
-            }else if(x <= x + UpdateDirent->nameLen) {
-                d->blockData[index + x] = UpdateDirent->name[x - 8];
-            }else
-                d->blockData[index + x] = 0x0;
-        }
-        FileAccess::writeBlockToFile(&vdiFile,blockNum,d->blockData,d->iNum);
+
         FileAccess::writeBlockToFile(&vdiFile, i, tmpBlock, destInode);
     }
 
