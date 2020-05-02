@@ -75,8 +75,8 @@ public:
     Ext2File();
     bool ext2Open(char *fn);
     void ext2Close();
-    uint32_t fetchBlock(uint32_t blockNum, void *buf);
-    uint32_t writeBlock(uint32_t blockNum, void *buf);
+    int32_t fetchBlock(uint32_t blockNum, void *buf);
+    int32_t writeBlock(uint32_t blockNum, void *buf);
 
     int32_t fetchSuperBlock(uint32_t blockNum, struct SuperBlock *sb);
     int32_t writeAllSuperBlocks(SuperBlock *superBlock);

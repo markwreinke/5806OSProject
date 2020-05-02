@@ -8,7 +8,7 @@
 #include <cmath>
 #include <cstring>
 
-/* Fetches a specific inode by fetching the block it is in, and grabbing the wanted inode from within it. */
+/* Fetches a specific inode by fetching the block it is in, and grabbing the wanted inode from within it. Returns -1 if failed */
 int32_t Inode::fetchInode(struct Ext2File *extFile, uint32_t iNum, struct InodeStruct *buf) {
     uint32_t successFlag = 0;
     int blockGroup = (iNum - 1) / extFile->superBlock.s_inodes_per_group; // Returns the block group that the wanted inode is in
@@ -22,10 +22,12 @@ int32_t Inode::fetchInode(struct Ext2File *extFile, uint32_t iNum, struct InodeS
     int wantedBlockIndex = localInodeIndex % inodesPerBlock; // Return the index of the block the wanted inode is in.
 
     successFlag = extFile->fetchBlock(extFile->BGDT[blockGroup].bg_inode_table + wantedBlock, tmpBlock);
-    if(successFlag != 0) {
-        cout << "Fetchblock failed" << endl;
+
+    /* If successFlag == -1, then it the fetchBlock failed */
+    if(successFlag == -1) {
+        cout << "fetchBlock failed" << endl;
         delete[] tmpBlock;
-        return successFlag;
+        return -1;
     }
 
     memcpy(buf, tmpBlock + (wantedBlockIndex * extFile->superBlock.s_inode_size), extFile->superBlock.s_inode_size);
@@ -36,9 +38,10 @@ int32_t Inode::fetchInode(struct Ext2File *extFile, uint32_t iNum, struct InodeS
 
 }
 
+/* Returns -1 upon failure */
 int32_t Inode::writeInode(struct Ext2File *f, uint32_t iNum, struct InodeStruct *buf) {
 
-    uint32_t successFlag = 0;//flag to catch if our fetchblock failed
+    int32_t successFlag = 0;//flag to catch if our fetchBlock failed
     int blockGroup = (iNum - 1) / f->superBlock.s_inodes_per_group; //value of the blockgroup containing the given inode
     int localInodeIndex = (iNum - 1) % f->superBlock.s_inodes_per_group;/// where in the blockgroup the inode is located IE is it the 10th inode in the group
 
@@ -51,10 +54,10 @@ int32_t Inode::writeInode(struct Ext2File *f, uint32_t iNum, struct InodeStruct 
     int wantedBlockIndex = localInodeIndex % inodesPerBlock;
     /// fetch the block and store it into a temp block, check to make sure it didn't fail
     successFlag = f->fetchBlock(f->BGDT[blockGroup].bg_inode_table + wantedBlock, tmpBlock);
-    if(successFlag != 0) {
+    if(successFlag == -1) {
         cout << "Fetchblock failed" << endl;
         delete[] tmpBlock;
-        return successFlag;
+        return -1;
     }
     //it didnt fail so copyFileToHost over the new inode into the location in memory where the original inode was located
     memcpy(tmpBlock + (wantedBlockIndex *f->superBlock.s_inode_size), buf, f->superBlock.s_inode_size);

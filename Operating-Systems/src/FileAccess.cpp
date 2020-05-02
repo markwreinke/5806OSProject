@@ -3,6 +3,8 @@
 //
 
 #include "../include/FileAccess.h"
+
+/* Returns -1 upon failure */
 int32_t FileAccess::fetchBlockFromFile(Ext2File *ext2, uint32_t bNum, void *buf, uint32_t iNum) {
 
     /* Get the k value (number of children each indirect node has) indirect node has pointers to k data nodes,

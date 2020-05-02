@@ -45,7 +45,7 @@ uint32_t FilePaths::traversePath(Ext2File *ext2, char *path){
     ///iNum is the inode to search for the name of the directory in, this is 2 by default because thats the inode we know has good information
     int start = 1;
     uint32_t length = strlen(path);
-    char *x;
+    char *x = new char[length];
     uint32_t iNum = 2;
     ///while not at the end of the filePath and search directory doesn't fail traverse through directories
     while(start < length && iNum != 0){

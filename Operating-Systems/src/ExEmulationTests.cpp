@@ -80,15 +80,18 @@ void ExEmulationTests::runEmTest(int step, int example){
                 break;
                 }
         case 8: if(example == 1){
-                step8Ex1();
-                break;
+                    step8Ex1();
+                    break;
                 }
                 else if(example == 2) {
-                step8Ex2();
-                break;
+                    step8Ex2();
+                    break;
                 }else if(example == 3){
-                step8Ex3();
-                break;
+                    step8Ex3();
+                    break;
+                } else if (example == 4) {
+                    step8Ex4();
+                    break;
                 }
         default:
             cout << "These are not the  step " << step << " example " << example << " emulation tests you are looking for." << endl;
@@ -608,4 +611,17 @@ void ExEmulationTests::step8Ex3() {
     char* fileName = "/examples/02.Digital/toneMelody/toneMelody.ino";
     char* Name = copyFile::traverseGivenFileName(fileName);
     cout << Name;
+}
+
+void ExEmulationTests::step8Ex4(){
+    cout << "Displaying Step 8, Example 4 Testing copyFileToHost." << endl;
+    char *filename = "../testFiles/Test-fixed-1k.vdi";
+    char *srcFileName = "/examples/08.Strings/StringComparisonOperators/StringComparisonOperators.txt";
+    char *dest = "/home/csis/Documents/CopiedStringComparisonOperators.txt";
+    int32_t flag = copyFile::copyFileToHost(filename, srcFileName, dest);
+    if(flag >=0 ){
+        copyFile::viewVDIDirectories(filename);
+    }
+
+    cout << "flag == " << flag << endl;
 }

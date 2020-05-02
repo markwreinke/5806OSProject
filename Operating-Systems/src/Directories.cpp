@@ -16,13 +16,17 @@ struct Directory* Directories::openDirectory(Ext2File* ext2, uint32_t iNum){
     return d;
 }
 bool Directories::getNextDirent(struct Directory *d, uint32_t &iNum, char *name){
-    int count = 0;
+    //int count = 0;
     while(d->cursor < d->iS.i_size){
-    if(count == 3) {break;}
+    //if(count == 3) {break;}
         int blockNum = d->cursor / d->ext2->getBlockSize();
         int offset = d->cursor % d->ext2->getBlockSize();
 
-        FileAccess::fetchBlockFromFile(d->ext2,blockNum, d->blockData, d->iNum);
+        int32_t fetchFlag = FileAccess::fetchBlockFromFile(d->ext2,blockNum, d->blockData, d->iNum);
+        if(fetchFlag == -1) {
+            cout << "GetNextDirent fetchBlockFromFile failed.  cursor: " << d->cursor << endl;
+            return false;
+        }
 
         d->dirent = (Dirent*)(d->blockData + offset);
         d->cursor += d->dirent->recLen;
@@ -36,7 +40,7 @@ bool Directories::getNextDirent(struct Directory *d, uint32_t &iNum, char *name)
             name[d->dirent->nameLen] = 0;
             return true;
         }
-    count++;
+    //count++;
     }
     return false;
 }

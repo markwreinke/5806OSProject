@@ -73,7 +73,8 @@ int32_t Ext2File::writeSuperBlock(uint32_t blockNum, struct SuperBlock *sb) {
     return successCheck;
 }
 
-uint32_t Ext2File::fetchBlock(uint32_t blockNum, void *buf) {
+/* Returns -1 if fails */
+int32_t Ext2File::fetchBlock(uint32_t blockNum, void *buf) {
 
     partition->partitionSeek(blockSize*blockNum, SEEK_SET);
     int blocksRead = partition->partitionRead(buf, blockSize);
@@ -84,7 +85,8 @@ uint32_t Ext2File::fetchBlock(uint32_t blockNum, void *buf) {
     return 0;
 }
 
-uint32_t Ext2File::writeBlock(uint32_t blockNum, void *buf){
+/* Returns -1 if fails */
+int32_t Ext2File::writeBlock(uint32_t blockNum, void *buf){
     partition->partitionSeek(blockSize*blockNum, SEEK_SET);
     int BlocksWritten = partition->partitionWrite(buf, blockSize);
 
