@@ -67,7 +67,7 @@ ssize_t copyFile::copyFileToHost(char* vdiName, char* src, char* dest){
 }
 
 
-// todo need to figure out how to fill the inode? As well as what directory to add it to
+/* Still needs work :( */
 ssize_t copyFile::copyFileToVDI(char* vdiName, char* src) {
 
     /* A variable to open the ext2File to be manipulated */
