@@ -24,7 +24,7 @@ ssize_t copyFile::copyFileToHost(char* vdiName, char* src, char* dest){
     }
 
     /* Open or create the destination file. Return -1 if failed */
-    ssize_t destFD = open(dest, O_WRONLY | O_CREAT, 0666);
+    ssize_t destFD = open(dest, O_WRONLY | O_CREAT | O_TRUNC, 0666);
     if(destFD < 0) {
         vdiFile.ext2Close();
         return -1;
@@ -37,15 +37,27 @@ ssize_t copyFile::copyFileToHost(char* vdiName, char* src, char* dest){
     /* Temp block to fetch to */
     uint8_t *tmpBlock = new uint8_t[vdiFile.getBlockSize()];
 
+
+    int counter = inodeStruct->i_size;
+    int bNum = 0;
     /* Loop through all data blocks of the file, copying to destination file. Return -1 if failure */
-    for(int i = 0; i < inodeStruct->i_blocks; i++) {
-        FileAccess::fetchBlockFromFile(&vdiFile, i, tmpBlock, srcInode);
-        int32_t writeFlag = write(destFD, tmpBlock, vdiFile.getBlockSize());
+    while(counter > 0) {
+
+
+        int32_t writeFlag;
+        FileAccess::fetchBlockFromFile(&vdiFile, bNum++, tmpBlock, srcInode);
+        if(counter > vdiFile.getBlockSize()) {
+            writeFlag = write(destFD, tmpBlock, vdiFile.getBlockSize());
+        } else {
+            writeFlag = write(destFD, tmpBlock, counter);
+        }
         if(writeFlag < 0) {
             delete[] tmpBlock;
             delete inodeStruct;
             vdiFile.ext2Close();
             return -1;
+        } else {
+            counter -= vdiFile.getBlockSize();
         }
     }
 
@@ -154,6 +166,16 @@ ssize_t copyFile::copyFileToVDI(char* vdiName, char* src, char* dest) {
     newFileDirent->fileType = newFileInode->i_mode;
     //newFileDirent->recLen = strlen(inputFileName) + 8 + (4 - ((strlen(inputFileName) + 8) % 4));
 
+    /*
+     * Find last entry, know you found it when you take dirent->rec_len + location of the dirent == blocksize(or some multiple of the block size)
+     *
+     * See if you can split that record (find the min length that the new dirent needs (8 + namelength rounded to multiple of 4)  see if there is enough space
+     * if there isn't, allocate a new block -> put new file in the new block, write block to file. This will be the blockNum == numOfBlocksIn file
+     * Then update size in inode, then update links (increment both), don't forget to write inode back out
+     *
+     *
+     * Update loop similar to VDIToHost
+     */
 
     /* ?? */
     uint32_t freeEntryINode;

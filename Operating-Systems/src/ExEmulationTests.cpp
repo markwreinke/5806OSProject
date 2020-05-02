@@ -616,8 +616,8 @@ void ExEmulationTests::step8Ex3() {
 void ExEmulationTests::step8Ex4(){
     cout << "Displaying Step 8, Example 4 Testing copyFileToHost." << endl;
     char *filename = "../testFiles/Test-fixed-1k.vdi";
-    char *srcFileName = "/examples/08.Strings/StringComparisonOperators/StringComparisonOperators.txt";
-    char *dest = "/home/csis/Documents/CopiedStringComparisonOperators.txt";
+    char *srcFileName = "/examples/02.Digital/DigitalInputPullup/layout.png";
+    char *dest = "/home/csis/Documents/Copiedlayout.png";
     int32_t flag = copyFile::copyFileToHost(filename, srcFileName, dest);
     if(flag >=0 ){
         copyFile::viewVDIDirectories(filename);
