@@ -138,7 +138,7 @@ int32_t FileAccess::fetchBlockFromFile(Ext2File *ext2, uint32_t bNum, void *buf,
             buf = {0};
         }
 
-        delete tempInodeStruct;
+        //delete tempInodeStruct;
         return flag;
 }
 

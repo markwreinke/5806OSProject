@@ -37,13 +37,10 @@ ssize_t copyFile::copyFileToHost(char* vdiName, char* src, char* dest){
     /* Temp block to fetch to */
     uint8_t *tmpBlock = new uint8_t[vdiFile.getBlockSize()];
 
-
     int counter = inodeStruct->i_size;
     int bNum = 0;
     /* Loop through all data blocks of the file, copying to destination file. Return -1 if failure */
     while(counter > 0) {
-
-
         int32_t writeFlag;
         FileAccess::fetchBlockFromFile(&vdiFile, bNum++, tmpBlock, srcInode);
         if(counter > vdiFile.getBlockSize()) {
@@ -65,12 +62,13 @@ ssize_t copyFile::copyFileToHost(char* vdiName, char* src, char* dest){
     delete[] tmpBlock;
     delete inodeStruct;
     vdiFile.ext2Close();
+    close(destFD);
     return 1;
 }
 
 
 // todo need to figure out how to fill the inode? As well as what directory to add it to
-ssize_t copyFile::copyFileToVDI(char* vdiName, char* src, char* dest) {
+ssize_t copyFile::copyFileToVDI(char* vdiName, char* src) {
 
     /* A variable to open the ext2File to be manipulated */
     Ext2File vdiFile;
@@ -132,23 +130,18 @@ ssize_t copyFile::copyFileToVDI(char* vdiName, char* src, char* dest) {
     newFileInode->i_links_count = 1;
     newFileInode->i_file_acl = rootInode->i_file_acl;
     newFileInode->i_mode = 0100644;
-
-    /* Since we don't need rootInode anymore, we delete it */
-    delete rootInode;
+    newFileInode->i_size = numBytesInFile;
 
     /* Write the actual inode */
     fetchFlag = Inode::writeInode(&vdiFile, destInode, newFileInode);
     if(fetchFlag == -1) {
         cout << "Writing the new file inode failed." << endl;
         delete newFileInode;
+        delete rootInode;
         close(srcFD);
         vdiFile.ext2Close();
         return -1;
     }
-
-
-    /* Temp block to fetch to */
-    uint8_t *tmpBlock = new uint8_t[vdiFile.getBlockSize()]{0};
 
     /* Create a new Directory structure to hold the root directory */
     Directory *rootDirectory = new Directory;
@@ -170,6 +163,8 @@ ssize_t copyFile::copyFileToVDI(char* vdiName, char* src, char* dest) {
      * Find last entry, know you found it when you take dirent->rec_len + location of the dirent == blocksize(or some multiple of the block size)
      *
      * See if you can split that record (find the min length that the new dirent needs (8 + namelength rounded to multiple of 4)  see if there is enough space
+     *
+     *
      * if there isn't, allocate a new block -> put new file in the new block, write block to file. This will be the blockNum == numOfBlocksIn file
      * Then update size in inode, then update links (increment both), don't forget to write inode back out
      *
@@ -177,83 +172,110 @@ ssize_t copyFile::copyFileToVDI(char* vdiName, char* src, char* dest) {
      * Update loop similar to VDIToHost
      */
 
-    /* ?? */
+    /* Variables for the getNextDirent calls  */
     uint32_t freeEntryINode;
     char* freeEntryName = new char; // Should be ""
 
     /* Move the root directory's cursor until it finds a free entry (the entry's iNode == 0) */
     while(Directories::getNextDirent(rootDirectory, freeEntryINode, freeEntryName)){}
 
-    /* Find the block number of the cursor, and the cursorIndex of curser within the block */
-    int cursorBlockNum = rootDirectory->cursor / rootDirectory->ext2->getBlockSize();
-    int cursorIndex = rootDirectory->cursor % rootDirectory->ext2->getBlockSize();
+    /* We don't need this anymore */
+    delete freeEntryName;
 
-    /* Fetch the block of the empty entry */
-    fetchFlag = FileAccess::fetchBlockFromFile(rootDirectory->ext2, cursorBlockNum, rootDirectory->blockData, rootDirectory->iNum);
-    if(fetchFlag == -1) {
-        cout << "Fetching empty entry failed." << endl;
-        Directories::closeDir(rootDirectory);
-        delete rootDirectory;
-        delete[] freeEntryName;
-        delete newFileDirent;
-        delete tmpBlock;
-        delete newFileInode;
-        close(srcFD);
-        vdiFile.ext2Close();
-        return -1;
+    /* Calculate the space needs of the new directory entry */
+    int16_t newFileSpaceNeed = (8 + strlen(inputFileName));
+    if((newFileSpaceNeed % 4) != 0) {
+        newFileSpaceNeed += (4 - (strlen(inputFileName) % 4));
     }
 
-    /* Calculate the recLen for the new file */
-    int16_t emptyRecLen = rootDirectory->blockData[cursorIndex + 4];
-    int16_t newFileRecLen = emptyRecLen - (8 + strlen(inputFileName) + (4 - ((strlen(inputFileName) % 4))));
-
-    /* Allocate a new block if there wasn't enough room? */
-    if(newFileRecLen < 0) {
-
-    }
-    newFileDirent->recLen = newFileRecLen;
-
-
-    for(int x = 0; x < newFileDirent->recLen; x++) {
-        if (x == 0) {
-            rootDirectory->blockData[cursorIndex + x] = newFileDirent->iNum;
-            x += 3;
-        }else if(x == 4) {
-            rootDirectory->blockData[cursorIndex + x] = newFileDirent->recLen;
-            x++;
-        }else if(x== 6){
-            rootDirectory->blockData[cursorIndex + x] = newFileDirent->nameLen;
-        }else if(x == 7){
-            rootDirectory->blockData[cursorIndex + x] = newFileDirent->fileType;
-        }else if(x <= x + newFileDirent->nameLen) {
-            rootDirectory->blockData[cursorIndex + x] = inputFileName[x - 8];
-        }else
-            rootDirectory->blockData[cursorIndex + x] = 0x0;
+    /* Calculate the space needs of the last directory entry */
+    int16_t oldFileSpaceNeed = (8 + rootDirectory->dirent->nameLen);
+    if((oldFileSpaceNeed % 4) != 0) {
+        oldFileSpaceNeed += (4 - (rootDirectory->dirent->nameLen % 4));
     }
 
-    FileAccess::writeBlockToFile(&vdiFile, cursorBlockNum, rootDirectory->blockData, rootDirectory->iNum);
+    /* If there is enough space in the current block to include the new dirent, else we make a new block */
+    if((rootDirectory->dirent->recLen - oldFileSpaceNeed) > newFileSpaceNeed) {
 
-    /* Loop through all data blocks of the file, copying to destination file. Return -1 if failure */
-    for(int i = 0; i < newFileInode->i_blocks; i++) {
-        int32_t readFlag = read(srcFD, tmpBlock, vdiFile.getBlockSize());
-        if(readFlag < 0) {
-            delete[] tmpBlock;
+        newFileDirent->recLen = rootDirectory->dirent->recLen - oldFileSpaceNeed;
+
+        /* Move cursor to beginning of the last dirent */
+        rootDirectory->cursor -= rootDirectory->dirent->recLen;
+
+        rootDirectory->dirent->recLen = oldFileSpaceNeed;
+
+        /* Find the block number of the cursor, and the cursorIndex of curser within the block */
+        int cursorBlockNum = rootDirectory->cursor / rootDirectory->ext2->getBlockSize();
+        int cursorIndex = rootDirectory->cursor % rootDirectory->ext2->getBlockSize();
+
+        /* Fetch the block of the dirent entries */
+        fetchFlag = FileAccess::fetchBlockFromFile(rootDirectory->ext2, cursorBlockNum, rootDirectory->blockData, rootDirectory->iNum);
+        if(fetchFlag == -1) {
+            cout << "Fetching empty entry failed." << endl;
+            Directories::closeDir(rootDirectory);
+            delete rootDirectory;
+            delete rootInode;
+            delete[] freeEntryName;
+            delete newFileDirent;
             delete newFileInode;
+            close(srcFD);
             vdiFile.ext2Close();
             return -1;
         }
 
-        FileAccess::writeBlockToFile(&vdiFile, i, tmpBlock, destInode);
-        Inode::fetchInode(&vdiFile, destInode, newFileInode);
+        rootDirectory->blockData[cursorIndex + 4] = rootDirectory->dirent->recLen;
 
-        if(readFlag < vdiFile.getBlockSize()) {
-            i = newFileInode->i_blocks;
+        /* Copy the newFileDirent into the blocData */
+        mempcpy(&rootDirectory->blockData[cursorIndex + rootDirectory->dirent->recLen], newFileDirent, sizeof(newFileDirent));
+        FileAccess::writeBlockToFile(&vdiFile, cursorBlockNum, rootDirectory->blockData, rootDirectory->iNum);
+
+    } else {
+        uint8_t *newDirBlock = new uint8_t[vdiFile.getBlockSize()]{0};
+
+        newFileDirent->recLen = vdiFile.getBlockSize();
+
+        char* tmp = (char*)newFileDirent;
+        newDirBlock[0] = (uint8_t)*tmp;
+
+        FileAccess::writeBlockToFile(&vdiFile, rootInode->i_size, newDirBlock, rootDirectory->iNum);
+        rootInode->i_size++;
+        rootInode->i_links_count++;
+
+        Inode::writeInode(&vdiFile, rootDirectory->iNum, rootInode);
+    }
+
+    /* Temp block to fetch to */
+    uint8_t *tmpBlock = new uint8_t[vdiFile.getBlockSize()]{0};
+
+    int counter = newFileInode->i_size;
+    int bNum = 0;
+    /* Loop through all data blocks of the file, copying to destination file. Return -1 if failure */
+    while(counter > 0) {
+        int32_t writeFlag;
+        if(counter > vdiFile.getBlockSize()) {
+            read(srcFD, tmpBlock, vdiFile.getBlockSize());
+
+        } else {
+            read(srcFD, tmpBlock, counter);
+        }
+
+        writeFlag = FileAccess::writeBlockToFile(&vdiFile, bNum++, tmpBlock, newFileDirent->iNum);
+        if(writeFlag < 0) {
+            delete[] tmpBlock;
+            delete newFileInode;
+            delete rootInode;
+            vdiFile.ext2Close();
+            return -1;
+        } else {
+            counter -= vdiFile.getBlockSize();
         }
     }
 
     /* Delete dynamic memory, return 1 for success */
     delete[] tmpBlock;
+    delete rootInode;
     delete newFileInode;
+    close(srcFD);
     vdiFile.ext2Close();
     return 1;
 }

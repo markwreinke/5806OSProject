@@ -24,7 +24,7 @@ bool Directories::getNextDirent(struct Directory *d, uint32_t &iNum, char *name)
 
         int32_t fetchFlag = FileAccess::fetchBlockFromFile(d->ext2,blockNum, d->blockData, d->iNum);
         if(fetchFlag == -1) {
-            cout << "GetNextDirent fetchBlockFromFile failed.  cursor: " << d->cursor << endl;
+            //cout << "GetNextDirent fetchBlockFromFile failed.  cursor: " << d->cursor << endl;
             return false;
         }
 

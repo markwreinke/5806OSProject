@@ -597,11 +597,10 @@ void ExEmulationTests::step8Ex1(){
 }
 
 void ExEmulationTests::step8Ex2(){
-    cout << "Displaying Step 8, Example 2" << endl;
+    cout << "Displaying Step 8, Example 2 Testing copyFiletoVDI" << endl;
     char *filename = "../testFiles/Write_Test-fixed-1k.vdi";
     char *srcFileName = "../testFiles/marksTestFile.txt";
-    char *dest = "poop";
-    int32_t flag = copyFile::copyFileToVDI(filename, srcFileName, dest);
+    int32_t flag = copyFile::copyFileToVDI(filename, srcFileName);
     if(flag >=0 ){
         copyFile::viewVDIDirectories(filename);
     }
