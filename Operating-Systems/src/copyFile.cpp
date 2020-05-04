@@ -290,6 +290,11 @@ ssize_t copyFile::copyFileToVDI(char* vdiName, char* src) {
         }
     }
 
+
+    cout << "******NewInode: " << destInode << endl;
+
+
+
     /* Delete dynamic memory, return 1 for success */
     delete[] tmpBlock;
     delete rootInode;
