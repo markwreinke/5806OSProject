@@ -1,5 +1,7 @@
 //
 // Created by csis on 2/8/20.
+
+/** The ExEmulationTests class acted as our test class within each step of the project. We compared the results to the given examples. **/
 //
 
 #include "../include/ExEmulationTests.h"

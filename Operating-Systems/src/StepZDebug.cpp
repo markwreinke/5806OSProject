@@ -1,5 +1,6 @@
 //
 // Created by csis on 1/26/20.
+/** A class full of several useful debugging mechanisms. Heavily used with ExEmulationTests **/
 //
 
 #include <cstring>
