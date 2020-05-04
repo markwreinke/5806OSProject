@@ -23,6 +23,7 @@ int main(int argc, char* argv[]) {
         cout << "To display the VDI file system, you must type: \"-display\" followed by the path for the VDI file." << endl;
         cout << endl;
         cout << "Have a good day, and shoot for the stars." << endl;
+        return -1;
     }
 
    if(strcmp(argv[1], "-tohost")){
@@ -54,6 +55,6 @@ int main(int argc, char* argv[]) {
        cout << "To display the VDI file system, you must type: \"-display\" followed by the path for the VDI file." << endl;
        cout << endl;
        cout << "Have a good day, and shoot for the stars." << endl;
-
    }
+   return 0;
 }
