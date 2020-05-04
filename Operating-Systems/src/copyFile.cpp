@@ -89,6 +89,7 @@ ssize_t copyFile::copyFileToVDI(char* vdiName, char* src) {
     /* Open the src file. Return -1 if failed */
     ssize_t srcFD = open(src, O_RDONLY, 0666);
     if(srcFD < 0) {
+        Inode::freeInode(&vdiFile, destInode);
         vdiFile.ext2Close();
         return -1;
     }
@@ -98,12 +99,13 @@ ssize_t copyFile::copyFileToVDI(char* vdiName, char* src) {
     /* Return the cursor to the beginning */
     lseek(srcFD, 0, SEEK_SET);
 
-    /* Create an newFileInode to store the inode of the root directory */
+    /* Create an rootInode to store the inode of the root directory */
     InodeStruct *rootInode = new InodeStruct;
     int32_t fetchFlag = Inode::fetchInode(&vdiFile, 2, rootInode);
     if(fetchFlag == -1) {
         cout << "Fetching the root inode failed." << endl;
         delete rootInode;
+        Inode::freeInode(&vdiFile, destInode);
         close(srcFD);
         vdiFile.ext2Close();
         return -1;
@@ -117,6 +119,7 @@ ssize_t copyFile::copyFileToVDI(char* vdiName, char* src) {
         cout << "Fetching the new file inode failed." << endl;
         delete newFileInode;
         delete rootInode;
+        Inode::freeInode(&vdiFile, destInode);
         close(srcFD);
         vdiFile.ext2Close();
         return -1;
@@ -138,13 +141,14 @@ ssize_t copyFile::copyFileToVDI(char* vdiName, char* src) {
         cout << "Writing the new file inode failed." << endl;
         delete newFileInode;
         delete rootInode;
+        Inode::freeInode(&vdiFile, destInode);
         close(srcFD);
         vdiFile.ext2Close();
         return -1;
     }
 
     /* Create a new Directory structure to hold the root directory */
-    Directory *rootDirectory = new Directory;
+    Directory *rootDirectory;
     rootDirectory = Directories::openDirectory(&vdiFile, 2);
 
     /* Create new dirent to store the new file's directory entry */
@@ -219,14 +223,16 @@ ssize_t copyFile::copyFileToVDI(char* vdiName, char* src) {
             delete newFileDirent;
             delete newFileInode;
             close(srcFD);
+            Inode::freeInode(&vdiFile, destInode);
             vdiFile.ext2Close();
             return -1;
         }
 
-        rootDirectory->blockData[cursorIndex + 4] = rootDirectory->dirent->recLen;
+        //rootDirectory->blockData[cursorIndex + 4] = rootDirectory->dirent->recLen;
+        memcpy(&rootDirectory->blockData[cursorIndex + 4], &rootDirectory->dirent->recLen, sizeof(rootDirectory->dirent->recLen));
 
         /* Copy the newFileDirent into the blocData */
-        mempcpy(&rootDirectory->blockData[cursorIndex + rootDirectory->dirent->recLen], newFileDirent, sizeof(newFileDirent));
+        memcpy(&rootDirectory->blockData[cursorIndex + rootDirectory->dirent->recLen], newFileDirent, sizeof(newFileDirent));
         FileAccess::writeBlockToFile(&vdiFile, cursorBlockNum, rootDirectory->blockData, rootDirectory->iNum);
 
     } else {
@@ -237,7 +243,20 @@ ssize_t copyFile::copyFileToVDI(char* vdiName, char* src) {
         char* tmp = (char*)newFileDirent;
         newDirBlock[0] = (uint8_t)*tmp;
 
-        FileAccess::writeBlockToFile(&vdiFile, rootInode->i_size, newDirBlock, rootDirectory->iNum);
+        fetchFlag = FileAccess::writeBlockToFile(&vdiFile, rootInode->i_size, newDirBlock, rootDirectory->iNum);
+        if(fetchFlag == -1) {
+            cout << "Writing new directory block failed." << endl;
+            Directories::closeDir(rootDirectory);
+            delete rootDirectory;
+            delete rootInode;
+            delete[] freeEntryName;
+            delete newFileDirent;
+            delete newFileInode;
+            close(srcFD);
+            Inode::freeInode(&vdiFile, destInode);
+            vdiFile.ext2Close();
+            return -1;
+        }
         rootInode->i_size++;
         rootInode->i_links_count++;
 
