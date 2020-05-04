@@ -29,6 +29,7 @@ int main(int argc, char* argv[]) {
    if(strcmp(argv[1], "-tohost")){
        if(argc != 5) {
            cout << "Inadequate arguments. To copy a file from the VDI filesystem to the Host system, you must type: \"-tohost\" followed by the paths for: VDI file, then the source file from the VDI system, then the destination in the host system. The destination path must include the name that you want the file to have (even if you want it to be named the same as its counterpart within the VDI file system)" << endl;
+            return  -1;
        }
        char *VDIFileName = argv[2];
        char *srcFileName = argv[3];
@@ -37,6 +38,7 @@ int main(int argc, char* argv[]) {
    } else if(strcmp(argv[1], "-tovdi")) {
        if(argc != 4) {
            cout << "Inadequate arguments. To copy a file from the Host system to the VDI file system, you must type: \"-tovdi\" followed by the paths for VDI file and then the source file from the host system." << endl;
+        return -1;
        }
        char *VDIFileName = argv[2];
        char *srcFileName = argv[3];
@@ -44,6 +46,7 @@ int main(int argc, char* argv[]) {
    } else if(strcmp(argv[1], "-display")) {
        if(argc != 3) {
            cout << "Inadequate arguments. To display the VDI file system, you must type: \"-display\" followed by the path for the VDI file." << endl;
+           return -1;
        }
        char *VDIFileName = argv[2];
        copyFile::viewVDIDirectories(VDIFileName);
