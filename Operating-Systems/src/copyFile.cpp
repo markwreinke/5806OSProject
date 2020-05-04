@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <cstring>
 #include "../include/copyFile.h"
+#include "../include/StepZDebug.h"
 
 ssize_t copyFile::copyFileToHost(char* vdiName, char* src, char* dest){
 
@@ -292,8 +293,12 @@ ssize_t copyFile::copyFileToVDI(char* vdiName, char* src) {
 
 
     cout << "******NewInode: " << destInode << endl;
-
-
+    InodeStruct *newInode = new InodeStruct;
+    Inode::fetchInode(&vdiFile,destInode,newInode);
+    uint8_t *bufferHoldingNewInodeBLockInfo = new uint8_t[vdiFile.getBlockSize()];
+    FileAccess::fetchBlockFromFile(&vdiFile,0,bufferHoldingNewInodeBLockInfo,destInode);
+    StepZDebug::displayBuffer(bufferHoldingNewInodeBLockInfo,vdiFile.getBlockSize(),0);
+    StepZDebug::dumpInode(&vdiFile,*newInode,destInode);
 
     /* Delete dynamic memory, return 1 for success */
     delete[] tmpBlock;

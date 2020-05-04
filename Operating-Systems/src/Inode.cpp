@@ -180,7 +180,7 @@ int32_t Inode::freeInode(struct Ext2File *f, uint32_t iNum) {
     uint8_t *tmpBlock = new uint8_t[f->getBlockSize()];
     f->fetchBlock(f->BGDT[blockGroup].bg_inode_bitmap + wantedBlock, tmpBlock);
 
-    ///change the bit in the wanted byte to 1
+    ///change the bit in the wanted byte to 0
     tmpBlock[wantedByte] &= ~(1UL << wantedBit);
 
     ///rewrite the tempBlock
