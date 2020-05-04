@@ -14,7 +14,7 @@ using namespace std;
 
 
 
-int main() {
+int main(int argc, char* argv[]) {
    ExEmulationTests::runEmTest(8,2);
     //char* fileName = "../testFiles/Write_Test-fixed-1k.vdi";
     //copyFile::viewVDIDirectories(fileName);

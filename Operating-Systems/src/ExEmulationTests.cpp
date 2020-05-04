@@ -592,7 +592,7 @@ void ExEmulationTests::step7Ex1() {
 ///used to print all the VDIDirectories in filename
 void ExEmulationTests::step8Ex1(){
     cout << "Displaying all inode information" << endl;
-    char *filename = "../testFiles/Test-fixed-1k.vdi";
+    char *filename = "../testFiles/Write_Test-fixed-1k.vdi";
     copyFile::viewVDIDirectories(filename);
 }
 

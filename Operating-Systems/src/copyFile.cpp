@@ -153,15 +153,12 @@ ssize_t copyFile::copyFileToVDI(char* vdiName, char* src) {
     rootDirectory = Directories::openDirectory(&vdiFile, 2);
 
     /* Create new dirent to store the new file's directory entry */
-    Dirent *newFileDirent = new Dirent;
-    newFileDirent->iNum = destInode;
+    Dirent *newFileDirent;
+
 
     /* Get the file name from the input path */
     char* inputFileName = copyFile::traverseGivenFileName(src);
 
-    /* Fill fields of the new file's dirent */
-    newFileDirent->nameLen = strlen(inputFileName);
-    newFileDirent->fileType = newFileInode->i_mode;
     //newFileDirent->recLen = strlen(inputFileName) + 8 + (4 - ((strlen(inputFileName) + 8) % 4));
 
     /*
@@ -201,40 +198,30 @@ ssize_t copyFile::copyFileToVDI(char* vdiName, char* src) {
 
     /* If there is enough space in the current block to include the new dirent, else we make a new block */
     if((rootDirectory->dirent->recLen - oldFileSpaceNeed) > newFileSpaceNeed) {
-
-        newFileDirent->recLen = rootDirectory->dirent->recLen - oldFileSpaceNeed;
-
         /* Move cursor to beginning of the last dirent */
         rootDirectory->cursor -= rootDirectory->dirent->recLen;
-
-        rootDirectory->dirent->recLen = oldFileSpaceNeed;
 
         /* Find the block number of the cursor, and the cursorIndex of curser within the block */
         int cursorBlockNum = rootDirectory->cursor / rootDirectory->ext2->getBlockSize();
         int cursorIndex = rootDirectory->cursor % rootDirectory->ext2->getBlockSize();
 
-        /* Fetch the block of the dirent entries */
-        fetchFlag = FileAccess::fetchBlockFromFile(rootDirectory->ext2, cursorBlockNum, rootDirectory->blockData, rootDirectory->iNum);
-        if(fetchFlag == -1) {
-            cout << "Fetching empty entry failed." << endl;
-            Directories::closeDir(rootDirectory);
-            delete rootDirectory;
-            delete rootInode;
-            delete[] freeEntryName;
-            delete newFileDirent;
-            delete newFileInode;
-            close(srcFD);
-            Inode::freeInode(&vdiFile, destInode);
-            vdiFile.ext2Close();
-            return -1;
-        }
+        newFileDirent = (Dirent*)(rootDirectory->blockData + cursorIndex + oldFileSpaceNeed);
+        newFileDirent->recLen = rootDirectory->dirent->recLen - oldFileSpaceNeed;
+        newFileDirent->iNum = destInode;
 
-        //rootDirectory->blockData[cursorIndex + 4] = rootDirectory->dirent->recLen;
-        memcpy(&rootDirectory->blockData[cursorIndex + 4], &rootDirectory->dirent->recLen, sizeof(rootDirectory->dirent->recLen));
+        /* Fill fields of the new file's dirent */
+        newFileDirent->nameLen = strlen(inputFileName);
+        newFileDirent->fileType = 1;
+        rootDirectory->dirent->recLen = oldFileSpaceNeed;
+
+
 
         /* Copy the newFileDirent into the blocData */
-        memcpy(&rootDirectory->blockData[cursorIndex + rootDirectory->dirent->recLen], newFileDirent, sizeof(newFileDirent));
+        memcpy(newFileDirent->name, inputFileName, newFileDirent->nameLen);
         fetchFlag = FileAccess::writeBlockToFile(&vdiFile, cursorBlockNum, rootDirectory->blockData, rootDirectory->iNum);
+
+
+
         if(fetchFlag == -1) {
             cout << "Writing directory block back failed." << endl;
         }
@@ -254,7 +241,6 @@ ssize_t copyFile::copyFileToVDI(char* vdiName, char* src) {
             delete rootDirectory;
             delete rootInode;
             delete[] freeEntryName;
-            delete newFileDirent;
             delete newFileInode;
             close(srcFD);
             Inode::freeInode(&vdiFile, destInode);
@@ -293,15 +279,6 @@ ssize_t copyFile::copyFileToVDI(char* vdiName, char* src) {
             counter -= vdiFile.getBlockSize();
         }
     }
-
-
-    cout << "******NewInode: " << destInode << endl;
-    InodeStruct *newInode = new InodeStruct;
-    Inode::fetchInode(&vdiFile,destInode,newInode);
-    uint8_t *bufferHoldingNewInodeBLockInfo = new uint8_t[vdiFile.getBlockSize()];
-    FileAccess::fetchBlockFromFile(&vdiFile,0,bufferHoldingNewInodeBLockInfo,destInode);
-    StepZDebug::displayBuffer(bufferHoldingNewInodeBLockInfo,vdiFile.getBlockSize(),0);
-    StepZDebug::dumpInode(&vdiFile,*newInode,destInode);
 
     /* Delete dynamic memory, return 1 for success */
     delete[] tmpBlock;

@@ -329,7 +329,7 @@ int32_t FileAccess::writeBlockToFile(Ext2File *ext2, uint32_t blockNum, void* bu
             ext2->writeBlock(iBlockNum, blockList);
 
             /* Updates the number of data blocks in the inode */
-            tempInodeStruct->i_blocks++;
+            tempInodeStruct->i_blocks += ext2->getBlockSize()/512;
             Inode::writeInode(ext2, iNum, tempInodeStruct);
 
         }
