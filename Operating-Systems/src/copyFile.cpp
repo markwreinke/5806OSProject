@@ -207,21 +207,17 @@ ssize_t copyFile::copyFileToVDI(char* vdiName, char* src) {
 
         newFileDirent = (Dirent*)(rootDirectory->blockData + cursorIndex + oldFileSpaceNeed);
         newFileDirent->recLen = rootDirectory->dirent->recLen - oldFileSpaceNeed;
-        newFileDirent->iNum = destInode;
+
 
         /* Fill fields of the new file's dirent */
+        newFileDirent->iNum = destInode;
         newFileDirent->nameLen = strlen(inputFileName);
         newFileDirent->fileType = 1;
         rootDirectory->dirent->recLen = oldFileSpaceNeed;
 
-
-
         /* Copy the newFileDirent into the blocData */
         memcpy(newFileDirent->name, inputFileName, newFileDirent->nameLen);
         fetchFlag = FileAccess::writeBlockToFile(&vdiFile, cursorBlockNum, rootDirectory->blockData, rootDirectory->iNum);
-
-
-
         if(fetchFlag == -1) {
             cout << "Writing directory block back failed." << endl;
         }
@@ -229,10 +225,14 @@ ssize_t copyFile::copyFileToVDI(char* vdiName, char* src) {
     } else {
         uint8_t *newDirBlock = new uint8_t[vdiFile.getBlockSize()]{0};
 
-        newFileDirent->recLen = vdiFile.getBlockSize();
+        newFileDirent = (Dirent*)newDirBlock;
 
-        char* tmp = (char*)newFileDirent;
-        newDirBlock[0] = (uint8_t)*tmp;
+        /* Fill fields of the new file's dirent */
+        newFileDirent->iNum = destInode;
+        newFileDirent->nameLen = strlen(inputFileName);
+        newFileDirent->fileType = 1;
+        newFileDirent->recLen = vdiFile.getBlockSize();
+        memcpy(newFileDirent->name, inputFileName, newFileDirent->nameLen);
 
         fetchFlag = FileAccess::writeBlockToFile(&vdiFile, rootInode->i_size, newDirBlock, rootDirectory->iNum);
         if(fetchFlag == -1) {
