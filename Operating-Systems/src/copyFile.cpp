@@ -234,7 +234,10 @@ ssize_t copyFile::copyFileToVDI(char* vdiName, char* src) {
 
         /* Copy the newFileDirent into the blocData */
         memcpy(&rootDirectory->blockData[cursorIndex + rootDirectory->dirent->recLen], newFileDirent, sizeof(newFileDirent));
-        FileAccess::writeBlockToFile(&vdiFile, cursorBlockNum, rootDirectory->blockData, rootDirectory->iNum);
+        fetchFlag = FileAccess::writeBlockToFile(&vdiFile, cursorBlockNum, rootDirectory->blockData, rootDirectory->iNum);
+        if(fetchFlag == -1) {
+            cout << "Writing directory block back failed." << endl;
+        }
 
     } else {
         uint8_t *newDirBlock = new uint8_t[vdiFile.getBlockSize()]{0};
